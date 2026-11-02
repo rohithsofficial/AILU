@@ -8,3 +8,11 @@ body { background: var(--cream); color: var(--black); font-family: var(--font-in
 h1, h2, h3 { font-family: var(--font-poppins), system-ui, sans-serif; }
 :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+/* Nav logo is revealed left to right once the intro hand has landed on it */
+.nav-logo-img { clip-path: inset(0 0 0 0); transition: clip-path 1.2s cubic-bezier(.65, 0, .35, 1); }
+html[data-logo="pending"] .nav-logo-img { clip-path: inset(0 100% 0 0); transition: none; }
+
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.marquee-track { animation: marquee 38s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }

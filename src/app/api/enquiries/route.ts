@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { dbConfigured, prisma } from "@/lib/db";
+import { dbConfigured, getPrisma } from "@/lib/db";
 import { enquirySchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
   const { website, email, eventDate, budget, services, details, ...rest } = parsed.data; void website;
   try {
-    const id = await prisma.$transaction(async (tx) => {
+    const id = await getPrisma().$transaction(async (tx) => {
       const row = await tx.eventEnquiry.create({
         data: { ...rest, id: `tmp-${crypto.randomUUID()}`, email: email || null, eventDate: eventDate || null, budget: budget || null, services: services || null, details: details || null },
       });

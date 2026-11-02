@@ -1,0 +1,123 @@
+"use client";
+
+import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
+import { Poppins, Inter } from "next/font/google";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+});
+const inter = Inter({ subsets: ["latin"], display: "swap" });
+
+// Set in .env.local, digits only with country code, e.g. 91XXXXXXXXXX
+const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+
+export default function ComingSoon() {
+  const reduce = useReducedMotion();
+
+  // One orchestrated moment: hand appears, then logo takes its place,
+  // then the words arrive. Everything else stays still.
+  const t = (delay: number, duration = 0.9) =>
+    reduce ? { duration: 0 } : { delay, duration, ease: [0.22, 1, 0.36, 1] as const };
+
+  return (
+    <main
+      className={`${inter.className} relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-[#111111] px-6 text-center text-[#FFFDF7]`}
+    >
+      {/* Warm glow behind the mark */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-[34%] h-[70vmin] w-[70vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{
+          background:
+            "radial-gradient(closest-side, rgba(245,196,0,0.28), rgba(245,196,0,0.06) 60%, transparent 100%)",
+        }}
+      />
+
+      {/* Mark: hand first, then the full logo in the same spot */}
+      <div className="relative z-10 h-40 w-64 sm:h-52 sm:w-80">
+        <motion.div
+          className="absolute inset-0"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: [0, 1, 1, 0], scale: [0.8, 1, 1, 1.08] }}
+          transition={
+            reduce
+              ? { duration: 0 }
+              : { duration: 2.4, times: [0, 0.3, 0.75, 1], ease: "easeInOut" }
+          }
+        >
+          <Image
+            src="/brand/ailu-hand.png"
+            alt=""
+            fill
+            priority
+            className="object-contain"
+            sizes="320px"
+          />
+        </motion.div>
+
+        <motion.div
+          className="absolute inset-0"
+          initial={{ opacity: reduce ? 1 : 0, scale: reduce ? 1 : 0.94 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={t(2.0, 1.1)}
+        >
+          <Image
+            src="/brand/ailu-logo.png"
+            alt="AILU"
+            fill
+            priority
+            className="object-contain"
+            sizes="320px"
+          />
+        </motion.div>
+      </div>
+
+      <motion.h1
+        className={`${poppins.className} relative z-10 mt-10 max-w-[18ch] text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-6xl`}
+        initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={t(2.9)}
+      >
+        Something to celebrate is on its way.
+      </motion.h1>
+
+      <motion.p
+        className="relative z-10 mt-5 max-w-[46ch] text-pretty text-base leading-relaxed text-[#FFFDF7]/75 sm:text-lg"
+        initial={{ opacity: 0, y: reduce ? 0 : 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={t(3.1)}
+      >
+        AILU is an event and celebration company in Udupi. Our new website is
+        being built. Planning something before we launch? Message us and we
+        will help.
+      </motion.p>
+
+      <motion.div
+        className="relative z-10 mt-9 flex flex-col items-center gap-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={t(3.3, 0.8)}
+      >
+        {WHATSAPP ? (
+          <a
+            href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+              "Hi AILU, I'd like to plan an event."
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${poppins.className} rounded-full bg-[#F5C400] px-8 py-3.5 text-base font-semibold text-[#111111] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F5C400]`}
+          >
+            Message us on WhatsApp
+          </a>
+        ) : null}
+
+        <p className={`${poppins.className} text-sm font-medium text-[#F5C400]`}>
+          Creating Moments. Delivering Smiles.
+        </p>
+      </motion.div>
+    </main>
+  );
+}
