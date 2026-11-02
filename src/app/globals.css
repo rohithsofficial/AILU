@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --yellow: #F5C400; --black: #111111; --cream: #FFFDF7; }
+html { scroll-behavior: smooth; }
+body { background: var(--cream); color: var(--black); font-family: var(--font-inter), system-ui, sans-serif; }
+h1, h2, h3 { font-family: var(--font-poppins), system-ui, sans-serif; }
+:focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }

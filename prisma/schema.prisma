@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum EnquiryStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  QUOTATION_PREPARED
+  AWAITING_CUSTOMER
+  PAYMENT_PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model EventEnquiry {
+  seq       Int           @unique @default(autoincrement())
+  id        String        @id // AILU-EVT-000001, set right after insert inside one transaction
+  name      String
+  phone     String
+  email     String?
+  category  String
+  eventDate String?
+  location  String
+  guests    Int?
+  budget    String?
+  services  String?
+  details   String?
+  status    EnquiryStatus @default(SUBMITTED)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([phone])
+  @@index([status, createdAt])
+}
