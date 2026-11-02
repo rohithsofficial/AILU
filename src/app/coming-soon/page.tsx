@@ -2,17 +2,11 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { Poppins, Inter } from "next/font/google";
+import { BRAND } from "@/lib/brand";
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  display: "swap",
-});
-const inter = Inter({ subsets: ["latin"], display: "swap" });
-
-// Set in .env.local, digits only with country code, e.g. 91XXXXXXXXXX
+// Optional, digits only with country code (91XXXXXXXXXX). Falls back to the number in lib/brand.ts.
 const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+const WHATSAPP_LINK = WHATSAPP ? `https://wa.me/${WHATSAPP}` : BRAND.whatsapp;
 
 export default function ComingSoon() {
   const reduce = useReducedMotion();
@@ -24,7 +18,7 @@ export default function ComingSoon() {
 
   return (
     <main
-      className={`${inter.className} relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-[#111111] px-6 text-center text-[#FFFDF7]`}
+      className={`font-body relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-[#111111] px-6 text-center text-[#FFFDF7]`}
     >
       {/* Warm glow behind the mark */}
       <div
@@ -76,7 +70,7 @@ export default function ComingSoon() {
       </div>
 
       <motion.h1
-        className={`${poppins.className} relative z-10 mt-10 max-w-[18ch] text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-6xl`}
+        className={`font-display relative z-10 mt-10 max-w-[18ch] text-balance text-4xl font-semibold leading-[1.1] tracking-tight sm:text-6xl`}
         initial={{ opacity: 0, y: reduce ? 0 : 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={t(2.9)}
@@ -101,20 +95,20 @@ export default function ComingSoon() {
         animate={{ opacity: 1 }}
         transition={t(3.3, 0.8)}
       >
-        {WHATSAPP ? (
+        {(
           <a
-            href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+            href={`${WHATSAPP_LINK}?text=${encodeURIComponent(
               "Hi AILU, I'd like to plan an event."
             )}`}
             target="_blank"
             rel="noopener noreferrer"
-            className={`${poppins.className} rounded-full bg-[#F5C400] px-8 py-3.5 text-base font-semibold text-[#111111] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F5C400]`}
+            className={`font-display rounded-full bg-[#F5C400] px-8 py-3.5 text-base font-semibold text-[#111111] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F5C400]`}
           >
             Message us on WhatsApp
           </a>
-        ) : null}
+        )}
 
-        <p className={`${poppins.className} text-sm font-medium text-[#F5C400]`}>
+        <p className={`font-display text-sm font-medium text-[#F5C400]`}>
           Creating Moments. Delivering Smiles.
         </p>
       </motion.div>
