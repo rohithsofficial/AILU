@@ -1,6 +1,7 @@
 import Link from "next/link";
 import PageHero from "@/components/PageHero";
-export const metadata = { title: "Join AILU" };
+import { metadataForPath } from "@/lib/public-metadata";
+export const metadata = metadataForPath("/join");
 
 export default function Join() {
   return (
@@ -16,8 +17,8 @@ export default function Join() {
         </section>
         <section className="rounded-2xl border border-black/10 bg-white p-6">
           <h2 className="text-2xl font-bold">Become an external sales partner</h2>
-          <p className="mt-2 text-black/75">Not joining the team, but know people planning an event? Introduce them to AILU. When a client you referred books an event with us, you receive a monetary reward.</p>
-          <p className="mt-3 text-sm text-black/60">The reward amount depends on the event and the partner terms AILU confirms with you. No earnings are guaranteed, and a reward applies only to a verified, completed booking.</p>
+          <p className="mt-2 text-black/85">Not joining the team, but know people planning an event? You can register as an external sales partner and introduce them to AILU.</p>
+          <p className="mt-3 text-sm text-black/80">A reward is considered only after a verified, completed, and paid booking under terms AILU confirms in writing. No earnings are guaranteed.</p>
           <Link href="/join/partner" className="mt-5 inline-block rounded-full bg-ailu-yellow px-6 py-3 font-semibold">Register as a partner</Link>
         </section>
       </div>

@@ -20,6 +20,7 @@ const setLogo = (v: "pending" | "ready") => { document.documentElement.dataset.l
 export default function Intro() {
   const router = useRouter();
   const handRef = useRef<HTMLDivElement>(null);
+  const skipRef = useRef<HTMLButtonElement>(null);
   const [phase, setPhase] = useState<"pending" | "playing" | "done">("pending");
   const [step, setStep] = useState(0);
   const [reduced, setReduced] = useState(false);
@@ -43,6 +44,10 @@ export default function Intro() {
   }, []);
 
   useEffect(() => { document.body.style.overflow = phase === "done" ? "" : "hidden"; return () => { document.body.style.overflow = ""; }; }, [phase]);
+  useEffect(() => {
+    if (phase === "playing") skipRef.current?.focus();
+    if (phase === "done") document.getElementById("main-content")?.focus();
+  }, [phase]);
 
   const finishNow = () => { sessionStorage.setItem(KEY, "1"); setLogo("ready"); setPhase("done"); };
 
@@ -68,14 +73,14 @@ export default function Intro() {
     router.push(intent === "events" ? "/events" : "/join");
   }
 
-  if (phase === "done") return null;
+  if (phase !== "playing") return null;
   const field = "mt-1 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-3 text-ailu-cream placeholder:text-white/40";
   return (
-    <div className={`fixed inset-0 z-50 ${flight ? "pointer-events-none" : ""}`} role="dialog" aria-label="Welcome to AILU">
+    <div id="ailu-intro" className={`fixed inset-0 z-50 ${flight ? "pointer-events-none" : ""}`} role="dialog" aria-modal="true" aria-label="Welcome to AILU">
       <motion.div className="absolute inset-0 bg-ailu-black" animate={{ opacity: flight ? 0 : 1 }} transition={{ duration: 1.1 }} />
-      {phase === "playing" && (
+      {(
         <motion.div className="relative flex h-full flex-col items-center overflow-y-auto px-4 py-8 text-ailu-cream" animate={{ opacity: flight ? 0 : 1 }} transition={{ duration: 0.35 }}>
-          <button onClick={startFlight} className="absolute right-4 top-4 z-10 rounded-full border border-white/30 px-4 py-2 text-sm">Skip intro</button>
+          <button ref={skipRef} onClick={startFlight} className="absolute right-4 top-4 z-10 min-h-11 rounded-full border border-white/50 px-4 py-2 text-sm">Skip intro</button>
           <div className="my-auto flex w-full max-w-lg flex-col items-center">
             <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: reduced ? 0 : 1.6, ease: "easeOut" }}>
               <div ref={handRef} className={`relative aspect-[4/3] transition-[width] duration-700 ${step >= 3 ? "w-36" : "w-[min(72vw,320px)]"}`}>

@@ -24,8 +24,8 @@ export default function Home() {
         <ul className="mt-10 grid gap-5 md:grid-cols-3">
           {[
             ["Events", "Celebrations across India's North and South traditions, planned around your people and your customs."],
-            ["Opportunities", "Join the team, or become an external sales partner and be rewarded when a client you introduce books with us."],
-            ["Dreams & giving", "Share a dream and we will try to help, privately and with dignity. A donation box will support people in need."],
+            ["Opportunities", "Apply to join the team or register as an external sales partner. Rewards are considered only under terms AILU confirms; earnings are not guaranteed."],
+            ["Private dreams", "Dream support is intended to be handled privately. The dream form and donation collection are not open on this website."],
           ].map(([t, d], i) => (
             <li key={t}><Reveal delay={i * 0.12} className="h-full"><div className="h-full rounded-3xl bg-ailu-black p-7 text-ailu-cream shadow-xl"><h3 className="text-2xl font-bold text-ailu-yellow">{t}</h3><p className="mt-3 text-ailu-cream/80">{d}</p></div></Reveal></li>
           ))}

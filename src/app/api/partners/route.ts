@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbConfigured, getPrisma } from "@/lib/db";
 import { normalizePhone, partnerSchema } from "@/lib/validation";
+import { checkPublicRateLimit, clientIpFrom, PUBLIC_RATE_LIMITS } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -16,6 +17,9 @@ export async function POST(req: Request) {
   const { website, consent, email, clientCategories, experience, referralSource, phone, ...rest } = parsed.data; void website; void consent;
   const phoneN = normalizePhone(phone);
   try {
+    if (!process.env.RATE_LIMIT_SALT) return NextResponse.json({ error: "Partner registration is temporarily unavailable. Please WhatsApp us." }, { status: 503 });
+    const limit = await checkPublicRateLimit({ ...PUBLIC_RATE_LIMITS.partnerIp, identifier: clientIpFrom(req.headers) });
+    if (!limit.allowed) return NextResponse.json({ error: "Too many registrations from this connection. Please try again later or WhatsApp us." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } });
     const db = getPrisma();
     if (await db.salesPartner.findUnique({ where: { phone: phoneN }, select: { seq: true } })) {
       return NextResponse.json({ error: "This number is already registered as a partner. Our team will be in touch." }, { status: 409 });

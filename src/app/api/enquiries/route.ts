@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbConfigured, getPrisma } from "@/lib/db";
 import { enquirySchema, normalizePhone } from "@/lib/validation";
+import { checkPublicRateLimit, clientIpFrom, PUBLIC_RATE_LIMITS } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -13,9 +14,14 @@ export async function POST(req: Request) {
 
   if (!dbConfigured()) return NextResponse.json({ error: "Enquiries are not switched on yet. Please call or WhatsApp us.", fields: undefined }, { status: 503 });
 
-  const { website, email, eventDate, budget, services, details, referralId, phone, ...rest } = parsed.data; void website;
+  const { website, email, eventDate, budget, services, details, referralId, consent, phone, ...rest } = parsed.data; void website; void consent;
   const phoneN = normalizePhone(phone);
   try {
+    if (!process.env.RATE_LIMIT_SALT) return NextResponse.json({ error: "Enquiries are temporarily unavailable. Please call or WhatsApp us." }, { status: 503 });
+    const ipLimit = await checkPublicRateLimit({ ...PUBLIC_RATE_LIMITS.enquiryIp, identifier: clientIpFrom(req.headers) });
+    if (!ipLimit.allowed) return NextResponse.json({ error: "Too many enquiries from this connection. Please try again later or contact AILU." }, { status: 429, headers: { "Retry-After": String(ipLimit.retryAfterSeconds) } });
+    const phoneLimit = await checkPublicRateLimit({ ...PUBLIC_RATE_LIMITS.enquiryPhone, identifier: phoneN });
+    if (!phoneLimit.allowed) return NextResponse.json({ error: "Too many enquiries from this number. Please try again later or contact AILU." }, { status: 429, headers: { "Retry-After": String(phoneLimit.retryAfterSeconds) } });
     const db = getPrisma();
 
     // A referral only counts for a real, active partner, and never when the partner refers themselves.

@@ -3,6 +3,7 @@ import { usePathname } from "next/navigation";
 import Footer from "./Footer";
 import Intro from "./Intro";
 import Navbar from "./Navbar";
+import FloatingWhatsApp from "./FloatingWhatsApp";
 
 // The coming-soon page and the staff admin are standalone screens: no intro overlay, navbar, footer or wrapping <main>.
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
@@ -12,7 +13,9 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
     <>
       <Intro />
       <Navbar />
-      <main>{children}</main>
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+      <main id="main-content" tabIndex={-1}>{children}</main>
+      <FloatingWhatsApp />
       <Footer />
     </>
   );

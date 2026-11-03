@@ -8,7 +8,7 @@ import { BRAND } from "@/lib/brand";
 import { canUse3D } from "@/lib/device";
 
 const HeroScene = dynamic(() => import("./HeroScene"), { ssr: false });
-const rise = (d: number) => ({ initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, delay: d, ease: [0.22, 1, 0.36, 1] as const } });
+const rise = (d: number) => ({ initial: false, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, delay: d, ease: [0.22, 1, 0.36, 1] as const } });
 
 export default function Hero() {
   const [use3D, setUse3D] = useState(false);

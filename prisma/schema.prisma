@@ -526,3 +526,16 @@ model Activity {
   @@index([eventId, at])
   @@index([enquiryId, at])
 }
+
+// Anonymous public-form abuse counters. The identifier is HMAC-hashed; raw IPs are never stored.
+model RateLimit {
+  id         String   @id @default(cuid())
+  keyHash    String
+  route      String
+  windowStart DateTime
+  count      Int      @default(0)
+  updatedAt  DateTime @updatedAt
+
+  @@unique([keyHash, route, windowStart])
+  @@index([windowStart])
+}
