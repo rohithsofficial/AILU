@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireRolePage, STAFF_ROLES, canWriteCRM, canEditEvent } from "@/lib/authz";
+import { requireRolePage, STAFF_ROLES, canWriteCRM, canEditEvent, can } from "@/lib/authz";
 import { getEvent, activityForEvent, tasksForEvent } from "@/server/events";
 import { listQuotations, CATEGORY_OPTIONS } from "@/server/quotations";
 import { listActiveStaff } from "@/server/inbox";
@@ -8,7 +8,9 @@ import { EVENT_STATUSES, EVENT_STATUS_LABELS, canTransitionEventStatus } from "@
 import { formatIN } from "@/lib/format";
 import { formatINR, toRupees } from "@/lib/money";
 import QuotationForm from "@/components/admin/QuotationForm";
+import { eventFinancials, listVendors, vendorBookingsForEvent } from "@/server/vendors";
 import { updateEventAction, setEventStatusAction, archiveEventAction, createQuotationAction, updateQuotationAction, setQuotationStatusAction, addTaskAction, toggleTaskAction } from "../actions";
+import { createVendorBookingAction, setVendorBookingStatusAction, createPaymentAction, createExpenseAction } from "../../vendors/actions";
 
 const box = "border border-white/10 bg-[#111114] p-6 rounded-2xl";
 const input = "mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-ailu-cream placeholder:text-ailu-cream/40";
@@ -19,17 +21,23 @@ const TABS = [
   { id: "quotations", label: "Quotations" },
   { id: "tasks", label: "Tasks" },
   { id: "activity", label: "Activity" },
+  { id: "vendors", label: "Vendors" },
+  { id: "finance", label: "Finance" },
 ] as const;
 
 export default async function EventDetail({ params }: { params: { id: string } }) {
   const staff = await requireRolePage(STAFF_ROLES);
+  const canReadFinance = can(staff.role, "finance.read");
   const event = await getEvent(params.id);
   if (!event) notFound();
   if (staff.role === "STAFF" && event.ownerId !== staff.id) notFound();
-  const [activity, tasks, quotations] = await Promise.all([
+  const [activity, tasks, quotations, finance, vendors, vendorBookings] = await Promise.all([
     activityForEvent(event.id),
     tasksForEvent(event.id),
     listQuotations(event.id),
+    canReadFinance ? eventFinancials(event.id) : Promise.resolve(null),
+    can(staff.role, "vendors.read") ? listVendors({ status: "ACTIVE" }) : Promise.resolve([]),
+    can(staff.role, "vendors.read") ? vendorBookingsForEvent(event.id) : Promise.resolve([]),
   ]);
   const staffList = await listActiveStaff();
   const canEdit = canWriteCRM(staff) && canEditEvent(staff, event);
@@ -46,7 +54,7 @@ export default async function EventDetail({ params }: { params: { id: string } }
 
       <div className="mt-4 border-b border-white/10">
         <nav className="flex flex-wrap gap-1" aria-label="Event sections">
-          {TABS.map((t) => (
+          {TABS.filter((tab) => tab.id !== "finance" || canReadFinance).map((t) => (
             <Link key={t.id} href={`#${t.id}`} className="rounded-t-lg px-4 py-2 text-sm font-medium border-b-2 border-transparent hover:bg-white/5 text-ailu-cream/70">{t.label}</Link>
           ))}
         </nav>
@@ -211,6 +219,26 @@ export default async function EventDetail({ params }: { params: { id: string } }
           )}
         </div>
       </div>
+
+      {/* Vendors */}
+      <section id="vendors" className="mt-6 scroll-mt-24 rounded-2xl border border-white/10 bg-[#111114] p-6">
+        <h2 className="font-display font-bold">Vendors ({vendorBookings.length})</h2>
+        {vendorBookings.length ? <ul className="mt-3 space-y-2">{vendorBookings.map((booking) => <li key={booking.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-white/10 p-3 text-sm"><Link href={`/admin/vendors/${booking.vendor.id}`} className="text-ailu-yellow hover:underline">{booking.vendor.name}</Link><span className="text-ailu-cream/60">{booking.service}</span>{finance?.bookings.find((item) => item.id === booking.id)?.agreedAmountPaise != null ? <span className="text-ailu-cream/60">{formatINR(finance.bookings.find((item) => item.id === booking.id)!.agreedAmountPaise!)}</span> : null}<span className="ml-auto text-xs">{booking.status}</span>{canEdit ? <form action={setVendorBookingStatusAction} className="flex gap-1"><input type="hidden" name="eventId" value={event.id}/><input type="hidden" name="bookingId" value={booking.id}/><select name="status" defaultValue={booking.status} className="rounded border border-white/20 bg-white/10 px-2 py-1 text-xs">{["ENQUIRED","QUOTED","CONFIRMED","DONE","CANCELLED"].map((s)=><option key={s} className="text-black">{s}</option>)}</select><button className="text-xs text-ailu-yellow underline">Save</button></form> : null}</li>)}</ul> : <p className="mt-2 text-sm text-ailu-cream/50">No vendors assigned yet.</p>}
+        {canEdit && vendors.length ? <form action={createVendorBookingAction} className="mt-4 grid gap-2 border-t border-white/10 pt-4 sm:grid-cols-2 lg:grid-cols-5"><input type="hidden" name="eventId" value={event.id}/><label className="lg:col-span-2">Vendor<select required name="vendorId" className="mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm"><option value="" className="text-black">Select vendor</option>{vendors.map((v)=><option key={v.id} value={v.id} className="text-black">{v.name} · {v.category}</option>)}</select></label><label>Service<input required name="service" maxLength={160} className={input}/></label><label>Agreed amount (₹)<input name="amount" inputMode="decimal" className={input}/></label><label>Status<select name="status" className={input}>{["ENQUIRED","QUOTED","CONFIRMED","DONE"].map((s)=><option key={s} className="text-black">{s}</option>)}</select></label><label className="sm:col-span-2 lg:col-span-4">Notes<input name="notes" maxLength={1000} className={input}/></label><button className="self-end rounded-lg border border-ailu-yellow/60 px-3 py-2 text-sm font-semibold text-ailu-yellow">Add vendor</button></form> : null}
+        {canEdit && !vendors.length ? <p className="mt-3 text-sm text-ailu-cream/50">Add an active vendor in the directory before assigning one to this event.</p> : null}
+      </section>
+
+      {/* Finance: OWNER/ACCOUNTS write; OWNER/MANAGER/ACCOUNTS read. */}
+      {finance ? <section id="finance" className="mt-6 scroll-mt-24 rounded-2xl border border-white/10 bg-[#111114] p-6">
+        <h2 className="font-display font-bold">Event finance</h2>
+        <p className="mt-1 text-xs text-ailu-cream/50">Revenue uses the latest accepted quotation. Vendor commitments and non-vendor expenses count once toward margin; outgoing payments track cash paid.</p>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{[["Accepted quote",finance.quotedPaise],["Received",finance.receivedPaise],["Client balance due",finance.balanceDuePaise],["Vendor commitments",finance.vendorCostPaise],["Vendor due",finance.vendorDuePaise],["Other expenses",finance.otherExpensePaise],["Estimated margin",finance.profitPaise]].map(([label,value])=><div key={label} className="rounded-xl border border-white/10 p-3"><dt className="text-xs text-ailu-cream/50">{label}</dt><dd className="mt-1 font-semibold">{formatINR(Number(value))}</dd></div>)}</dl>
+        {can(staff.role, "finance.write") ? <div className="mt-5 grid gap-4 border-t border-white/10 pt-4 lg:grid-cols-2">
+          <form action={createPaymentAction} className="grid gap-2 sm:grid-cols-2"><input type="hidden" name="eventId" value={event.id}/><h3 className="font-semibold sm:col-span-2">Record payment</h3><label>Direction<select name="direction" className={input}><option value="IN" className="text-black">Client payment received</option><option value="OUT" className="text-black">Vendor payment paid</option></select></label><label>Purpose<input required name="purpose" maxLength={80} placeholder="Advance, final, vendor balance…" className={input}/></label><label>Amount (₹)<input required name="amount" inputMode="decimal" className={input}/></label><label>Payment mode<select name="mode" className={input}>{["CASH","UPI","BANK_TRANSFER","CARD","CHEQUE","OTHER"].map((m)=><option key={m} className="text-black">{m}</option>)}</select></label><label>Date<input required type="date" name="paidOn" defaultValue={new Date().toISOString().slice(0,10)} className={input}/></label><label>Reference (UPI/cheque only)<input name="reference" maxLength={120} className={input}/></label><label>Vendor booking<select name="vendorBookingId" className={input}><option value="" className="text-black">Not linked</option>{finance.bookings.map((b)=><option key={b.id} value={b.id} className="text-black">{b.vendor.name} · {b.service}</option>)}</select></label><label>Note<input name="note" maxLength={500} className={input}/></label><button className="rounded-lg border border-ailu-yellow/60 px-3 py-2 text-sm font-semibold text-ailu-yellow sm:col-span-2">Save payment</button></form>
+          <form action={createExpenseAction} className="grid gap-2 sm:grid-cols-2"><input type="hidden" name="eventId" value={event.id}/><h3 className="font-semibold sm:col-span-2">Record event expense</h3><label>Category<input required name="category" maxLength={80} placeholder="Transport, meals, supplies…" className={input}/></label><label>Amount (₹)<input required name="amount" inputMode="decimal" className={input}/></label><label>Date<input required type="date" name="spentOn" defaultValue={new Date().toISOString().slice(0,10)} className={input}/></label><label>Vendor booking (optional)<select name="vendorBookingId" className={input}><option value="" className="text-black">Other expense</option>{finance.bookings.map((b)=><option key={b.id} value={b.id} className="text-black">{b.vendor.name} · {b.service}</option>)}</select></label><label className="sm:col-span-2">Note<input name="note" maxLength={500} className={input}/></label><button className="rounded-lg border border-ailu-yellow/60 px-3 py-2 text-sm font-semibold text-ailu-yellow sm:col-span-2">Save expense</button></form>
+        </div> : null}
+        <div className="mt-5 grid gap-4 lg:grid-cols-2"><div><h3 className="font-semibold">Payment history</h3><ul className="mt-2 space-y-2 text-sm">{finance.payments.length ? finance.payments.map((payment)=><li key={payment.id} className="rounded-lg border border-white/10 p-3"><div className="flex justify-between gap-3"><span>{payment.direction === "IN" ? "Received" : "Paid"} · {payment.purpose}</span><strong>{formatINR(payment.amountPaise)}</strong></div><div className="mt-1 text-xs text-ailu-cream/50">{formatIN(payment.paidOn)} · {payment.mode}{payment.vendorBooking?.vendor ? ` · ${payment.vendorBooking.vendor.name}` : ""}{payment.reference ? ` · ref ${payment.reference}` : ""}</div></li>) : <li className="text-ailu-cream/50">No payments recorded.</li>}</ul></div><div><h3 className="font-semibold">Expense history</h3><ul className="mt-2 space-y-2 text-sm">{finance.expenses.length ? finance.expenses.map((expense)=><li key={expense.id} className="rounded-lg border border-white/10 p-3"><div className="flex justify-between gap-3"><span>{expense.category}{expense.vendorBooking?.vendor ? ` · ${expense.vendorBooking.vendor.name}` : ""}</span><strong>{formatINR(expense.amountPaise)}</strong></div><div className="mt-1 text-xs text-ailu-cream/50">{formatIN(expense.spentOn)}{expense.note ? ` · ${expense.note}` : ""}</div></li>) : <li className="text-ailu-cream/50">No expenses recorded.</li>}</ul></div></div>
+      </section> : null}
     </div>
   );
 }

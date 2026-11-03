@@ -23,4 +23,13 @@ describe("staff permissions", () => {
     expect(canEditAssignedRecord("MANAGER", "manager-1", "staff-2")).toBe(true);
     expect(canEditAssignedRecord("ACCOUNTS", "accounts-1", "accounts-1")).toBe(false);
   });
+
+  it("restricts finance writes to the owner and accounts roles", () => {
+    expect(can("OWNER", "finance.write")).toBe(true);
+    expect(can("ACCOUNTS", "finance.write")).toBe(true);
+    expect(can("MANAGER", "finance.read")).toBe(true);
+    expect(can("MANAGER", "finance.write")).toBe(false);
+    expect(can("STAFF", "finance.read")).toBe(false);
+    expect(can("STAFF", "vendors.read")).toBe(true);
+  });
 });

@@ -90,13 +90,15 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 8. **Join forms + referrals:** `/join/team` (applications, IDs `AILU-APP-000001`) and `/join/partner` (registration, IDs `AILU-SP-000001`, status starts `PENDING`); optional partner ID on the event enquiry form, recorded as `referredBySpId` (ignored if the partner is rejected/suspended or the phone matches the partner's own).
 9. **CRM foundation (A0):** Google OAuth allowlist with first-owner bootstrap only while `StaffUser` is empty, active staff and current roles rechecked from the database, owner-only staff management and paginated audit log, responsive standalone admin shell.
 10. **CRM core (A1):** inbox filters and enquiry conversion in a transaction; assigned clients with contacts, tasks and activity history; event pipeline, transition rules, quotations with server-computed integer-paise totals and one accepted version per event; task views and role checks. A1 records are private to staff.
+11. **CRM vendors and finance (A2, in progress):** vendor directory, event vendor bookings, integer-paise client/vendor payments and expenses, role-restricted event finance summary. No bank account details are collected; UPI IDs are owner/accounts-only.
 
-### Delivery status: **A0 and A1 implemented on `feat/crm-a0-a1`**
-- Prisma CLI/client 7.10.1; schema has no datasource URL. Seven additive migrations are applied to the connected Neon database; never reset it.
-- `npx prisma validate`, `npx prisma generate`, `npx prisma migrate status`, `npx tsc --noEmit`, and the Vitest suite passed during this delivery.
+### Delivery status: **A0/A1 committed; A2 implementation and migration applied on `feat/crm-a0-a1`**
+- Prisma CLI/client 7.10.1; schema has no datasource URL. Eight additive migrations are applied to the connected Neon database; never reset it.
+- `npx prisma validate`, `npx prisma generate`, elevated `npx prisma migrate status`, `npx tsc --noEmit`, and the Vitest suite passed during this delivery.
 - Google OAuth sign-in could not be manually exercised without using the configured OAuth account. The code path is ready when the deployment has `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, and `ADMIN_BOOTSTRAP_EMAIL` configured.
 - Production build is blocked in the restricted environment because `next/font` cannot reach Google Fonts. Do not replace the brand fonts to bypass this; rerun the build where font access is available.
-- No A2 work has started.
+- A2 schema, server services and admin pages are implemented. Its additive migration has been applied after confirming the seven prior migrations; elevated `migrate status` confirmed all eight are up to date. Still needs authenticated runtime walkthrough when OAuth is configured.
+- A2 default decisions: free-text vendor categories, no bank account storage, optional UPI ID visible to OWNER/ACCOUNTS only; payment and expense entries are recorded in integer paise. No commission/reward calculations are included. Finance summary tests cover integer totals, linked vendor expenses and balances.
 
 ---
 
@@ -148,16 +150,16 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 
 ## 9. What to do next (in order)
 
-1. **Review A0/A1 delivery:** verify the Google OAuth deployment values and manually walk the sign-in and CRM flows. The current code and migrations are in this branch; keep the public site working.
-2. **Stop before A2:** do not start vendors, payments, commissions, team CRM, CMS, or reports until Rani reviews and approves the next phase and any required business decisions.
-3. **Customer accounts:** phone number + OTP login (decision pending: Firebase Auth only for OTP and verify its token on the server, or Auth.js/Better Auth with an Indian SMS provider such as MSG91). Backend-generated user ID `AILU-USER-000001`. "My AILU" dashboard: my enquiries and status, my applications, my partner ID and referrals.
-4. **Referral tracking:** show partners their leads and statuses; admin marks a referral qualified only after a verified, completed and paid booking; admin-configurable reward policy (fixed / percentage), approve → paid; no amounts shown until AILU defines the policy.
-5. **Private dream submission** (`/dreams`): form + table with consent, guardian consent for under-18s, moderation status, no public display ever, no sensitive data collected.
-6. **Donation Box:** only after the legal and payment setup exists. Then Razorpay with transparent copy on who receives funds and how they are reported.
-7. **Policy pages:** privacy policy, terms, referral policy (rewards policy only if points are introduced).
-8. **Real content:** event photos and short demo videos of how AILU runs events (placeholders only today), confirmed list of North/South Indian traditions AILU can really deliver, real About text.
-9. **Hardening:** rate limiting on public forms, security headers, SEO and Open Graph, accessibility pass, production env on Vercel (`COMING_SOON`, `PREVIEW_SECRET`, Neon URLs), launch by setting `COMING_SOON=false`.
-10. **Later:** loyalty points (needs a business decision first), "Meet AILU" character and chat (predefined answers first, AI later), WhatsApp/email notifications, payments for bookings.
+1. **Runtime verify A2:** with authenticated OWNER, MANAGER, STAFF and ACCOUNTS accounts, walk vendor CRUD/notes, assigned event vendor bookings, finance reads/writes, event balances, vendor dues and expense totals. Build still needs network access for Google Fonts.
+2. **Review A0/A1/A2 delivery:** verify Google OAuth deployment values and manually walk the sign-in, CRM, vendor and finance flows; keep the public site working.
+3. **A3 team and partners:** applications to team conversion, assignments, partner approval and commission workflows. Do not invent commission values or rules; confirm the business policy first.
+4. **Customer accounts:** phone number + OTP login (decision pending: Firebase Auth only for OTP and verify its token on the server, or Auth.js/Better Auth with an Indian SMS provider such as MSG91). Backend-generated user ID `AILU-USER-000001`. "My AILU" dashboard: my enquiries and status, my applications, my partner ID and referrals.
+5. **Referral tracking:** show partners their leads and statuses; qualify referrals only after a verified, completed and paid booking; no amounts until AILU defines the reward policy.
+6. **Private dream submission** (`/dreams`): consent and guardian consent for under-18s, moderation status, no public display ever, no sensitive data collected.
+7. **Donation Box:** only after the legal and payment setup exists.
+8. **Policy pages and real content:** privacy, terms, referral policy; real event photos/videos and confirmed traditions.
+9. **Hardening:** rate limiting, security headers, SEO/Open Graph, accessibility, production env and launch decision.
+10. **Later:** CMS (A5), reports (A6), loyalty points only after a business decision, "Meet AILU" character and chat, WhatsApp/email notifications, customer payments.
 
 ## 10. Open decisions (ask Rani, do not guess)
 

@@ -7,13 +7,15 @@ export type StaffAction =
   | "events.read" | "events.write" | "events.archive"
   | "tasks.read" | "tasks.write"
   | "quotations.read" | "quotations.write"
-  | "team.read" | "staff.manage" | "audit.read";
+  | "team.read" | "staff.manage" | "audit.read"
+  | "vendors.read" | "vendors.write" | "vendors.note"
+  | "finance.read" | "finance.write";
 
 const PERMISSIONS: Record<StaffRole, readonly StaffAction[]> = {
-  OWNER: ["dashboard.view", "inbox.read", "inbox.write", "clients.read", "clients.write", "clients.archive", "events.read", "events.write", "events.archive", "tasks.read", "tasks.write", "quotations.read", "quotations.write", "team.read", "staff.manage", "audit.read"],
-  MANAGER: ["dashboard.view", "inbox.read", "inbox.write", "clients.read", "clients.write", "events.read", "events.write", "tasks.read", "tasks.write", "quotations.read", "quotations.write", "team.read"],
-  STAFF: ["dashboard.view", "inbox.read", "inbox.write", "clients.read", "clients.write", "events.read", "events.write", "tasks.read", "tasks.write", "quotations.read", "quotations.write", "team.read"],
-  ACCOUNTS: ["dashboard.view", "clients.read", "events.read", "tasks.read", "quotations.read"],
+  OWNER: ["dashboard.view", "inbox.read", "inbox.write", "clients.read", "clients.write", "clients.archive", "events.read", "events.write", "events.archive", "tasks.read", "tasks.write", "quotations.read", "quotations.write", "team.read", "staff.manage", "audit.read", "vendors.read", "vendors.write", "vendors.note", "finance.read", "finance.write"],
+  MANAGER: ["dashboard.view", "inbox.read", "inbox.write", "clients.read", "clients.write", "events.read", "events.write", "tasks.read", "tasks.write", "quotations.read", "quotations.write", "team.read", "vendors.read", "vendors.write", "vendors.note", "finance.read"],
+  STAFF: ["dashboard.view", "inbox.read", "inbox.write", "clients.read", "clients.write", "events.read", "events.write", "tasks.read", "tasks.write", "quotations.read", "quotations.write", "team.read", "vendors.read", "vendors.note"],
+  ACCOUNTS: ["dashboard.view", "clients.read", "events.read", "tasks.read", "quotations.read", "vendors.read", "finance.read", "finance.write"],
 };
 
 export function can(role: StaffRole, action: StaffAction): boolean {

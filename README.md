@@ -1,6 +1,6 @@
 # AILU
 
-AILU is an event management and celebration company in Udupi, Karnataka. This repository contains the public website and the staff-only CRM foundation.
+AILU is an event management and celebration company in Udupi, Karnataka. This repository contains the public website and a staff-only CRM. Phase A2 adds the vendor directory and event finance tracking.
 
 ## Stack
 
@@ -31,10 +31,12 @@ The admin remains accessible while `COMING_SOON=true`; it is protected by staff 
 ## Main routes
 
 - Public site: `/`, `/events`, `/join`, `/dreams`, `/donate`.
-- Staff CRM: `/admin`, `/admin/inbox`, `/admin/clients`, `/admin/events`, `/admin/tasks`.
+- Staff CRM: `/admin`, `/admin/inbox`, `/admin/clients`, `/admin/events`, `/admin/tasks`, `/admin/vendors`.
 - Owner settings: `/admin/settings/staff`, `/admin/settings/audit`.
 
 Enquiries are not confirmed bookings. Staff must verify availability, scope, terms, and payment before confirming an event. Donations remain information-only until the required legal and payment setup exists. Dreams remain private.
+
+Vendor categories are free text. Vendor UPI IDs are optional and visible only to OWNER and ACCOUNTS; bank account details are not stored. Event finance records use integer paise. OWNER and ACCOUNTS can record payments and expenses; MANAGER can read event finance; assigned STAFF can manage vendor bookings without access to finance totals. Margin uses the latest accepted quotation less vendor commitments (or higher linked actual expenses) and non-vendor expenses, while client and vendor balances use recorded payments. These are operational estimates, not accounting statements.
 
 ## Checks
 
@@ -44,4 +46,4 @@ Enquiries are not confirmed bookings. Staff must verify availability, scope, ter
 - `npx prisma validate`
 - `npx prisma migrate status`
 
-Vitest covers permissions, money calculations, phone normalization, enquiry conversion mapping, and event status transitions.
+Vitest covers permissions, quotation and event-finance calculations, phone normalization, enquiry conversion mapping, and event status transitions.

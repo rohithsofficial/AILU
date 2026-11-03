@@ -39,8 +39,8 @@ model EventEnquiry {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  client  Client?  @relation("ClientEventEnquiries", fields: [clientId], references: [id])
-  event   Event?   @relation("EventEnquiryEvent")
+  client     Client?    @relation("ClientEventEnquiries", fields: [clientId], references: [id])
+  event      Event?     @relation("EventEnquiryEvent")
   activities Activity[] @relation("EnquiryActivity")
 
   @@index([phone])
@@ -186,9 +186,9 @@ model Client {
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 
-  contacts   ClientContact[]
-  events     Event[]
-  enquiries  EventEnquiry[] @relation("ClientEventEnquiries")
+  contacts  ClientContact[]
+  events    Event[]
+  enquiries EventEnquiry[]  @relation("ClientEventEnquiries")
 
   @@index([name])
   @@index([city])
@@ -197,9 +197,9 @@ model Client {
 
 // Extra people at a company / community client
 model ClientContact {
-  id       String @id @default(cuid())
+  id       String  @id @default(cuid())
   clientId String
-  client   Client @relation(fields: [clientId], references: [id])
+  client   Client  @relation(fields: [clientId], references: [id])
   name     String
   role     String?
   phone    String?
@@ -244,11 +244,126 @@ model Event {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  quotations  Quotation[]
-  enquiry     EventEnquiry? @relation("EventEnquiryEvent", fields: [enquiryId], references: [id])
+  quotations     Quotation[]
+  enquiry        EventEnquiry?   @relation("EventEnquiryEvent", fields: [enquiryId], references: [id])
+  vendorBookings VendorBooking[]
+  payments       Payment[]
+  expenses       Expense[]
 
   @@index([status, startDate])
   @@index([clientId])
+}
+
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  DO_NOT_USE
+}
+
+enum VendorBookingStatus {
+  ENQUIRED
+  QUOTED
+  CONFIRMED
+  DONE
+  CANCELLED
+}
+
+enum PaymentDirection {
+  IN
+  OUT
+}
+
+enum PaymentMode {
+  CASH
+  UPI
+  BANK_TRANSFER
+  CARD
+  CHEQUE
+  OTHER
+}
+
+// Vendor directory; financial account numbers are deliberately not stored.
+model Vendor {
+  seq           Int             @unique @default(autoincrement())
+  id            String          @id // AILU-VEN-000001
+  name          String
+  category      String
+  contactPerson String?
+  phone         String
+  altPhone      String?
+  email         String?
+  city          String?
+  address       String?
+  gstin         String?
+  rateNotes     String?
+  rating        Int?
+  status        VendorStatus    @default(ACTIVE)
+  tags          String[]
+  notes         String?
+  upiId         String?
+  archivedAt    DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  bookings      VendorBooking[]
+
+  @@index([name])
+  @@index([category, status])
+  @@index([city])
+}
+
+model VendorBooking {
+  id                String              @id @default(cuid())
+  eventId           String
+  event             Event               @relation(fields: [eventId], references: [id])
+  vendorId          String
+  vendor            Vendor              @relation(fields: [vendorId], references: [id])
+  service           String
+  agreedAmountPaise Int?
+  status            VendorBookingStatus @default(ENQUIRED)
+  notes             String?
+  payments          Payment[]
+  expenses          Expense[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([eventId, status])
+  @@index([vendorId])
+}
+
+model Payment {
+  id              String           @id @default(cuid())
+  direction       PaymentDirection
+  purpose         String
+  eventId         String?
+  event           Event?           @relation(fields: [eventId], references: [id])
+  vendorBookingId String?
+  vendorBooking   VendorBooking?   @relation(fields: [vendorBookingId], references: [id])
+  amountPaise     Int
+  mode            PaymentMode
+  reference       String?
+  paidOn          DateTime
+  recordedById    String?
+  note            String?
+  createdAt       DateTime         @default(now())
+
+  @@index([eventId, direction, paidOn])
+  @@index([vendorBookingId])
+}
+
+model Expense {
+  id              String         @id @default(cuid())
+  eventId         String
+  event           Event          @relation(fields: [eventId], references: [id])
+  vendorBookingId String?
+  vendorBooking   VendorBooking? @relation(fields: [vendorBookingId], references: [id])
+  category        String
+  amountPaise     Int
+  spentOn         DateTime
+  note            String?
+  recordedById    String?
+  createdAt       DateTime       @default(now())
+
+  @@index([eventId, spentOn])
 }
 
 enum QuotationStatus {
@@ -305,18 +420,18 @@ model Task {
 
 // Timeline: calls, WhatsApp, meetings, notes, status changes
 model Activity {
-  id       String   @id @default(cuid())
-  kind     String // CALL WHATSAPP MEETING NOTE STATUS
-  body     String
-  byId     String? // StaffUser
-  clientId String?
-  eventId  String?
+  id        String        @id @default(cuid())
+  kind      String // CALL WHATSAPP MEETING NOTE STATUS
+  body      String
+  byId      String? // StaffUser
+  clientId  String?
+  eventId   String?
   enquiryId String?
-  vendorId String?
-  at       DateTime @default(now())
+  vendorId  String?
+  at        DateTime      @default(now())
+  enquiry   EventEnquiry? @relation("EnquiryActivity", fields: [enquiryId], references: [id], onDelete: SetNull)
 
   @@index([clientId, at])
   @@index([eventId, at])
   @@index([enquiryId, at])
-  enquiry EventEnquiry? @relation("EnquiryActivity", fields: [enquiryId], references: [id], onDelete: SetNull)
 }
