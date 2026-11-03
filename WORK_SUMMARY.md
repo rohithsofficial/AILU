@@ -60,6 +60,7 @@ The inbox passed enquiry status values such as `SUBMITTED` to the date formatter
 - Before applying it, inspected the existing schema and migrations and confirmed the previous seven migrations were applied.
 - Applied the additive migration with `prisma migrate deploy`; no reset or data drop was performed.
 - A subsequent elevated `prisma migrate status` confirmed all eight migrations are up to date.
+- A3 migration `20261103101734_a3_team_partners_commissions` adds team members, event assignments, assignment payment links, and versioned commissions. It was applied after confirming the prior eight migrations; status confirmed all nine are up to date.
 
 ## Verification
 
@@ -83,6 +84,11 @@ Could not complete:
 - `8625c1c` — `fix(admin): render enquiry statuses as labels`
 - `668f984` — `docs: add AILU main theme brief`
 - `29c2d0a` — `feat(crm): add vendor and event finance workflows`
+- `62dfec6` — `feat(crm): add A3 team partner and commission workflows`
+
+## A3 PR summary
+
+Add applications review and conversion to team members, event team assignments and fee tracking, partner management and referral history, and manual commissions with server-side eligibility checks, owner approval, and restricted payment recording. Include team fees and approved commissions in event finance, enforce role-based visibility, and document the workflows. Commission amounts and basis are entered by staff; no reward formula is assumed.
 
 ## Remaining work
 
