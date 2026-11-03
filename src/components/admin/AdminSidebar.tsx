@@ -5,10 +5,13 @@ import type { StaffRole } from "@prisma/client";
 
 const ITEMS: { href: string; label: string; ownerOnly?: boolean; roles?: StaffRole[] }[] = [
   { href: "/admin", label: "Dashboard" },
+  { href: "/admin/attention", label: "Needs attention" },
+  { href: "/admin/calendar", label: "Calendar" },
   { href: "/admin/inbox", label: "Inbox", roles: ["OWNER", "MANAGER", "STAFF"] },
   { href: "/admin/clients", label: "Clients" },
   { href: "/admin/events", label: "Events" },
   { href: "/admin/tasks", label: "Tasks" },
+  { href: "/admin/finance", label: "Finance", roles: ["OWNER", "MANAGER", "ACCOUNTS"] },
   { href: "/admin/vendors", label: "Vendors" },
   { href: "/admin/applications", label: "Applications", roles: ["OWNER", "MANAGER", "STAFF"] },
   { href: "/admin/team", label: "Team" },

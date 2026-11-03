@@ -8,7 +8,12 @@ export async function listTasks(actor: { id: string; role: StaffRole }, view: st
   const db = getPrisma();
   const now = new Date();
   const scope = actor.role === "STAFF" ? { assigneeId: actor.id } : {};
-  const where = view === "overdue"
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now).map((part) => [part.type, part.value]));
+  const tomorrow = new Date(`${parts.year}-${parts.month}-${parts.day}T00:00:00.000Z`);
+  tomorrow.setTime(tomorrow.getTime() + 24 * 60 * 60 * 1000);
+  const where = view === "due"
+    ? { ...scope, doneAt: null, dueAt: { lt: tomorrow } }
+    : view === "overdue"
     ? { ...scope, doneAt: null, dueAt: { lt: now } }
     : view === "my"
       ? { assigneeId: actor.id, doneAt: null }

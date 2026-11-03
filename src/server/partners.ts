@@ -167,14 +167,3 @@ export async function listCommissions(params: { status?: string; partnerId?: str
   ]);
   return { rows, total, page, pages: Math.max(1, Math.ceil(total / pageSize)), totals };
 }
-
-export async function dashboardA3Counts() {
-  const db = getPrisma();
-  const [applications, partners, commissionsPending, commissionsPayable] = await Promise.all([
-    db.application.count({ where: { status: "SUBMITTED" } }),
-    db.salesPartner.count({ where: { status: "PENDING" } }),
-    db.commission.count({ where: { status: "PENDING_APPROVAL" } }),
-    db.commission.count({ where: { status: "APPROVED" } }),
-  ]);
-  return { applications, partners, commissionsPending, commissionsPayable };
-}

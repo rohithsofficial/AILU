@@ -3,12 +3,13 @@ import { getPrisma } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { logActivity } from "@/server/activity";
 
-export async function listEnquiries(params: { q?: string; status?: string; spam?: string; conversion?: string; staffId?: string; page?: number }) {
+export async function listEnquiries(params: { q?: string; status?: string; spam?: string; conversion?: string; owner?: string; staffId?: string; page?: number }) {
   const db = getPrisma();
   const where: Prisma.EventEnquiryWhereInput = {};
   if (params.spam === "only") where.spam = true;
   else if (params.spam !== "all") where.spam = false; // default: hide spam
   if (params.staffId) where.AND = [{ OR: [{ ownerId: params.staffId }, { ownerId: null }] }];
+  if (params.owner === "unassigned") where.ownerId = null;
   if (params.conversion === "unconverted") where.eventId = null;
   else if (params.conversion === "converted") where.eventId = { not: null };
   if (params.status) where.status = params.status as Prisma.EnumEnquiryStatusFilter;

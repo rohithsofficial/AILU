@@ -11,7 +11,7 @@ const input = "mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py
 
 export default async function TasksPage({ searchParams }: { searchParams: { view?: string; msg?: string } }) {
   const staff = await requireRolePage(STAFF_ROLES);
-  const view = ["all", "my", "overdue"].includes(searchParams.view ?? "") ? searchParams.view! : "all";
+  const view = ["all", "my", "overdue", "due"].includes(searchParams.view ?? "") ? searchParams.view! : "all";
   const [tasks, people] = await Promise.all([listTasks(staff, view), listActiveStaff()]);
   const canEdit = staff.role !== "ACCOUNTS";
 
@@ -20,7 +20,7 @@ export default async function TasksPage({ searchParams }: { searchParams: { view
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div><h1 className="font-display text-2xl font-bold">Tasks</h1><p className="mt-1 text-sm text-ailu-cream/60">Follow-ups across enquiries, clients and events.</p></div>
         <nav aria-label="Task views" className="flex gap-2 text-sm">
-          {["my", "overdue", "all"].map((key) => <Link key={key} href={`/admin/tasks?view=${key}`} aria-current={view === key ? "page" : undefined} className={`rounded-full border px-3 py-1.5 ${view === key ? "border-ailu-yellow text-ailu-yellow" : "border-white/15 text-ailu-cream/70"}`}>{key === "my" ? "My tasks" : key === "overdue" ? "Overdue" : "All"}</Link>)}
+          {["my", "due", "overdue", "all"].map((key) => <Link key={key} href={`/admin/tasks?view=${key}`} aria-current={view === key ? "page" : undefined} className={`rounded-full border px-3 py-1.5 ${view === key ? "border-ailu-yellow text-ailu-yellow" : "border-white/15 text-ailu-cream/70"}`}>{key === "my" ? "My tasks" : key === "due" ? "Due today / overdue" : key === "overdue" ? "Overdue" : "All"}</Link>)}
         </nav>
       </div>
       {searchParams.msg ? <p className="mt-4 rounded-lg bg-ailu-yellow/10 px-4 py-2 text-sm text-ailu-yellow">{searchParams.msg}</p> : null}
