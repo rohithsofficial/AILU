@@ -2,8 +2,9 @@ import Link from "next/link";
 import { EVENT_CATEGORIES } from "@/lib/events";
 import EnquiryForm from "@/components/EnquiryForm";
 import PageHero from "@/components/PageHero";
+import { metadataForPath } from "@/lib/public-metadata";
 
-export const metadata = { title: "Events | AILU" };
+export const metadata = metadataForPath("/events");
 
 export default function EventsPage() {
   return (
@@ -15,7 +16,7 @@ export default function EventsPage() {
             <li key={c.slug} className="group rounded-3xl border border-black/10 bg-white p-7 transition duration-300 hover:-translate-y-1 hover:border-ailu-yellow hover:shadow-xl">
               <h2 className="text-xl font-bold">{c.title}</h2>
               <p className="mt-2 text-black/70">{c.blurb}</p>
-              <Link href={`/events/${c.slug}`} className="mt-4 inline-block font-semibold underline decoration-ailu-yellow decoration-2">See details</Link>
+              <Link href={`/events/${c.slug}`} className="mt-4 inline-flex min-h-11 items-center font-semibold underline decoration-ailu-yellow decoration-2">See details</Link>
             </li>
           ))}
         </ul>
