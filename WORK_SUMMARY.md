@@ -6,7 +6,7 @@ Branch: `feat/crm-a4`
 
 ## Overview
 
-This branch contains the staff CRM foundation and event workflows (A0/A1), vendor and event finance (A2), team, partner, and commission management (A3), role-aware dashboard, calendar and search (A4), and the AILU main theme brief. Work keeps the public website, existing AILU brand palette, Neon + Prisma 7 architecture, and the privacy and business rules in `AGENTS.md`.
+This branch contains the public website launch-readiness work on top of the staff CRM foundation and event workflows (A0/A1), vendor and event finance (A2), team, partner, and commission management (A3), role-aware dashboard, calendar and search (A4), and AILU main theme brief. Work keeps the AILU brand palette, Neon + Prisma 7 architecture, and the privacy and business rules in `AGENTS.md`.
 
 ## A0 — Staff admin foundation
 
@@ -65,31 +65,51 @@ The inbox passed enquiry status values such as `SUBMITTED` to the date formatter
 - Updated inbox owner filtering and task due view so dashboard links open the corresponding filtered lists.
 - No database migration, schema change, new dependency, or environment variable was added.
 
+## Public website launch-readiness pass
+
+- Added typed `src/content/site.ts` for site content, factual FAQs/process descriptions, optional social/person content, and empty category galleries. Added gallery asset requirements in `public/gallery/README.md`.
+- Added `/about`, `/contact`, `/faq`, `/privacy`, `/terms`, and `/referral-policy`, refreshed Dreams and Donation Box messaging, and set `/my-ailu` to noindex. The Donation Box and dream form remain closed.
+- Reworked the public navigation/footer, active links and Escape behavior in the mobile menu, skip-to-content link, and a floating WhatsApp link that hides while forms/footer are visible, during the intro, and on coming-soon/admin screens.
+- Added public page metadata, canonical/Open Graph/Twitter values, a network-independent generated Open Graph image, Organization/FAQ/Breadcrumb JSON-LD, robots and sitemap routes, not-found/error/loading UI, and the sitemap/robots coming-soon behavior.
+- Improved event-category pages with process/checklist/related categories, optional empty gallery support, metadata, breadcrumbs, and category-prefilled enquiry. Enquiry supports `?category=` and format-validated `?ref=` prefills, required contact consent, past-date rejection, associated inline errors, focusable feedback, and a WhatsApp follow-up link.
+- Application/partner consent messaging now links to privacy and errors are connected for assistive technology. Server validation remains authoritative.
+- Added salted HMAC rate limits without storing raw IPs: 5 event enquiries/hour/IP and 3/hour/phone; 3 applications/day/IP; 3 partner registrations/day/IP. Existing honeypots and duplicate checks remain. Set `RATE_LIMIT_SALT` before enabling forms.
+- Added and applied `20261103111506_website_rate_limit`; current Neon status reports 10 migrations applied. This is additive; no data was reset or removed.
+- Added ESLint 8, `eslint-config-next`, and `eslint-plugin-jsx-a11y`; the lint script covers public app/components/content/lib while excluding admin pages and components, which are outside this pass.
+- Read-only `npm audit --omit=dev` reports 9 production advisories (6 moderate, 2 high, 1 critical), including Next.js, PostCSS, and Zod. The automatic fix crosses major versions; this remains a separate launch blocker requiring compatibility review and full CRM regression.
+- Removed three unused brand assets after confirming there were no code references: `Glossy Golden Shaka Hand Icon.png`, `ailu-transparent-logo.png`, and `ailu-hand.svg`.
+- Updated README and AGENTS and added `LAUNCH_CHECKLIST.md`.
+
+Copy changes: removed the unsupported “founder-led” and “selected bookings across South India” wording; replaced it with “Based in Udupi, Karnataka. Planning celebrations across India.” Reworded partner copy so registration does not promise a reward or earnings and consideration depends on a verified, completed, paid booking and written terms. Clarified that dreams are private and the form is not open; donations are not collected. Removed public suggestions that dream support/donation collection is available now.
+
+Open points before launch: lawyer review of legal drafts; data retention and consent-evidence retention decisions; response expectations; referral amount/basis and event eligibility in writing; approved founder/About story; confirmed event traditions/services; social links; real photos and permissions. No retention or response-time promise was invented.
+
 ## Database
 
 - Added migration `20261103100000_add_vendors_and_event_finance` with vendor, vendor booking, payment, and expense tables plus indexes and relations.
 - Before applying it, inspected the existing schema and migrations and confirmed the previous seven migrations were applied.
 - Applied the additive migration with `prisma migrate deploy`; no reset or data drop was performed.
-- A subsequent elevated `prisma migrate status` confirmed all eight migrations are up to date.
+- A subsequent elevated `prisma migrate status` confirmed all eight migrations were up to date at the A2 stage.
 - A3 migration `20261103101734_a3_team_partners_commissions` adds team members, event assignments, assignment payment links, and versioned commissions. It was applied after confirming the prior eight migrations; status confirmed all nine are up to date.
-- A4 has no schema change; database remains at the same nine applied migrations.
+- A4 has no schema change. The public launch pass adds and applies `20261103111506_website_rate_limit`; the connected database now has ten applied migrations.
 
 ## Verification
 
 Passed:
 
 - `npm run typecheck`
-- `npm run test` — 41 tests across 10 files
+- `npm run lint` — passes for public app/components/content/lib; admin routes and components intentionally excluded
+- `npm run test` — 56 tests across 15 files
 - `npx prisma validate`
 - `npx prisma generate`
 - `prisma migrate status` — successful with elevated network access after migration; all nine migrations are applied
 - `git diff --check`
-- `npm run lint` is not configured in `package.json`.
 
 Could not complete:
 
-- `npm run build` fails at `next/font` because the environment cannot connect to Google Fonts to fetch Inter and Poppins. The build needs to be rerun in an environment with font access.
+- `npm run build` fails at `next/font` because the environment cannot connect to Google Fonts to fetch Inter and Poppins. The build needs to be rerun in an environment with font access; no First Load JS report is available until it succeeds.
 - Google OAuth and the full authenticated UI workflow have not been manually exercised. Walk through the workflows with OWNER, MANAGER, STAFF, and ACCOUNTS accounts when OAuth is configured.
+- Real browser checks for 360 px overflow, no-JavaScript rendering, mobile animation performance, and live form 429 behavior remain pending. Unit tests cover the related logic, but they do not replace the launch checklist walkthrough.
 
 ## Commits
 
@@ -100,6 +120,9 @@ Could not complete:
 - `62dfec6` — `feat(crm): add A3 team partner and commission workflows`
 - `d1c35ba` — `docs: update A3 work summary`
 - `6839ad5` — `feat(crm): add A4 dashboard calendar and search`
+- `7c1253b` — `feat(public): add launch pages and SEO metadata`
+- `6be75e6` — `feat(public): protect forms and improve accessibility`
+- `028d280` — `chore(lint): add public accessibility rules`
 
 ## A3 PR summary
 
@@ -111,8 +134,9 @@ Add a role-aware CRM dashboard with needs-attention rules and finance due lists,
 
 ## Remaining work
 
-1. Run the production build where Google Fonts are reachable.
-2. Sign in with staff accounts for each role and manually verify A2–A4 role access, application conversion, assignment, eligibility, commission approval/payment, finance totals, dashboard scopes, search visibility, calendar filters, and audit history.
-3. Keep commissions manual until AILU defines reward policy; the system does not calculate a rate.
+1. Complete `LAUNCH_CHECKLIST.md`, including the legal review and real content inputs, before setting `COMING_SOON=false`.
+2. Run the production build where Google Fonts are reachable and do the 360 px/mobile/browser form walkthrough.
+3. Sign in with staff accounts for each role and manually verify A2–A4 access and workflows.
+4. Keep commissions manual until AILU defines reward policy; the system does not calculate a rate.
 
 No credentials or `.env.local` values are included in this report.

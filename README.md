@@ -28,9 +28,16 @@ Visit `/admin` and sign in with that Google account. After the first owner is cr
 
 The admin remains accessible while `COMING_SOON=true`; it is protected by staff authentication. Public APIs remain closed while the public site is hidden.
 
+Public launch settings:
+
+- `NEXT_PUBLIC_SITE_URL`: final canonical HTTPS website origin, used for metadata and sitemap URLs.
+- `RATE_LIMIT_SALT`: long random server-only secret used to hash public form rate-limit identifiers. Do not expose or reuse the preview secret.
+- `COMING_SOON` and `PREVIEW_SECRET`: keep the public site hidden until launch checks pass; the preview secret stays private.
+- `NEXT_PUBLIC_WHATSAPP_NUMBER`: optional country-code digits; otherwise the number in `src/lib/brand.ts` is used.
+
 ## Main routes
 
-- Public site: `/`, `/events`, `/join`, `/dreams`, `/donate`.
+- Public site: `/`, `/events`, `/about`, `/contact`, `/faq`, `/join`, `/dreams`, `/donate`, `/privacy`, `/terms`, `/referral-policy`.
 - Staff CRM: `/admin`, `/admin/inbox`, `/admin/clients`, `/admin/events`, `/admin/calendar`, `/admin/attention`, `/admin/tasks`, `/admin/finance`, `/admin/vendors`, `/admin/applications`, `/admin/team`, `/admin/partners`, `/admin/commissions`, `/admin/search`.
 - Owner settings: `/admin/settings/staff`, `/admin/settings/audit`.
 
@@ -42,12 +49,15 @@ Applications can be reviewed and converted to team members. Existing normalized 
 
 The A4 dashboard filters records and finance by role. It includes today's work, upcoming and unassigned queues, needs-attention rules, finance due lists, and estimated margin. The month calendar and global search use the same server-side event and record access scopes as the admin lists. Search requires two characters, waits 300 ms after typing, and returns at most five results per allowed group. A4 makes no schema changes or new dependencies.
 
+The public launch pass adds About, Contact, FAQ, and legal pages; canonical/Open Graph metadata, Organization/FAQ/Breadcrumb structured data, robots and sitemap routes; public form abuse limits; form consent and accessibility improvements; and 404/error/loading states. Rate-limit rows store salted hashes rather than raw IPs. The website collects no payments, dream submissions, analytics, or advertising trackers. Legal pages are drafts and need legal review. See `LAUNCH_CHECKLIST.md` before changing `COMING_SOON` to false.
+
 ## Checks
 
 - `npm run typecheck`
+- `npm run lint`
 - `npm run test`
 - `npm run build` (requires network access to Google Fonts used by `next/font`)
 - `npx prisma validate`
 - `npx prisma migrate status`
 
-Vitest covers permissions, quotation and event-finance calculations, phone normalization, enquiry conversion mapping, and event status transitions.
+Vitest covers permissions, quotation and event-finance calculations, phone normalization, enquiry conversion mapping, event status transitions, public metadata/indexing, enquiry prefill/date/consent validation, and rate-limit window/hash behavior.

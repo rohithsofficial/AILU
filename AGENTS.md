@@ -93,9 +93,10 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 11. **CRM vendors and finance (A2):** vendor directory, event vendor bookings, integer-paise client/vendor payments and expenses, role-restricted event finance summary. No bank account details are collected; UPI IDs are owner/accounts-only.
 12. **CRM applications, team, partners and commissions (A3):** application review/conversion, team member directory and event assignments, partner status and referral history, manually entered commissions with eligibility checks and owner approval.
 13. **CRM dashboard, calendar and search (A4):** role-aware dashboard and finance widgets, tested needs-attention rules, a filtered month calendar with mobile agenda, and permission-filtered global search. No schema migration or new dependency.
+14. **Public website launch pass:** About, Contact, FAQ, Privacy, Terms, and Referral Policy pages; site-wide content source and empty-ready galleries; SEO/social metadata and structured data; robots/sitemap; honest footer/navigation; accessible form changes; 429 form abuse limits; error/loading/404 pages; and launch checklist. The CRM is unchanged except for the additive `RateLimit` table used by the public APIs.
 
-### Delivery status: **A0–A4 implemented; A4 has no schema changes (`feat/crm-a4`)**
-- Prisma CLI/client 7.10.1; schema has no datasource URL. Nine additive migrations are applied to the connected Neon database; never reset it.
+### Delivery status: **A0–A4 implemented; public website launch pass implemented on `feat/public-site-launch`; production launch verification pending**
+- Prisma CLI/client 7.10.1; schema has no datasource URL. Ten additive migrations are applied to the connected Neon database; never reset it.
 - `prisma validate`, `prisma generate`, elevated `prisma migrate status`, `npm run typecheck`, and the Vitest suite passed during this delivery.
 - Google OAuth sign-in could not be manually exercised without using the configured OAuth account. The code path is ready when the deployment has `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, and `ADMIN_BOOTSTRAP_EMAIL` configured.
 - Production build is blocked in the restricted environment because `next/font` cannot reach Google Fonts. Do not replace the brand fonts to bypass this; rerun the build where font access is available.
@@ -104,6 +105,12 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 - Commission amount and basis are entered manually; no reward formula is assumed. Eligibility requires correct referral attribution, an approved partner, a completed event, an accepted quotation and a fully paid client balance. Owner approves/rejects; proposer cannot approve their own proposal; OWNER/ACCOUNTS records payment. STAFF cannot read commission or team fee amounts.
 - A4 adds the role-aware dashboard, all seven threshold-based attention rules, finance due list, month calendar and global search. Dashboard, calendar and search use server-side role scopes. STAFF does not receive finance widgets or amounts. No A4 migration or dependencies were added.
 - A4 test coverage includes all attention-rule boundaries, money due/within-seven-day calculations, all four role scopes, phone normalization, and multi-day calendar/month edges.
+- The public launch pass added the additive `20261103111506_website_rate_limit` migration. It stores only salted HMAC hashes for IP/phone counters. Enquiries are limited to 5/hour per IP and 3/hour per phone; applications and partner registrations are each limited to 3/day per IP.
+- Public enquiry, application, and partner APIs retain honeypot and duplicate checks. Contact-consent requirements are validated server-side; the current CRM models do not retain a separate consent timestamp, which is disclosed in the privacy draft and remains a pre-launch decision.
+- Public forms now have an event-enquiry consent checkbox and India-date past-event validation; partner/category URL prefill; inline error descriptions, focusable feedback, and a WhatsApp enquiry follow-up link.
+- Added content/metadata, About/Contact/FAQ/legal pages, robots/sitemap, Open Graph image, JSON-LD, 404/error/loading UI, and a floating WhatsApp button. Donation and dream submissions remain closed; `/my-ailu` is noindex.
+- ESLint was added for public code with `next/core-web-vitals` and `jsx-a11y/recommended`. The lint command excludes the existing CRM route group and admin components per the public-only scope.
+- Public test/typecheck/lint results passed during delivery. Production build could not fetch Google Fonts; no real-browser/mobile walkthrough has been completed yet. See `LAUNCH_CHECKLIST.md`.
 - Authenticated runtime walkthrough for A2–A4 remains pending. The production build still needs Google Fonts network access.
 
 ---
@@ -145,25 +152,28 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 - Google OAuth has not been manually tested against the team's Google project.
 - Animations (intro flight, scroll logo, hero 3D) were **never viewed in a browser** by the author. Please run them and fix visual issues: hand landing a few pixels off the logo's hand, compact logo spacing (`GAP` in `logoLayers.ts`), mobile performance.
 - A production `npm run build` needs network access to Google Fonts (`next/font`); it failed in this environment with `EACCES` while fetching Inter and Poppins.
-- No rate limiting on the public forms yet (only a honeypot and duplicate checks).
+- Rate limiting is database-backed; production requires `RATE_LIMIT_SALT` to be configured before public forms will accept submissions.
+- `npm audit --omit=dev` currently reports nine production dependency advisories, including one critical Next.js issue and high-severity PostCSS/Zod advisories. The suggested automatic fix includes a major Next.js upgrade; review a supported upgrade path and run CRM regression before launch. Do not apply `npm audit fix --force` blindly.
+- The privacy, terms, and referral policy pages are drafts and need review by an Indian lawyer before launch. Data-retention periods, consent-evidence retention, and response expectations are undecided.
+- Real approved event photographs, About/story content, traditions/service details, and official social URLs are still needed.
 
 ## 8. Cleanup to do
 
 - Remove Firebase leftovers: `firestore.rules`, `src/lib/firebaseAdmin.ts`, and `npm uninstall firebase-admin` (data is on Neon). Keep the package only if Firebase Auth is later chosen for phone OTP.
-- Stop tracking junk: `ZIP FILES/`, `public/brand/Glossy Golden Shaka Hand Icon.png`, `public/brand/ailu-transparent-logo.png`, `public/brand/ailu-hand.svg` (add `ZIP FILES/` to `.gitignore`).
+- Unused public brand files were removed after confirming they were not referenced by application code: `Glossy Golden Shaka Hand Icon.png`, `ailu-transparent-logo.png`, and `ailu-hand.svg`.
 - `README.md` now includes public/admin setup and Google OAuth bootstrap instructions.
 
 ---
 
 ## 9. What to do next (in order)
 
-1. **Runtime verify A2–A4:** with authenticated OWNER, MANAGER, STAFF and ACCOUNTS accounts, walk finance, application conversion, assignments, commission eligibility/approval/payment, dashboard scopes, search visibility, calendar filters, and role boundaries. Build still needs network access for Google Fonts.
-2. **Customer accounts:** phone number + OTP login (decision pending: Firebase Auth only for OTP and verify its token on the server, or Auth.js/Better Auth with an Indian SMS provider such as MSG91). Backend-generated user ID `AILU-USER-000001`. "My AILU" dashboard: my enquiries and status, my applications, my partner ID and referrals.
-3. **Private dream submission** (`/dreams`): consent and guardian consent for under-18s, moderation status, no public display ever, no sensitive data collected.
-4. **Donation Box:** only after the legal and payment setup exists.
-5. **Policy pages and real content:** privacy, terms, referral policy; real event photos/videos and confirmed traditions.
-6. **Hardening:** rate limiting, security headers, SEO/Open Graph, accessibility, production env and launch decision.
-7. **Later:** CMS, reports, loyalty points only after a business decision, "Meet AILU" character and chat, WhatsApp/email notifications, customer payments.
+1. **Launch verification:** follow `LAUNCH_CHECKLIST.md`; verify forms, mobile/accessibility behavior, Vercel/Neon production configuration, OAuth, rate limits, SEO, and `COMING_SOON=false` only at the end.
+2. **Review policies and business details:** lawyer review, data retention, consent evidence, response expectations, referral reward terms, and legal donation setup.
+3. **Supply approved content:** About/story, category/traditions information, real photographs with permissions, and official social links.
+4. **Runtime verify A2–A4:** with authenticated OWNER, MANAGER, STAFF and ACCOUNTS accounts, walk finance, application conversion, assignments, commission eligibility/approval/payment, dashboard scopes, search visibility, calendar filters, and role boundaries.
+5. **Customer accounts:** phone number + OTP login (provider decision pending); "My AILU" dashboard for enquiries, applications, partner ID and referrals.
+6. **Private dream submission:** only after designing consent and guardian consent for minors, private moderation, and minimal data collection.
+7. **Later:** CMS, reports, loyalty points only after a business decision, "Meet AILU" character/chat, notifications, and customer payments.
 
 ## 10. Open decisions (ask Rani, do not guess)
 
