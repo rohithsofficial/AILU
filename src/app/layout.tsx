@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   title: { default: `${BRAND.name} | ${BRAND.tagline}`, template: "%s | AILU" },
   description: ROOT_DESCRIPTION,
   alternates: { canonical: "/" },
-  openGraph: { type: "website", siteName: BRAND.name, title: `${BRAND.name} | ${BRAND.tagline}`, description: ROOT_DESCRIPTION, images: ["/opengraph-image"] },
-  twitter: { card: "summary_large_image", title: `${BRAND.name} | ${BRAND.tagline}`, description: ROOT_DESCRIPTION, images: ["/opengraph-image"] },
+  openGraph: { type: "website", siteName: BRAND.name, title: `${BRAND.name} | ${BRAND.tagline}`, description: ROOT_DESCRIPTION, images: ["/opengraph-image.png"] },
+  twitter: { card: "summary_large_image", title: `${BRAND.name} | ${BRAND.tagline}`, description: ROOT_DESCRIPTION, images: ["/opengraph-image.png"] },
 };
 
 const siteUrl = publicSiteUrl()?.toString();
