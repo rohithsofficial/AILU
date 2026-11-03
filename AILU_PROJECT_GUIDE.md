@@ -203,7 +203,7 @@ These are the local project branches and the changes they contain. The A4 branch
 - Adds no schema migration, dependency, or environment variable.
 - Latest A4 commits: `6839ad5` feature implementation and `dec0925` documentation.
 
-Branches pushed to `origin` include `main`, `feat/crm-a0-a1`, `feat/crm-a3`, and `feat/crm-a4`. The public site launch pass is on `feat/public-site-launch`, based on `feat/crm-a4` because CRM has not been merged into `main`.
+Branches pushed to `origin` include `main`, `feat/crm-a0-a1`, `feat/crm-a3`, `feat/crm-a4`, and `feat/public-site-launch`. The public site launch pass is based on `feat/crm-a4` because CRM has not been merged into `main`.
 
 ## 10. Database and secret safety — read before changing data
 
