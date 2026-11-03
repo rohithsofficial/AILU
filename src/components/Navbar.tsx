@@ -35,7 +35,7 @@ export default function Navbar() {
 
   if (pathname === "/coming-soon") return null;
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-ailu-black/85 text-ailu-cream backdrop-blur-lg">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-ailu-black text-ailu-cream">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3" aria-label="Main">
         {/* The intro hand flies to the marked hand area of this logo */}
         <Link href="/" aria-label="AILU home" data-ailu-logo className="block"><NavLogo compact={compact} /></Link>

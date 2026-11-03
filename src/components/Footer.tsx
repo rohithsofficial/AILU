@@ -10,7 +10,7 @@ const columns = [
 ];
 
 export default function Footer() {
-  return <footer className="bg-ailu-black text-ailu-cream">
+  return <footer className="bg-ailu-black pb-20 text-ailu-cream">
     <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-5">
       <div className="lg:col-span-2">
         <Link href="/" aria-label="AILU home" className="inline-block rounded bg-ailu-black p-1"><Image src={BRAND.logo} alt="AILU" width={210} height={70} sizes="210px" /></Link>

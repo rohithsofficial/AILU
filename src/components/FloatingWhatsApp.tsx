@@ -5,10 +5,20 @@ import { BRAND } from "@/lib/brand";
 export default function FloatingWhatsApp() {
   const [avoid, setAvoid] = useState(false);
   useEffect(() => {
-    const forms = [...document.querySelectorAll("main form"), ...document.querySelectorAll("footer")];
-    if (!forms.length || !("IntersectionObserver" in window)) return;
-    const observer = new IntersectionObserver((entries) => setAvoid(entries.some((entry) => entry.isIntersecting)), { threshold: 0.01 });
-    forms.forEach((element) => observer.observe(element));
+    const competingActions = [
+      ...document.querySelectorAll("main form"),
+      ...document.querySelectorAll('#celebration-world a[href="/events#enquire"]'),
+    ];
+    if (!competingActions.length || !("IntersectionObserver" in window)) return;
+    const visible = new Set<Element>();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) visible.add(entry.target);
+        else visible.delete(entry.target);
+      });
+      setAvoid(visible.size > 0);
+    }, { threshold: 0.01 });
+    competingActions.forEach((element) => observer.observe(element));
     return () => observer.disconnect();
   }, []);
   if (avoid) return null;

@@ -13,7 +13,7 @@ Note: Rani often sends dictated (voice-to-text) messages with typos. Interpret t
 
 AILU is an event management and celebration company in Udupi, Karnataka, India.
 Tagline: **"Creating Moments. Delivering Smiles."**
-Contact: +91 74488 11611 · worldofailu24@gmail.com · WhatsApp https://wa.me/917448811611
+Contact: +91 82967 93486 · worldofailu24@gmail.com · WhatsApp https://wa.me/918296793486
 
 The site is meant to feel like entering the world of AILU: premium, emotional, friendly. It is not a generic event marketplace.
 

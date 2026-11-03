@@ -22,7 +22,7 @@ The CRM is not a replacement for accounting software, a public customer account 
 - **Brand colors:** AILU yellow `#F5C400`, black `#111111`, and warm white `#FFFDF7`.
 - **Fonts:** Poppins for display headings and Inter for body text.
 - **Logo:** white A, I, L and the golden “I love you” hand that forms the U, with a gold heart under the A. It needs a dark background.
-- **Contact:** +91 74488 11611 · worldofailu24@gmail.com · [WhatsApp](https://wa.me/917448811611).
+- **Contact:** +91 82967 93486 · worldofailu24@gmail.com · [WhatsApp](https://wa.me/918296793486).
 
 Business copy and workflows must stay honest:
 

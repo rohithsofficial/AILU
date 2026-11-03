@@ -1,10 +1,14 @@
-export default function PageHero({ title, children }: { title: string; children?: React.ReactNode }) {
+export default function PageHero({ title, children, marker = "A moment, made yours" }: { title: string; children?: React.ReactNode; marker?: string }) {
   return (
-    <section className="relative overflow-hidden bg-ailu-black text-ailu-cream">
-      <div aria-hidden className="absolute inset-0" style={{ background: "radial-gradient(50% 90% at 88% 0%, rgba(245,196,0,.25), transparent 70%)" }} />
-      <div className="relative mx-auto max-w-6xl px-4 py-14 sm:py-20">
-        <h1 className="text-4xl font-extrabold sm:text-5xl">{title}</h1>
-        {children && <p className="mt-3 max-w-2xl text-lg text-ailu-cream/75">{children}</p>}
+    <section className="relative isolate overflow-hidden bg-ailu-black text-ailu-cream">
+      <div aria-hidden className="absolute inset-y-0 right-[12%] w-px bg-ailu-yellow/10" />
+      <div aria-hidden className="absolute inset-y-0 right-[24%] w-px bg-white/[.04]" />
+      <div className="relative mx-auto flex min-h-[300px] max-w-7xl items-center px-6 py-16 sm:min-h-[360px] sm:px-10 sm:py-20 lg:px-16">
+        <div className="relative z-10">
+          <p className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[.3em] text-ailu-yellow sm:text-xs"><span aria-hidden className="h-px w-9 bg-ailu-yellow" />{marker}</p>
+          <h1 className="mt-6 max-w-5xl font-display text-[clamp(3rem,8vw,7.5rem)] font-extrabold leading-[.86] tracking-[-.075em]">{title}</h1>
+          {children && <p className="mt-5 max-w-2xl text-base leading-relaxed text-ailu-cream/75 sm:text-lg">{children}</p>}
+        </div>
       </div>
     </section>
   );

@@ -1,28 +1,19 @@
-import Link from "next/link";
-import { EVENT_CATEGORIES } from "@/lib/events";
+import EventDiscovery from "@/components/EventDiscovery";
 import EnquiryForm from "@/components/EnquiryForm";
-import PageHero from "@/components/PageHero";
 import { metadataForPath } from "@/lib/public-metadata";
 
 export const metadata = metadataForPath("/events");
 
 export default function EventsPage() {
-  return (
-    <>
-      <PageHero title="Events">Choose an occasion to see how AILU can help. Pricing depends on your requirements, so we prepare a personalised quotation for every event.</PageHero>
-      <div className="mx-auto max-w-6xl px-4 py-14">
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {EVENT_CATEGORIES.map((c) => (
-            <li key={c.slug} className="group rounded-3xl border border-black/10 bg-white p-7 transition duration-300 hover:-translate-y-1 hover:border-ailu-yellow hover:shadow-xl">
-              <h2 className="text-xl font-bold">{c.title}</h2>
-              <p className="mt-2 text-black/70">{c.blurb}</p>
-              <Link href={`/events/${c.slug}`} className="mt-4 inline-flex min-h-11 items-center font-semibold underline decoration-ailu-yellow decoration-2">See details</Link>
-            </li>
-          ))}
-        </ul>
-        <h2 id="enquire" className="mt-16 scroll-mt-24 text-3xl font-bold">Tell us about your event</h2>
-        <div className="mt-6"><EnquiryForm /></div>
+  return <>
+    <EventDiscovery />
+    <section className="relative overflow-hidden bg-ailu-cream px-4 py-16 text-ailu-black sm:px-8 sm:py-24">
+      <div className="mx-auto max-w-5xl">
+        <p className="text-xs font-semibold uppercase tracking-[.25em] text-black/50">The next part starts with you</p>
+        <h2 id="enquire" className="mt-3 scroll-mt-24 max-w-[14ch] font-display text-4xl font-extrabold leading-[.9] tracking-tight sm:text-6xl">Tell us what you’re gathering for.</h2>
+        <p className="mt-5 max-w-2xl leading-relaxed text-black/70">Share the occasion, date if known, location and what matters to you. AILU will review your enquiry and discuss availability, scope, terms and a quotation. An enquiry is not a confirmed booking.</p>
+        <div className="mt-8"><EnquiryForm /></div>
       </div>
-    </>
-  );
+    </section>
+  </>;
 }

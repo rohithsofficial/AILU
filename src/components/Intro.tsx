@@ -1,22 +1,16 @@
 "use client";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BRAND } from "@/lib/brand";
-import { canUse3D } from "@/lib/device";
-
-const HandScene = dynamic(() => import("./HandScene"), { ssr: false });
 const KEY = "ailu-intro-seen";
-const PROFILE_KEY = "ailu-visitor";
-const WHO = ["Planning a celebration", "A company or organisation", "Part of a community or college", "A performer or creator", "Just exploring"];
 const HAND_FILL = 0.76; // the standalone hand artwork fills about 76% of its image box
 
 type Box = { l: number; t: number; w: number; h: number };
 const setLogo = (v: "pending" | "ready") => { document.documentElement.dataset.logo = v; };
 
-// steps: 0 hand alone, 1 welcome, 2 what we do, 3 about you + choices
+// steps: 0 hand alone, 1 welcome, 2 the AILU feeling, 3 choose a path
 export default function Intro() {
   const router = useRouter();
   const handRef = useRef<HTMLDivElement>(null);
@@ -24,10 +18,6 @@ export default function Intro() {
   const [phase, setPhase] = useState<"pending" | "playing" | "done">("pending");
   const [step, setStep] = useState(0);
   const [reduced, setReduced] = useState(false);
-  const [use3D, setUse3D] = useState(false);
-  const [name, setName] = useState("");
-  const [city, setCity] = useState("");
-  const [who, setWho] = useState(WHO[0]);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [flight, setFlight] = useState<{ from: Box; to: Box } | null>(null);
 
@@ -35,11 +25,11 @@ export default function Intro() {
     if (sessionStorage.getItem(KEY)) { setLogo("ready"); setPhase("done"); return; }
     const rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setReduced(rm);
-    setUse3D(canUse3D());
     setLogo("pending");
     setPhase("playing");
     if (rm) { setStep(3); return; }
-    timers.current = [setTimeout(() => setStep(1), 3000), setTimeout(() => setStep(2), 5200), setTimeout(() => setStep(3), 7600)];
+    // Let the brand open quickly; visitors can enter or skip without waiting through a long intro.
+    timers.current = [setTimeout(() => setStep(1), 450), setTimeout(() => setStep(2), 1200), setTimeout(() => setStep(3), 2300)];
     return () => timers.current.forEach(clearTimeout);
   }, []);
 
@@ -67,14 +57,11 @@ export default function Intro() {
   }
 
   function choose(intent: "events" | "join") {
-    // Kept on this device only for now. Saving to a database needs a consent line first.
-    try { localStorage.setItem(PROFILE_KEY, JSON.stringify({ name: name.trim(), city: city.trim(), who, intent })); } catch {}
     startFlight();
     router.push(intent === "events" ? "/events" : "/join");
   }
 
   if (phase !== "playing") return null;
-  const field = "mt-1 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-3 text-ailu-cream placeholder:text-white/40";
   return (
     <div id="ailu-intro" className={`fixed inset-0 z-50 ${flight ? "pointer-events-none" : ""}`} role="dialog" aria-modal="true" aria-label="Welcome to AILU">
       <motion.div className="absolute inset-0 bg-ailu-black" animate={{ opacity: flight ? 0 : 1 }} transition={{ duration: 1.1 }} />
@@ -85,31 +72,24 @@ export default function Intro() {
             <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: reduced ? 0 : 1.6, ease: "easeOut" }}>
               <div ref={handRef} className={`relative aspect-[4/3] transition-[width] duration-700 ${step >= 3 ? "w-36" : "w-[min(72vw,320px)]"}`}>
                 <div className="absolute inset-0 rounded-full bg-ailu-yellow/25 blur-3xl" aria-hidden />
-                {use3D && step < 3 ? <HandScene /> : (
-                  <motion.div className="absolute inset-0" animate={reduced ? {} : { y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
-                    <Image src={BRAND.hand} alt="AILU hand symbol" fill sizes="320px" className="object-contain" priority />
-                  </motion.div>
-                )}
+                <motion.div className="absolute inset-0" animate={reduced ? {} : { y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+                  <Image src={BRAND.hand} alt="AILU hand symbol" fill sizes="320px" className="object-contain" priority />
+                </motion.div>
               </div>
             </motion.div>
 
             <div className="mt-4 min-h-[5rem] text-center">
               {step === 1 && <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl font-bold">Hi, welcome to AILU.</motion.p>}
-              {step === 2 && <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-lg text-ailu-cream/85">We plan celebrations, open doors to opportunities, and stand beside people&apos;s dreams. {BRAND.tagline}</motion.p>}
+              {step === 2 && <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="font-display text-2xl font-semibold leading-snug text-ailu-cream/90 sm:text-3xl">A feeling becomes a gathering. A gathering becomes a memory.<br /><span className="mt-3 inline-block text-base font-normal text-ailu-yellow sm:text-lg">{BRAND.tagline}</span></motion.p>}
             </div>
 
             {step >= 3 && (
               <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="w-full">
-                <h2 className="font-display text-xl font-bold">Tell us a little about you</h2>
-                <p className="mt-1 text-sm text-ailu-cream/70">Optional. It helps us show you the right things. It stays on this device for now.</p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <label className="block text-sm">Your name<input value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" className={field} /></label>
-                  <label className="block text-sm">City<input value={city} onChange={(e) => setCity(e.target.value)} autoComplete="address-level2" className={field} /></label>
-                  <label className="block text-sm sm:col-span-2">I am<select value={who} onChange={(e) => setWho(e.target.value)} className={field}>{WHO.map((w) => <option key={w} className="text-black">{w}</option>)}</select></label>
-                </div>
-                <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                  <button onClick={() => choose("events")} className="rounded-full bg-ailu-yellow px-7 py-3 font-semibold text-ailu-black">I am looking for events</button>
-                  <button onClick={() => choose("join")} className="rounded-full border border-ailu-yellow px-7 py-3 font-semibold text-ailu-yellow">I want to join AILU</button>
+                <h2 className="text-center font-display text-2xl font-bold sm:text-3xl">Where will your story go?</h2>
+                <p className="mt-2 text-center text-sm text-ailu-cream/65">Choose a path. You can wander anywhere from there.</p>
+                <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+                  <button onClick={() => choose("events")} className="min-h-14 rounded-full bg-ailu-yellow px-7 font-semibold text-ailu-black transition hover:-translate-y-1">I have a celebration in mind <span aria-hidden>↗</span></button>
+                  <button onClick={() => choose("join")} className="min-h-14 rounded-full border border-ailu-yellow px-7 font-semibold text-ailu-yellow transition hover:bg-ailu-yellow/10">I want to be part of AILU <span aria-hidden>↗</span></button>
                 </div>
               </motion.div>
             )}
