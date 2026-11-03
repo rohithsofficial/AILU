@@ -1,0 +1,23 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { requireRolePage, can } from "@/lib/authz";
+import { getTeamMember } from "@/server/team";
+import { formatIN, formatINR } from "@/lib/format";
+import { updateTeamMemberAction } from "../actions";
+
+const input = "mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-ailu-cream";
+export default async function TeamMemberPage({ params, searchParams }: { params: { id: string }; searchParams: { msg?: string } }) {
+  const staff = await requireRolePage(["OWNER", "MANAGER", "STAFF", "ACCOUNTS"]);
+  if (!can(staff.role, "team.read")) notFound();
+  const includeFees = staff.role !== "STAFF";
+  const member = await getTeamMember(params.id, includeFees);
+  if (!member) notFound();
+  const canEdit = can(staff.role, "team.write");
+  const details: [string,string][] = [["Phone",member.phone],["Email",member.email ?? "—"],["City",member.city ?? "—"],["Roles",member.roles.join(", ") || "—"],["Added",formatIN(member.createdAt)],["Notes",member.notes ?? "—"]];
+  return <div className="mx-auto max-w-5xl"><Link href="/admin/team" className="text-sm text-ailu-cream/60 hover:underline">← Team</Link><div className="mt-2 flex flex-wrap items-center gap-3"><h1 className="font-display text-2xl font-bold">{member.name}</h1><span className="font-mono text-xs text-ailu-yellow">{member.id}</span><span className="rounded-full bg-white/10 px-2 py-1 text-xs">{member.active ? "ACTIVE" : "INACTIVE"}</span></div>
+    {searchParams.msg ? <p role="status" className="mt-4 rounded-lg border border-ailu-yellow/30 bg-ailu-yellow/10 p-3 text-sm">{searchParams.msg}</p> : null}
+    <div className="mt-5 grid gap-4 lg:grid-cols-2"><section className="rounded-2xl border border-white/10 bg-[#111114] p-5"><h2 className="font-semibold">Profile</h2><dl className="mt-3 space-y-2 text-sm">{details.map(([label,value])=><div key={label} className="flex gap-3"><dt className="w-28 shrink-0 text-ailu-cream/50">{label}</dt><dd className="whitespace-pre-wrap">{value}</dd></div>)}{member.feeNotes ? <div className="flex gap-3"><dt className="w-28 shrink-0 text-ailu-cream/50">Fee notes</dt><dd>{member.feeNotes}</dd></div> : null}</dl>{member.application ? <p className="mt-4 text-xs">Origin application: <Link href={`/admin/applications/${member.application.id}`} className="text-ailu-yellow underline">{member.application.id}</Link></p> : null}</section>
+      {canEdit ? <section className="rounded-2xl border border-white/10 bg-[#111114] p-5"><h2 className="font-semibold">Edit team profile</h2><form action={updateTeamMemberAction} className="mt-3 grid gap-3 sm:grid-cols-2"><input type="hidden" name="id" value={member.id}/><label>Name<input name="name" required defaultValue={member.name} className={input}/></label><label>Phone<input name="phone" required defaultValue={member.phone} className={input}/></label><label>Email<input name="email" type="email" defaultValue={member.email ?? ""} className={input}/></label><label>City<input name="city" defaultValue={member.city ?? ""} className={input}/></label><label>Roles (comma separated)<input name="roles" required defaultValue={member.roles.join(", ")} className={input}/></label><label>Active<select name="active" defaultValue={member.active ? "yes" : "no"} className={input}><option value="yes" className="text-black">Active</option><option value="no" className="text-black">Inactive</option></select></label><label className="sm:col-span-2">Fee notes<textarea name="feeNotes" defaultValue={member.feeNotes ?? ""} className={input}/></label><label className="sm:col-span-2">Notes<textarea name="notes" defaultValue={member.notes ?? ""} className={input}/></label><button className="rounded-lg border border-ailu-yellow/60 px-4 py-2 font-semibold text-ailu-yellow">Save profile</button></form></section> : null}</div>
+    <section className="mt-5 rounded-2xl border border-white/10 bg-[#111114] p-5"><h2 className="font-semibold">Event assignments ({member.assignments.length})</h2>{member.assignments.length ? <ul className="mt-3 space-y-2">{member.assignments.map((assignment)=><li key={assignment.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-white/10 p-3 text-sm"><Link href={`/admin/events/${assignment.event.id}#team`} className="text-ailu-yellow hover:underline">{assignment.event.title}</Link><span>{assignment.role}</span>{assignment.feePaise != null ? <span>{formatINR(assignment.feePaise)}</span> : null}<span className="ml-auto text-xs text-ailu-cream/60">{assignment.status}{assignment.event.startDate ? ` · ${formatIN(assignment.event.startDate)}` : ""}</span></li>)}</ul> : <p className="mt-2 text-sm text-ailu-cream/50">No event assignments yet.</p>}</section>
+  </div>;
+}

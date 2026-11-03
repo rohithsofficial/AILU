@@ -67,26 +67,29 @@ enum PartnerStatus {
 
 // People applying to work with the AILU team
 model Application {
-  seq             Int               @unique @default(autoincrement())
-  id              String            @id // AILU-APP-000001, set right after insert inside one transaction
-  name            String
-  phone           String
-  email           String?
-  city            String
-  role            String
-  skills          String
-  experience      String?
-  portfolioUrl    String?
-  availability    String?
-  eventCategories String?
-  beginner        Boolean           @default(false)
-  notes           String?
-  status          ApplicationStatus @default(SUBMITTED)
-  internalNotes   String? // staff-only
-  decidedById     String? // staff who closed the decision
-  decidedAt       DateTime?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  seq                 Int               @unique @default(autoincrement())
+  id                  String            @id // AILU-APP-000001, set right after insert inside one transaction
+  name                String
+  phone               String
+  email               String?
+  city                String
+  role                String
+  skills              String
+  experience          String?
+  portfolioUrl        String?
+  availability        String?
+  eventCategories     String?
+  beginner            Boolean           @default(false)
+  notes               String?
+  status              ApplicationStatus @default(SUBMITTED)
+  internalNotes       String? // staff-only
+  decidedById         String? // staff who closed the decision
+  decidedAt           DateTime?
+  teamMemberId        String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  teamMember          TeamMember?       @relation("ApplicationTeamLink", fields: [teamMemberId], references: [id], onDelete: SetNull)
+  originForTeamMember TeamMember?       @relation("TeamMemberOrigin")
 
   @@index([phone])
   @@index([status, createdAt])
@@ -109,6 +112,7 @@ model SalesPartner {
   decidedAt        DateTime?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
+  commissions      Commission[]
 
   @@index([status, createdAt])
 }
@@ -245,10 +249,12 @@ model Event {
   updatedAt     DateTime    @updatedAt
 
   quotations     Quotation[]
-  enquiry        EventEnquiry?   @relation("EventEnquiryEvent", fields: [enquiryId], references: [id])
+  enquiry        EventEnquiry?     @relation("EventEnquiryEvent", fields: [enquiryId], references: [id])
   vendorBookings VendorBooking[]
   payments       Payment[]
   expenses       Expense[]
+  assignments    EventAssignment[]
+  commissions    Commission[]
 
   @@index([status, startDate])
   @@index([clientId])
@@ -338,6 +344,8 @@ model Payment {
   event           Event?           @relation(fields: [eventId], references: [id])
   vendorBookingId String?
   vendorBooking   VendorBooking?   @relation(fields: [vendorBookingId], references: [id])
+  assignmentId    String?
+  assignment      EventAssignment? @relation(fields: [assignmentId], references: [id])
   amountPaise     Int
   mode            PaymentMode
   reference       String?
@@ -348,6 +356,7 @@ model Payment {
 
   @@index([eventId, direction, paidOn])
   @@index([vendorBookingId])
+  @@index([assignmentId])
 }
 
 model Expense {
@@ -364,6 +373,88 @@ model Expense {
   createdAt       DateTime       @default(now())
 
   @@index([eventId, spentOn])
+}
+
+enum EventAssignmentStatus {
+  ASSIGNED
+  CONFIRMED
+  DONE
+  DROPPED
+}
+
+model TeamMember {
+  seq           Int      @unique @default(autoincrement())
+  id            String   @id // AILU-TM-000001
+  name          String
+  phone         String   @unique
+  email         String?
+  city          String?
+  roles         String[]
+  applicationId String?  @unique
+  feeNotes      String?
+  active        Boolean  @default(true)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  application        Application?      @relation("TeamMemberOrigin", fields: [applicationId], references: [id], onDelete: SetNull)
+  linkedApplications Application[]     @relation("ApplicationTeamLink")
+  assignments        EventAssignment[]
+
+  @@index([name])
+  @@index([city, active])
+}
+
+model EventAssignment {
+  id           String                @id @default(cuid())
+  eventId      String
+  event        Event                 @relation(fields: [eventId], references: [id])
+  teamMemberId String
+  teamMember   TeamMember            @relation(fields: [teamMemberId], references: [id])
+  role         String
+  feePaise     Int?
+  status       EventAssignmentStatus @default(ASSIGNED)
+  notes        String?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  payments     Payment[]
+
+  @@unique([eventId, teamMemberId, role])
+  @@index([teamMemberId, status])
+}
+
+enum CommissionStatus {
+  PENDING_APPROVAL
+  APPROVED
+  PAID
+  REJECTED
+}
+
+model Commission {
+  id               String           @id @default(cuid())
+  partnerId        String
+  partner          SalesPartner     @relation(fields: [partnerId], references: [id])
+  eventId          String
+  event            Event            @relation(fields: [eventId], references: [id])
+  version          Int              @default(1)
+  basis            String
+  amountPaise      Int
+  status           CommissionStatus @default(PENDING_APPROVAL)
+  proposedById     String
+  decidedById      String?
+  decidedAt        DateTime?
+  rejectionReason  String?
+  paidOn           DateTime?
+  paymentMode      PaymentMode?
+  paymentReference String?
+  paidById         String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@unique([partnerId, eventId, version])
+  @@index([status, createdAt])
+  @@index([partnerId, status])
+  @@index([eventId])
 }
 
 enum QuotationStatus {

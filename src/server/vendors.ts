@@ -133,17 +133,25 @@ export async function setVendorBookingStatus(actor: { id: string }, bookingId: s
 export async function createPayment(actor: { id: string }, eventId: string, fd: FormData) {
   const eventExists = await getPrisma().event.findUnique({ where: { id: eventId }, select: { id: true } });
   if (!eventExists) throw new Error("That event does not exist.");
-  const parsed = z.object({ direction: z.enum(["IN", "OUT"]), purpose: z.string().trim().min(2).max(80), amount: amountSchema, mode: z.enum(["CASH", "UPI", "BANK_TRANSFER", "CARD", "CHEQUE", "OTHER"]), reference: z.string().trim().max(120), paidOn: z.string(), vendorBookingId: z.string().max(100), note: z.string().trim().max(500) }).safeParse({
-    direction: String(fd.get("direction") ?? ""), purpose: String(fd.get("purpose") ?? ""), amount: String(fd.get("amount") ?? ""), mode: String(fd.get("mode") ?? ""), reference: String(fd.get("reference") ?? ""), paidOn: String(fd.get("paidOn") ?? ""), vendorBookingId: String(fd.get("vendorBookingId") ?? ""), note: String(fd.get("note") ?? ""),
+  const parsed = z.object({ direction: z.enum(["IN", "OUT"]), purpose: z.string().trim().max(80), amount: amountSchema, mode: z.enum(["CASH", "UPI", "BANK_TRANSFER", "CARD", "CHEQUE", "OTHER"]), reference: z.string().trim().max(120), paidOn: z.string(), vendorBookingId: z.string().max(100), assignmentId: z.string().max(100), note: z.string().trim().max(500) }).safeParse({
+    direction: String(fd.get("direction") ?? ""), purpose: String(fd.get("purpose") ?? ""), amount: String(fd.get("amount") ?? ""), mode: String(fd.get("mode") ?? ""), reference: String(fd.get("reference") ?? ""), paidOn: String(fd.get("paidOn") ?? ""), vendorBookingId: String(fd.get("vendorBookingId") ?? ""), assignmentId: String(fd.get("assignmentId") ?? ""), note: String(fd.get("note") ?? ""),
   });
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Check the payment details.");
   const bookingId = parsed.data.vendorBookingId || null;
+  const assignmentId = parsed.data.assignmentId || null;
+  if (!assignmentId && parsed.data.purpose.length < 2) throw new Error("Enter a payment purpose.");
+  if (bookingId && assignmentId) throw new Error("Choose either a vendor booking or a team assignment.");
+  if (assignmentId && parsed.data.direction !== "OUT") throw new Error("Team fee payments must be recorded as outgoing payments.");
   if (parsed.data.direction === "IN" && bookingId) throw new Error("Client receipts cannot be linked to a vendor booking.");
   if (bookingId) {
     const booking = await getPrisma().vendorBooking.findUnique({ where: { id: bookingId }, select: { eventId: true } });
     if (!booking || booking.eventId !== eventId) throw new Error("That vendor booking does not belong to this event.");
   }
-  const result = await getPrisma().payment.create({ data: { eventId, direction: parsed.data.direction, purpose: parsed.data.purpose, amountPaise: amountPaise(parsed.data.amount), mode: parsed.data.mode, reference: parsed.data.reference || null, paidOn: validDate(parsed.data.paidOn), vendorBookingId: bookingId, recordedById: actor.id, note: parsed.data.note || null } });
+  if (assignmentId) {
+    const assignment = await getPrisma().eventAssignment.findUnique({ where: { id: assignmentId }, select: { eventId: true } });
+    if (!assignment || assignment.eventId !== eventId) throw new Error("That team assignment does not belong to this event.");
+  }
+  const result = await getPrisma().payment.create({ data: { eventId, direction: parsed.data.direction, purpose: assignmentId ? "TEAM_FEE" : parsed.data.purpose, amountPaise: amountPaise(parsed.data.amount), mode: parsed.data.mode, reference: parsed.data.reference || null, paidOn: validDate(parsed.data.paidOn), vendorBookingId: bookingId, assignmentId, recordedById: actor.id, note: parsed.data.note || null } });
   await audit(actor, "payment.recorded", "Payment", result.id, { eventId, direction: result.direction, amountPaise: result.amountPaise, fields: ["direction", "purpose", "amountPaise", "mode", "paidOn"] });
   await logActivity("NOTE", `${result.direction === "IN" ? "Client receipt" : "Vendor payment"} recorded: ₹${(result.amountPaise / 100).toFixed(2)}.`, { eventId }, actor.id);
   return result;
@@ -168,15 +176,17 @@ export async function createExpense(actor: { id: string }, eventId: string, fd: 
 }
 
 export async function eventFinancials(eventId: string) {
-  const [event, payments, expenses, bookings] = await Promise.all([
+  const [event, payments, expenses, bookings, assignments, commissions] = await Promise.all([
     getPrisma().event.findUnique({ where: { id: eventId }, select: { id: true, quotations: { where: { status: "ACCEPTED" }, orderBy: { version: "desc" }, take: 1, select: { totalPaise: true } } } }),
-    getPrisma().payment.findMany({ where: { eventId }, orderBy: { paidOn: "desc" }, include: { vendorBooking: { include: { vendor: { select: { id: true, name: true } } } } } }),
+    getPrisma().payment.findMany({ where: { eventId }, orderBy: { paidOn: "desc" }, include: { vendorBooking: { include: { vendor: { select: { id: true, name: true } } } }, assignment: { include: { teamMember: { select: { id: true, name: true } } } } } }),
     getPrisma().expense.findMany({ where: { eventId }, orderBy: { spentOn: "desc" }, include: { vendorBooking: { include: { vendor: { select: { id: true, name: true } } } } } }),
     getPrisma().vendorBooking.findMany({ where: { eventId, status: { not: "CANCELLED" } }, orderBy: { createdAt: "desc" }, include: { vendor: { select: { id: true, name: true, category: true } } } }),
+    getPrisma().eventAssignment.findMany({ where: { eventId }, select: { id: true, feePaise: true, status: true } }),
+    getPrisma().commission.findMany({ where: { eventId, status: { in: ["APPROVED", "PAID"] } }, select: { amountPaise: true } }),
   ]);
   return {
     payments, expenses, bookings,
-    ...calculateEventFinancials({ acceptedQuotePaise: event?.quotations[0]?.totalPaise ?? 0, payments, expenses, bookings }),
+    ...calculateEventFinancials({ acceptedQuotePaise: event?.quotations[0]?.totalPaise ?? 0, payments, expenses, bookings, assignments, approvedCommissionPaise: commissions.reduce((sum, commission) => sum + commission.amountPaise, 0) }),
   };
 }
 

@@ -3,6 +3,8 @@ import { requireRolePage } from "@/lib/authz";
 import { getPrisma } from "@/lib/db";
 import { STAFF_ROLES } from "@/lib/authz";
 import { EVENT_STATUSES, EVENT_STATUS_LABELS } from "@/lib/eventStatus";
+import { can } from "@/lib/authz";
+import { dashboardA3Counts } from "@/server/partners";
 
 export const dynamic = "force-dynamic";
 
@@ -15,18 +17,23 @@ export default async function AdminDashboard() {
   nextMonth.setDate(nextMonth.getDate() + 30);
   const eventWhere = { archivedAt: null, ...(ownOnly ? { ownerId: staff.id } : {}) };
   const taskScope = ownOnly ? { assigneeId: staff.id } : {};
-  const [newEnquiries, pipeline, upcoming, upcomingCount, overdue] = await Promise.all([
+  const [newEnquiries, pipeline, upcoming, upcomingCount, overdue, a3] = await Promise.all([
     db.eventEnquiry.count({ where: { eventId: null, spam: false, status: "SUBMITTED", ...(ownOnly ? { ownerId: staff.id } : {}) } }),
     db.event.groupBy({ by: ["status"], where: eventWhere, _count: { _all: true } }),
     db.event.findMany({ where: { ...eventWhere, startDate: { gte: now, lte: nextMonth } }, orderBy: { startDate: "asc" }, take: 8, select: { id: true, title: true, status: true, startDate: true, venueCity: true } }),
     db.event.count({ where: { ...eventWhere, startDate: { gte: now, lte: nextMonth } } }),
     db.task.count({ where: { ...taskScope, doneAt: null, dueAt: { lt: now } } }),
+    dashboardA3Counts(),
   ]);
 
   const cards = [
     ...(staff.role === "ACCOUNTS" ? [] : [{ label: "New enquiries", total: newEnquiries, note: "Unconverted, non-spam, submitted", href: "/admin/inbox" }]),
     { label: "Upcoming events", total: upcomingCount, note: "Next 30 days", href: "/admin/events" },
     { label: "Overdue tasks", total: overdue, note: ownOnly ? "Assigned to you" : "Open follow-ups", href: "/admin/tasks" },
+    ...(can(staff.role, "applications.read") ? [{ label: "Applications to review", total: a3.applications, note: "Submitted by potential team members", href: "/admin/applications?status=SUBMITTED" }] : []),
+    ...(can(staff.role, "partners.read") ? [{ label: "Partners awaiting review", total: a3.partners, note: "Registrations pending", href: "/admin/partners?status=PENDING" }] : []),
+    ...(can(staff.role, "commissions.propose") ? [{ label: "Commissions awaiting approval", total: a3.commissionsPending, note: "Owner review required", href: "/admin/commissions?status=PENDING_APPROVAL" }] : []),
+    ...(can(staff.role, "commissions.mark_paid") ? [{ label: "Approved rewards to pay", total: a3.commissionsPayable, note: "Approved; payment not yet recorded", href: "/admin/commissions?status=APPROVED" }] : []),
   ];
 
   return (

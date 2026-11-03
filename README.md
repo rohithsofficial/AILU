@@ -1,6 +1,6 @@
 # AILU
 
-AILU is an event management and celebration company in Udupi, Karnataka. This repository contains the public website and a staff-only CRM. Phase A2 adds the vendor directory and event finance tracking.
+AILU is an event management and celebration company in Udupi, Karnataka. This repository contains the public website and a staff-only CRM. Phases A2–A3 add vendor and event finance tracking, application review and conversion, team assignments, partner management, and manual commission workflows.
 
 ## Stack
 
@@ -31,12 +31,14 @@ The admin remains accessible while `COMING_SOON=true`; it is protected by staff 
 ## Main routes
 
 - Public site: `/`, `/events`, `/join`, `/dreams`, `/donate`.
-- Staff CRM: `/admin`, `/admin/inbox`, `/admin/clients`, `/admin/events`, `/admin/tasks`, `/admin/vendors`.
+- Staff CRM: `/admin`, `/admin/inbox`, `/admin/clients`, `/admin/events`, `/admin/tasks`, `/admin/vendors`, `/admin/applications`, `/admin/team`, `/admin/partners`, `/admin/commissions`.
 - Owner settings: `/admin/settings/staff`, `/admin/settings/audit`.
 
 Enquiries are not confirmed bookings. Staff must verify availability, scope, terms, and payment before confirming an event. Donations remain information-only until the required legal and payment setup exists. Dreams remain private.
 
 Vendor categories are free text. Vendor UPI IDs are optional and visible only to OWNER and ACCOUNTS; bank account details are not stored. Event finance records use integer paise. OWNER and ACCOUNTS can record payments and expenses; MANAGER can read event finance; assigned STAFF can manage vendor bookings without access to finance totals. Margin uses the latest accepted quotation less vendor commitments (or higher linked actual expenses) and non-vendor expenses, while client and vendor balances use recorded payments. These are operational estimates, not accounting statements.
+
+Applications can be reviewed and converted to team members. Existing normalized phone matches are reused. Team assignments are recorded per event, including optional fees and payments; STAFF cannot read fee amounts. Partner rewards remain manual: staff enter an amount and basis, and the system checks attribution, partner approval, completed event, accepted quotation, and full client payment. OWNER approves or rejects a commission; OWNER or ACCOUNTS records payment. No commission rate is assumed.
 
 ## Checks
 

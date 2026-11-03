@@ -5,7 +5,7 @@ Companion to `AGENTS.md`. Read `AGENTS.md` first (rules, stack, current state). 
 - **CRM:** everything AILU knows about clients, vendors, partners, team members and every event, from first enquiry to money settled.
 - **CMS:** the content shown on the public website, editable without code.
 
-Status: **A0/A1 delivered; A2 implementation complete, runtime walkthrough pending**. Remaining business decisions in section 11 apply to later phases unless stated otherwise. Each phase gets one additive Prisma migration.
+Status: **A0–A3 implementation delivered; authenticated runtime walkthrough pending.** A3 applications, team, partners, and manual commissions are implemented. Remaining business decisions in section 11 apply to later phases unless stated otherwise. Each phase gets one additive Prisma migration.
 
 ---
 

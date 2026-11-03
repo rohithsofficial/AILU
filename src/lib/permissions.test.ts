@@ -32,4 +32,20 @@ describe("staff permissions", () => {
     expect(can("STAFF", "finance.read")).toBe(false);
     expect(can("STAFF", "vendors.read")).toBe(true);
   });
+
+  it("matches A3 application, team, partner and commission roles", () => {
+    expect(can("OWNER", "applications.write")).toBe(true);
+    expect(can("MANAGER", "applications.write")).toBe(true);
+    expect(can("STAFF", "applications.read")).toBe(true);
+    expect(can("STAFF", "applications.write")).toBe(false);
+    expect(can("ACCOUNTS", "applications.read")).toBe(false);
+    expect(can("STAFF", "team.assign")).toBe(true);
+    expect(can("STAFF", "team.write")).toBe(false);
+    expect(can("ACCOUNTS", "team.read")).toBe(true);
+    expect(can("MANAGER", "commissions.propose")).toBe(true);
+    expect(can("MANAGER", "commissions.approve")).toBe(false);
+    expect(can("OWNER", "commissions.approve")).toBe(true);
+    expect(can("ACCOUNTS", "commissions.mark_paid")).toBe(true);
+    expect(can("STAFF", "commissions.read")).toBe(false);
+  });
 });
