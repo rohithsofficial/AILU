@@ -88,12 +88,15 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 6. **Coming-soon mode** (Rani added, then hardened): `COMING_SOON=true` redirects everyone to `/coming-soon`; `/?preview=<PREVIEW_SECRET>` sets an httpOnly cookie to bypass. `/api/*` returns 503 while hidden. `X-Robots-Tag: noindex` on the page. `SiteChrome` hides intro, navbar and footer on `/coming-soon`.
 7. **Scroll logo:** on scroll the "I" and "L" fold away and the hand slides left beside the "A" (first and last parts remain). Reverses at the top.
 8. **Join forms + referrals:** `/join/team` (applications, IDs `AILU-APP-000001`) and `/join/partner` (registration, IDs `AILU-SP-000001`, status starts `PENDING`); optional partner ID on the event enquiry form, recorded as `referredBySpId` (ignored if the partner is rejected/suspended or the phone matches the partner's own).
+9. **CRM foundation (A0):** Google OAuth allowlist with first-owner bootstrap only while `StaffUser` is empty, active staff and current roles rechecked from the database, owner-only staff management and paginated audit log, responsive standalone admin shell.
+10. **CRM core (A1):** inbox filters and enquiry conversion in a transaction; assigned clients with contacts, tasks and activity history; event pipeline, transition rules, quotations with server-computed integer-paise totals and one accepted version per event; task views and role checks. A1 records are private to staff.
 
-### Delivery status: **verify first**
-Work after the coming-soon hardening was delivered to Rani as patch files. Check whether each is in the repo before assuming:
-- Last commit known to include the coming-soon fixes: `cd770da`.
-- Scroll logo + skip flight: present if `src/components/NavLogo.tsx` and `src/lib/logoLayers.ts` exist.
-- Join forms + referrals: present if `src/app/api/partners/route.ts` and `src/components/forms/PartnerForm.tsx` exist. If present, the migration `add_applications_and_partners` must be created and run (new tables `Application`, `SalesPartner`; new column `EventEnquiry.referredBySpId`).
+### Delivery status: **A0 and A1 implemented on `feat/crm-a0-a1`**
+- Prisma CLI/client 7.10.1; schema has no datasource URL. Seven additive migrations are applied to the connected Neon database; never reset it.
+- `npx prisma validate`, `npx prisma generate`, `npx prisma migrate status`, `npx tsc --noEmit`, and the Vitest suite passed during this delivery.
+- Google OAuth sign-in could not be manually exercised without using the configured OAuth account. The code path is ready when the deployment has `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, and `ADMIN_BOOTSTRAP_EMAIL` configured.
+- Production build is blocked in the restricted environment because `next/font` cannot reach Google Fonts. Do not replace the brand fonts to bypass this; rerun the build where font access is available.
+- No A2 work has started.
 
 ---
 
@@ -119,6 +122,7 @@ Work after the coming-soon hardening was delivered to Rani as patch files. Check
 - `EventEnquiry` (+ `EnquiryStatus`: SUBMITTED, UNDER_REVIEW, QUOTATION_PREPARED, AWAITING_CUSTOMER, PAYMENT_PENDING, CONFIRMED, COMPLETED, CANCELLED; `referredBySpId`)
 - `Application` (+ `ApplicationStatus`: SUBMITTED, UNDER_REVIEW, SHORTLISTED, CONTACTED, SELECTED, NOT_SELECTED, CLOSED)
 - `SalesPartner` (+ `PartnerStatus`: PENDING, APPROVED, REJECTED, SUSPENDED; `phone` unique)
+- CRM additions include `Client.ownerId` for staff assignment and `Activity.enquiryId` for inbox history. These are nullable indexed fields with additive migrations.
 - Phones are normalised to `+91XXXXXXXXXX` by `normalizePhone()` in `src/lib/validation.ts`.
 
 **API routes:** `POST /api/enquiries`, `/api/applications` (one per phone per 30 days), `/api/partners` (one per phone). All validate with Zod on the server, use a hidden honeypot field, and return friendly errors. They return 503 when `DATABASE_URL` is missing.
@@ -129,23 +133,23 @@ Work after the coming-soon hardening was delivered to Rani as patch files. Check
 
 ## 7. Known issues and unverified items
 
-- The authoring sandbox **could not run `prisma generate`** (no access to Prisma's binary host), so Prisma-dependent code was never compiled against a generated client. `npx tsc --noEmit` should be clean once `prisma generate` runs. If it is not, fix it. The most likely spots are `src/lib/db.ts` (adapter setup) and the `$transaction` callbacks.
+- Google OAuth has not been manually tested against the team's Google project.
 - Animations (intro flight, scroll logo, hero 3D) were **never viewed in a browser** by the author. Please run them and fix visual issues: hand landing a few pixels off the logo's hand, compact logo spacing (`GAP` in `logoLayers.ts`), mobile performance.
-- A production `npm run build` needs network access to Google Fonts (`next/font`).
+- A production `npm run build` needs network access to Google Fonts (`next/font`); it failed in this environment with `EACCES` while fetching Inter and Poppins.
 - No rate limiting on the public forms yet (only a honeypot and duplicate checks).
 
 ## 8. Cleanup to do
 
 - Remove Firebase leftovers: `firestore.rules`, `src/lib/firebaseAdmin.ts`, and `npm uninstall firebase-admin` (data is on Neon). Keep the package only if Firebase Auth is later chosen for phone OTP.
 - Stop tracking junk: `ZIP FILES/`, `public/brand/Glossy Golden Shaka Hand Icon.png`, `public/brand/ailu-transparent-logo.png`, `public/brand/ailu-hand.svg` (add `ZIP FILES/` to `.gitignore`).
-- `README.md` is outdated. Update it from this file.
+- `README.md` now includes public/admin setup and Google OAuth bootstrap instructions.
 
 ---
 
 ## 9. What to do next (in order)
 
-1. **Sync and verify:** check the delivery status in section 5, run `npx prisma generate`, `npx prisma migrate status`, create/run the pending migration, `npx tsc --noEmit`, `npm run dev`. Submit one test enquiry, application and partner registration.
-2. **Admin system = CRM + CMS.** This replaces the earlier "simple admin dashboard" idea. The full plan, data model and phases are in **`CRM_CMS_PLAN.md`** (read it). CRM stores clients, vendors, partners, team members and every event's details, quotes, payments and costs. CMS manages public website content. Start with phase A0 (staff auth, roles, audit log) only, and confirm the open decisions in section 11 of that file first. Keep all authorisation server-side.
+1. **Review A0/A1 delivery:** verify the Google OAuth deployment values and manually walk the sign-in and CRM flows. The current code and migrations are in this branch; keep the public site working.
+2. **Stop before A2:** do not start vendors, payments, commissions, team CRM, CMS, or reports until Rani reviews and approves the next phase and any required business decisions.
 3. **Customer accounts:** phone number + OTP login (decision pending: Firebase Auth only for OTP and verify its token on the server, or Auth.js/Better Auth with an Indian SMS provider such as MSG91). Backend-generated user ID `AILU-USER-000001`. "My AILU" dashboard: my enquiries and status, my applications, my partner ID and referrals.
 4. **Referral tracking:** show partners their leads and statuses; admin marks a referral qualified only after a verified, completed and paid booking; admin-configurable reward policy (fixed / percentage), approve → paid; no amounts shown until AILU defines the policy.
 5. **Private dream submission** (`/dreams`): form + table with consent, guardian consent for under-18s, moderation status, no public display ever, no sensitive data collected.

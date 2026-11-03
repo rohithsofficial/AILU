@@ -41,6 +41,7 @@ model EventEnquiry {
 
   client  Client?  @relation("ClientEventEnquiries", fields: [clientId], references: [id])
   event   Event?   @relation("EventEnquiryEvent")
+  activities Activity[] @relation("EnquiryActivity")
 
   @@index([phone])
   @@index([status, createdAt])
@@ -177,6 +178,7 @@ model Client {
   gstin            String? // corporate clients only
   source           ClientSource @default(WEBSITE)
   referredBySpId   String? // partner who introduced them
+  ownerId          String? // StaffUser responsible for this client
   tags             String[]
   notes            String?
   consentToContact Boolean      @default(false)
@@ -190,6 +192,7 @@ model Client {
 
   @@index([name])
   @@index([city])
+  @@index([ownerId])
 }
 
 // Extra people at a company / community client
@@ -308,9 +311,12 @@ model Activity {
   byId     String? // StaffUser
   clientId String?
   eventId  String?
+  enquiryId String?
   vendorId String?
   at       DateTime @default(now())
 
   @@index([clientId, at])
   @@index([eventId, at])
+  @@index([enquiryId, at])
+  enquiry EventEnquiry? @relation("EnquiryActivity", fields: [enquiryId], references: [id], onDelete: SetNull)
 }

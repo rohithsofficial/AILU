@@ -6,10 +6,10 @@ import { formatIN } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default async function InboxPage({ searchParams }: { searchParams: { q?: string; status?: string; spam?: string; page?: string } }) {
-  await requireRolePage(STAFF_ROLES);
+export default async function InboxPage({ searchParams }: { searchParams: { q?: string; status?: string; spam?: string; conversion?: string; page?: string } }) {
+  const staff = await requireRolePage(["OWNER", "MANAGER", "STAFF"]);
   const page = Number(searchParams.page ?? "1") || 1;
-  const { rows, total, pages } = await listEnquiries({ q: searchParams.q, status: searchParams.status, spam: searchParams.spam, page });
+  const { rows, total, pages } = await listEnquiries({ q: searchParams.q, status: searchParams.status, spam: searchParams.spam, conversion: searchParams.conversion, staffId: staff.role === "STAFF" ? staff.id : undefined, page });
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -29,6 +29,7 @@ export default async function InboxPage({ searchParams }: { searchParams: { q?: 
             <option value="all" className="text-black">Show all incl. spam</option>
             <option value="only" className="text-black">Only spam</option>
           </select>
+          <select name="conversion" defaultValue={searchParams.conversion ?? ""} className="rounded-lg border border-white/20 bg-white/10 px-2 py-2 text-sm"><option value="" className="text-black">All enquiries</option><option value="unconverted" className="text-black">Unconverted</option><option value="converted" className="text-black">Converted</option></select>
           <button className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10">Filter</button>
         </form>
       </div>
@@ -75,9 +76,9 @@ export default async function InboxPage({ searchParams }: { searchParams: { q?: 
         {pages > 1 && (
           <>
             {" · "}
-            <Link href={`/admin/inbox?page=${Math.max(1, page - 1)}&q=${encodeURIComponent(searchParams.q ?? "")}&status=${searchParams.status ?? ""}&spam=${searchParams.spam ?? ""}`} className="underline">← prev</Link>
+            <Link href={`/admin/inbox?page=${Math.max(1, page - 1)}&q=${encodeURIComponent(searchParams.q ?? "")}&status=${searchParams.status ?? ""}&spam=${searchParams.spam ?? ""}&conversion=${searchParams.conversion ?? ""}`} className="underline">← prev</Link>
             {" · "}
-            <Link href={`/admin/inbox?page=${Math.min(pages, page + 1)}&q=${encodeURIComponent(searchParams.q ?? "")}&status=${searchParams.status ?? ""}&spam=${searchParams.spam ?? ""}`} className="underline">next →</Link>
+            <Link href={`/admin/inbox?page=${Math.min(pages, page + 1)}&q=${encodeURIComponent(searchParams.q ?? "")}&status=${searchParams.status ?? ""}&spam=${searchParams.spam ?? ""}&conversion=${searchParams.conversion ?? ""}`} className="underline">next →</Link>
           </>
         )}
       </p>

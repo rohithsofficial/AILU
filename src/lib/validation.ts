@@ -2,8 +2,9 @@ import { z } from "zod";
 import { EVENT_CATEGORIES } from "./events";
 import { ROLES } from "./roles";
 
-const PHONE = /^(\+91[\s-]?)?[6-9]\d{9}$/;
-const phone = z.string().trim().regex(PHONE, "Enter a valid Indian mobile number");
+const PHONE = /^(\+91[\s-]?)?[6-9](?:[\s-]?\d){9}$/;
+export const indianPhoneSchema = z.string().trim().regex(PHONE, "Enter a valid Indian mobile number");
+const phone = indianPhoneSchema;
 const optionalEmail = z.union([z.literal(""), z.string().trim().email().max(120)]).optional();
 const optionalUrl = z.union([z.literal(""), z.string().trim().url().max(300)]).optional();
 const optionalText = (max: number) => z.string().trim().max(max).optional();
@@ -16,7 +17,10 @@ export const enquirySchema = z.object({
   phone,
   email: optionalEmail,
   category: z.enum(EVENT_CATEGORIES.map((c) => c.slug) as [string, ...string[]]),
-  eventDate: optionalText(20),
+  eventDate: z.union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a valid event date").refine((v) => {
+    const date = new Date(`${v}T00:00:00.000Z`);
+    return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === v;
+  }, "Enter a valid event date")]).optional(),
   location: z.string().trim().min(2).max(120),
   guests: z.coerce.number().int().min(1).max(100000).optional(),
   budget: optionalText(60),

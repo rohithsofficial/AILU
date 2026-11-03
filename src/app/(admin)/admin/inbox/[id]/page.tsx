@@ -16,7 +16,8 @@ export default async function EnquiryDetail({ searchParams, params }: { searchPa
   const staff = await requireRolePage(STAFF_ROLES);
   const data = await getEnquiry(params.id);
   if (!data) notFound();
-  const { enquiry, tasks } = data;
+  const { enquiry, tasks, activity } = data;
+  if (staff.role === "STAFF" && enquiry.ownerId && enquiry.ownerId !== staff.id) notFound();
   const staffList = await listActiveStaff();
 
   return (
@@ -104,6 +105,10 @@ export default async function EnquiryDetail({ searchParams, params }: { searchPa
           <button className="rounded-lg border border-ailu-yellow/60 px-4 py-2 font-semibold text-ailu-yellow">Add</button>
         </form>
       </div>
+      <section className={`${box} mt-4`}>
+        <h2 className="font-display font-bold">Activity history</h2>
+        {activity.length === 0 ? <p className="mt-3 text-sm text-ailu-cream/50">No activity yet.</p> : <ul className="mt-3 space-y-2 text-sm">{activity.map((item) => <li key={item.id} className="flex flex-wrap gap-3 rounded-lg border border-white/10 px-3 py-2"><span className="text-xs text-ailu-cream/50">{formatIN(item.at)}</span><span className="text-xs font-semibold text-ailu-yellow">{item.kind}</span><span className="flex-1">{item.body}</span></li>)}</ul>}
+      </section>
     </div>
   );
 }

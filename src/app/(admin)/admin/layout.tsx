@@ -10,7 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-[100svh] bg-[#0d0d0d] font-body text-ailu-cream antialiased">
       {staff ? (
-        <div className="flex min-h-[100svh]">
+        <div className="flex min-h-[100svh] flex-col lg:flex-row">
           <AdminSidebar role={staff.role} userName={staff.name || staff.email} signOutForm={
             /* sign out stays a server action: no client JS needed */
             <form action={async () => { "use server"; await signOut({ redirectTo: "/admin/login" }); }}>
@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <Link href="/admin" className="flex items-center gap-3">
                 <Image src="/brand/ailu-logo.png" alt="AILU" width={1400} height={468} className="h-7 w-auto" priority />
               </Link>
-              <span className="text-xs uppercase tracking-widest text-ailu-cream/50">Admin · CRM</span>
+              <span className="text-xs text-ailu-cream/60">{staff.name || staff.email} · Admin CRM</span>
             </div>
             <main className="px-4 py-6 lg:px-8">{children}</main>
           </div>
