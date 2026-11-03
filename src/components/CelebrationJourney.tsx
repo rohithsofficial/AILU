@@ -40,12 +40,18 @@ export default function CelebrationJourney() {
   const entrance = entrances[active];
 
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
-    setActive(Math.min(chapters.length - 1, Math.floor(progress * chapters.length)));
+    const next = Math.min(chapters.length - 1, Math.floor(progress * chapters.length));
+    setActive((current) => {
+      const hysteresis = 0.02;
+      if (next > current && progress >= (current + 1) / chapters.length + hysteresis) return next;
+      if (next < current && progress <= current / chapters.length - hysteresis) return next;
+      return current;
+    });
   });
 
   return (
-    <section id="celebration-world" ref={journey} className="relative h-[240svh]" aria-label="Explore celebrations and ways to join AILU">
-      <div className={`sticky top-16 flex h-[calc(100svh-4rem)] min-h-[560px] overflow-hidden transition-colors duration-700 ${scene.surface}`}>
+    <section id="celebration-world" ref={journey} className="relative h-[360svh]" aria-label="Explore celebrations and ways to join AILU">
+      <div className={`sticky top-16 flex h-[calc(100svh-4rem)] min-h-[min(560px,calc(100svh-4rem))] overflow-hidden transition-colors duration-700 ${scene.surface}`}>
         <div aria-hidden className="pointer-events-none absolute inset-0 opacity-80" style={{ backgroundImage: scene.pattern, backgroundSize: active === 2 ? "28px 28px" : undefined }} />
         <motion.div aria-hidden className="pointer-events-none absolute inset-y-0 right-[12%] w-px bg-current/10" style={{ x: reduceMotion ? 0 : drift }} />
 
@@ -57,7 +63,7 @@ export default function CelebrationJourney() {
               initial={reduceMotion ? { opacity: 0 } : { ...entrance.from, opacity: 0 }}
               animate={{ x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 }}
               exit={reduceMotion ? { opacity: 0 } : { ...entrance.exit, opacity: 0 }}
-              transition={{ duration: reduceMotion ? 0 : .72, ease: [0.2, 0.8, 0.2, 1] }}
+              transition={{ duration: reduceMotion ? 0 : .46, ease: [0.2, 0.8, 0.2, 1] }}
             >
               <p className="text-[10px] font-bold uppercase tracking-[.3em] opacity-65 sm:text-xs">{chapter.cue}</p>
               {chapter.category ? <>
