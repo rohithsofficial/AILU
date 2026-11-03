@@ -2,11 +2,11 @@
 
 Updated: 3 November 2026
 
-Branch: `feat/crm-a3`
+Branch: `feat/crm-a4`
 
 ## Overview
 
-This branch contains the staff CRM foundation and event workflows (A0/A1), vendor and event finance (A2), team, partner, and commission management (A3), and the AILU main theme brief. Work keeps the public website, existing AILU brand palette, Neon + Prisma 7 architecture, and the privacy and business rules in `AGENTS.md`.
+This branch contains the staff CRM foundation and event workflows (A0/A1), vendor and event finance (A2), team, partner, and commission management (A3), role-aware dashboard, calendar and search (A4), and the AILU main theme brief. Work keeps the public website, existing AILU brand palette, Neon + Prisma 7 architecture, and the privacy and business rules in `AGENTS.md`.
 
 ## A0 — Staff admin foundation
 
@@ -54,6 +54,17 @@ The inbox passed enquiry status values such as `SUBMITTED` to the date formatter
 - Added dashboard cards, admin navigation, event detail sections, audit records, permission rules, and A3 rules/finance tests.
 - Added migration `20261103101734_a3_team_partners_commissions`; it was applied to Neon after confirming the prior migrations were already applied. No reset or destructive migration was used.
 
+## A4 — Dashboard, calendar, needs attention, and global search
+
+- Extended the existing dashboard with role-scoped today tasks, 7-day events, unassigned and oldest unconverted enquiries, clickable event pipeline counts, upcoming 30-day events, and the A3 approval queues.
+- Added money widgets only for OWNER, MANAGER, and ACCOUNTS: client balances, vendor payments and stored team fees due, plus estimated margin for completed events with accepted quotations dated this month. Each due widget links to a role-protected filtered list. Money remains integer paise and is labelled operational/estimated.
+- Added seven pure needs-attention rules with named thresholds and boundary tests: stale/unassigned enquiries, unanswered sent quotes, near events without vendor and team preparation, client balance due near event date (finance roles only), events left in EXECUTED, overdue client/event tasks, and pending partners.
+- Added `/admin/attention` grouped full-list view and a top-bar My tasks due/overdue count.
+- Added `/admin/calendar`: URL-persisted month/status/category/owner/closed filters, multi-day spans, status labels and legend, month grid, and CSS-selected mobile agenda. STAFF results follow the events-list owner scope; the calendar returns no finance fields.
+- Added top-bar global search and `/admin/search?q=` results for clients, events, enquiries, vendors, partners, applications, and team members. It debounces input, requires at least two characters, normalizes formatted phone searches, limits each group to five, and queries only types/rows allowed for the current role.
+- Updated inbox owner filtering and task due view so dashboard links open the corresponding filtered lists.
+- No database migration, schema change, new dependency, or environment variable was added.
+
 ## Database
 
 - Added migration `20261103100000_add_vendors_and_event_finance` with vendor, vendor booking, payment, and expense tables plus indexes and relations.
@@ -61,17 +72,19 @@ The inbox passed enquiry status values such as `SUBMITTED` to the date formatter
 - Applied the additive migration with `prisma migrate deploy`; no reset or data drop was performed.
 - A subsequent elevated `prisma migrate status` confirmed all eight migrations are up to date.
 - A3 migration `20261103101734_a3_team_partners_commissions` adds team members, event assignments, assignment payment links, and versioned commissions. It was applied after confirming the prior eight migrations; status confirmed all nine are up to date.
+- A4 has no schema change; database remains at the same nine applied migrations.
 
 ## Verification
 
 Passed:
 
 - `npm run typecheck`
-- `npm run test` — 24 tests across 7 files
+- `npm run test` — 41 tests across 10 files
 - `npx prisma validate`
 - `npx prisma generate`
 - `prisma migrate status` — successful with elevated network access after migration; all nine migrations are applied
 - `git diff --check`
+- `npm run lint` is not configured in `package.json`.
 
 Could not complete:
 
@@ -85,15 +98,21 @@ Could not complete:
 - `668f984` — `docs: add AILU main theme brief`
 - `29c2d0a` — `feat(crm): add vendor and event finance workflows`
 - `62dfec6` — `feat(crm): add A3 team partner and commission workflows`
+- `d1c35ba` — `docs: update A3 work summary`
+- `6839ad5` — `feat(crm): add A4 dashboard calendar and search`
 
 ## A3 PR summary
 
 Add applications review and conversion to team members, event team assignments and fee tracking, partner management and referral history, and manual commissions with server-side eligibility checks, owner approval, and restricted payment recording. Include team fees and approved commissions in event finance, enforce role-based visibility, and document the workflows. Commission amounts and basis are entered by staff; no reward formula is assumed.
 
+## A4 PR summary
+
+Add a role-aware CRM dashboard with needs-attention rules and finance due lists, a filtered responsive events calendar, and global search across permitted CRM records. Add the top-bar My tasks shortcut and filtered finance, inbox, and task destinations. Keep authorization in server queries; STAFF receives no finance data. No schema change, migration, dependency, or environment variable is needed.
+
 ## Remaining work
 
 1. Run the production build where Google Fonts are reachable.
-2. Sign in with staff accounts for each role and manually verify A2/A3 role access, application conversion, assignment, eligibility, commission approval/payment, finance totals, and audit history.
+2. Sign in with staff accounts for each role and manually verify A2–A4 role access, application conversion, assignment, eligibility, commission approval/payment, finance totals, dashboard scopes, search visibility, calendar filters, and audit history.
 3. Keep commissions manual until AILU defines reward policy; the system does not calculate a rate.
 
 No credentials or `.env.local` values are included in this report.

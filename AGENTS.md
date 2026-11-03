@@ -92,8 +92,9 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 10. **CRM core (A1):** inbox filters and enquiry conversion in a transaction; assigned clients with contacts, tasks and activity history; event pipeline, transition rules, quotations with server-computed integer-paise totals and one accepted version per event; task views and role checks. A1 records are private to staff.
 11. **CRM vendors and finance (A2):** vendor directory, event vendor bookings, integer-paise client/vendor payments and expenses, role-restricted event finance summary. No bank account details are collected; UPI IDs are owner/accounts-only.
 12. **CRM applications, team, partners and commissions (A3):** application review/conversion, team member directory and event assignments, partner status and referral history, manually entered commissions with eligibility checks and owner approval.
+13. **CRM dashboard, calendar and search (A4):** role-aware dashboard and finance widgets, tested needs-attention rules, a filtered month calendar with mobile agenda, and permission-filtered global search. No schema migration or new dependency.
 
-### Delivery status: **A0–A3 implemented; A3 migration applied on `feat/crm-a3`**
+### Delivery status: **A0–A4 implemented; A4 has no schema changes (`feat/crm-a4`)**
 - Prisma CLI/client 7.10.1; schema has no datasource URL. Nine additive migrations are applied to the connected Neon database; never reset it.
 - `prisma validate`, `prisma generate`, elevated `prisma migrate status`, `npm run typecheck`, and the Vitest suite passed during this delivery.
 - Google OAuth sign-in could not be manually exercised without using the configured OAuth account. The code path is ready when the deployment has `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, and `ADMIN_BOOTSTRAP_EMAIL` configured.
@@ -101,7 +102,9 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 - A2 schema, server services and admin pages are implemented. Its additive migration was applied after confirming the seven prior migrations.
 - A3 adds applications review and idempotent team-member conversion, team assignment and fee tracking, partner status/history, manual commission proposals, and a commission approval/payment queue. Its additive migration was applied after confirming the eight prior migrations; status confirmed all nine are applied.
 - Commission amount and basis are entered manually; no reward formula is assumed. Eligibility requires correct referral attribution, an approved partner, a completed event, an accepted quotation and a fully paid client balance. Owner approves/rejects; proposer cannot approve their own proposal; OWNER/ACCOUNTS records payment. STAFF cannot read commission or team fee amounts.
-- Authenticated runtime walkthrough for A2/A3 remains pending. A3 unit tests cover permission boundaries and core eligibility, transitions, conversion matching, duplicate assignment, and finance calculations.
+- A4 adds the role-aware dashboard, all seven threshold-based attention rules, finance due list, month calendar and global search. Dashboard, calendar and search use server-side role scopes. STAFF does not receive finance widgets or amounts. No A4 migration or dependencies were added.
+- A4 test coverage includes all attention-rule boundaries, money due/within-seven-day calculations, all four role scopes, phone normalization, and multi-day calendar/month edges.
+- Authenticated runtime walkthrough for A2–A4 remains pending. The production build still needs Google Fonts network access.
 
 ---
 
@@ -154,7 +157,7 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 
 ## 9. What to do next (in order)
 
-1. **Runtime verify A2/A3:** with authenticated OWNER, MANAGER, STAFF and ACCOUNTS accounts, walk finance, application conversion, assignments, commission eligibility/approval/payment, and role boundaries. Build still needs network access for Google Fonts.
+1. **Runtime verify A2–A4:** with authenticated OWNER, MANAGER, STAFF and ACCOUNTS accounts, walk finance, application conversion, assignments, commission eligibility/approval/payment, dashboard scopes, search visibility, calendar filters, and role boundaries. Build still needs network access for Google Fonts.
 2. **Customer accounts:** phone number + OTP login (decision pending: Firebase Auth only for OTP and verify its token on the server, or Auth.js/Better Auth with an Indian SMS provider such as MSG91). Backend-generated user ID `AILU-USER-000001`. "My AILU" dashboard: my enquiries and status, my applications, my partner ID and referrals.
 3. **Private dream submission** (`/dreams`): consent and guardian consent for under-18s, moderation status, no public display ever, no sensitive data collected.
 4. **Donation Box:** only after the legal and payment setup exists.
