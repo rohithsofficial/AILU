@@ -3,10 +3,16 @@ import { NextRequest, NextResponse } from "next/server";
 const COOKIE = "ailu_preview";
 
 export function middleware(req: NextRequest) {
+  // The admin system is staff-authenticated separately and stays reachable while the site is hidden.
+  const { pathname } = req.nextUrl;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin") || pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
   if (process.env.COMING_SOON !== "true") return NextResponse.next();
 
   const secret = process.env.PREVIEW_SECRET;
-  const { pathname, searchParams } = req.nextUrl;
+  const { searchParams } = req.nextUrl;
 
   // Visit /?preview=YOUR_SECRET once to unlock the real site in this browser.
   if (secret && searchParams.get("preview") === secret) {

@@ -27,6 +27,7 @@ export default function Intro() {
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
   const [who, setWho] = useState(WHO[0]);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [flight, setFlight] = useState<{ from: Box; to: Box } | null>(null);
 
   useEffect(() => {
@@ -37,18 +38,18 @@ export default function Intro() {
     setLogo("pending");
     setPhase("playing");
     if (rm) { setStep(3); return; }
-    const t = [setTimeout(() => setStep(1), 3000), setTimeout(() => setStep(2), 5200), setTimeout(() => setStep(3), 7600)];
-    return () => t.forEach(clearTimeout);
+    timers.current = [setTimeout(() => setStep(1), 3000), setTimeout(() => setStep(2), 5200), setTimeout(() => setStep(3), 7600)];
+    return () => timers.current.forEach(clearTimeout);
   }, []);
 
   useEffect(() => { document.body.style.overflow = phase === "done" ? "" : "hidden"; return () => { document.body.style.overflow = ""; }; }, [phase]);
 
   const finishNow = () => { sessionStorage.setItem(KEY, "1"); setLogo("ready"); setPhase("done"); };
 
-  function choose(intent: "events" | "join") {
-    // Kept on this device only for now. Saving to a database needs a consent line first.
-    try { localStorage.setItem(PROFILE_KEY, JSON.stringify({ name: name.trim(), city: city.trim(), who, intent })); } catch {}
-    router.push(intent === "events" ? "/events" : "/join");
+  // Used by both the two entrance buttons and "Skip intro": the hand leaves the centre and lands on the logo.
+  function startFlight() {
+    if (flight) return;
+    timers.current.forEach(clearTimeout);
     const fromEl = handRef.current;
     const toEl = document.querySelector("[data-ailu-hand]");
     if (reduced || !fromEl || !toEl) return finishNow();
@@ -60,6 +61,13 @@ export default function Intro() {
     setFlight({ from: { l: f.left, t: f.top, w: f.width, h: f.height }, to: { l: t.left + t.width / 2 - w / 2, t: t.top + t.height / 2 - h / 2, w, h } });
   }
 
+  function choose(intent: "events" | "join") {
+    // Kept on this device only for now. Saving to a database needs a consent line first.
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify({ name: name.trim(), city: city.trim(), who, intent })); } catch {}
+    startFlight();
+    router.push(intent === "events" ? "/events" : "/join");
+  }
+
   if (phase === "done") return null;
   const field = "mt-1 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-3 text-ailu-cream placeholder:text-white/40";
   return (
@@ -67,7 +75,7 @@ export default function Intro() {
       <motion.div className="absolute inset-0 bg-ailu-black" animate={{ opacity: flight ? 0 : 1 }} transition={{ duration: 1.1 }} />
       {phase === "playing" && (
         <motion.div className="relative flex h-full flex-col items-center overflow-y-auto px-4 py-8 text-ailu-cream" animate={{ opacity: flight ? 0 : 1 }} transition={{ duration: 0.35 }}>
-          <button onClick={finishNow} className="absolute right-4 top-4 z-10 rounded-full border border-white/30 px-4 py-2 text-sm">Skip intro</button>
+          <button onClick={startFlight} className="absolute right-4 top-4 z-10 rounded-full border border-white/30 px-4 py-2 text-sm">Skip intro</button>
           <div className="my-auto flex w-full max-w-lg flex-col items-center">
             <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: reduced ? 0 : 1.6, ease: "easeOut" }}>
               <div ref={handRef} className={`relative aspect-[4/3] transition-[width] duration-700 ${step >= 3 ? "w-36" : "w-[min(72vw,320px)]"}`}>

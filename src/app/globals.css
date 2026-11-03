@@ -9,9 +9,16 @@ h1, h2, h3 { font-family: var(--font-poppins), system-ui, sans-serif; }
 :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 
-/* Nav logo is revealed left to right once the intro hand has landed on it */
-.nav-logo-img { clip-path: inset(0 0 0 0); transition: clip-path 1.2s cubic-bezier(.65, 0, .35, 1); }
+/* Nav logo: three layers (A, IL, hand). Revealed left to right after the intro hand lands, compact on scroll. */
+.nav-logo { --h: 3rem; position: relative; display: block; height: var(--h); width: calc(var(--h) * var(--r)); transition: width .6s cubic-bezier(.65, 0, .35, 1); }
+@media (min-width: 768px) { .nav-logo { --h: 3.5rem; } }
+.nav-logo[data-compact="true"] { width: calc(var(--h) * var(--r) * var(--compact-w)); }
+.nav-logo-img { position: absolute; left: 0; top: 0; height: 100%; aspect-ratio: var(--r); clip-path: inset(0 0 0 0); transition: clip-path 1.2s cubic-bezier(.65, 0, .35, 1); }
 html[data-logo="pending"] .nav-logo-img { clip-path: inset(0 100% 0 0); transition: none; }
+.logo-il { transform-origin: left center; transition: opacity .35s ease, transform .6s cubic-bezier(.65, 0, .35, 1); }
+.nav-logo[data-compact="true"] .logo-il { opacity: 0; transform: scaleX(.2); }
+.logo-hand { left: var(--hand-left); transition: left .6s cubic-bezier(.65, 0, .35, 1); }
+.nav-logo[data-compact="true"] .logo-hand { left: var(--hand-left-compact); }
 
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .marquee-track { animation: marquee 38s linear infinite; }

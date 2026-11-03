@@ -1,0 +1,36 @@
+import { NextResponse } from "next/server";
+import { dbConfigured, getPrisma } from "@/lib/db";
+import { normalizePhone, partnerSchema } from "@/lib/validation";
+
+export const runtime = "nodejs";
+
+export async function POST(req: Request) {
+  let body: unknown;
+  try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid request" }, { status: 400 }); }
+  const parsed = partnerSchema.safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: "Please check the highlighted fields.", fields: parsed.error.flatten().fieldErrors }, { status: 400 });
+  if (parsed.data.website) return NextResponse.json({ id: "AILU-SP-000000" }); // honeypot
+
+  if (!dbConfigured()) return NextResponse.json({ error: "Partner registration is not switched on yet. Please WhatsApp us." }, { status: 503 });
+
+  const { website, consent, email, clientCategories, experience, referralSource, phone, ...rest } = parsed.data; void website; void consent;
+  const phoneN = normalizePhone(phone);
+  try {
+    const db = getPrisma();
+    if (await db.salesPartner.findUnique({ where: { phone: phoneN }, select: { seq: true } })) {
+      return NextResponse.json({ error: "This number is already registered as a partner. Our team will be in touch." }, { status: 409 });
+    }
+    const id = await db.$transaction(async (tx) => {
+      const row = await tx.salesPartner.create({
+        data: { ...rest, phone: phoneN, id: `tmp-${crypto.randomUUID()}`, email: email || null, clientCategories: clientCategories || null, experience: experience || null, referralSource: referralSource || null },
+      });
+      const code = `AILU-SP-${String(row.seq).padStart(6, "0")}`;
+      await tx.salesPartner.update({ where: { seq: row.seq }, data: { id: code } });
+      return code;
+    });
+    return NextResponse.json({ id });
+  } catch (e) {
+    console.error("partner save failed", e);
+    return NextResponse.json({ error: "Something went wrong saving your registration. Please WhatsApp us." }, { status: 500 });
+  }
+}

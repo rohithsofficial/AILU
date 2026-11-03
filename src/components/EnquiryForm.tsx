@@ -45,6 +45,7 @@ export default function EnquiryForm({ defaultCategory }: { defaultCategory?: str
       <label className="block">Estimated budget<input name="budget" placeholder="Optional" className={input} /></label>
       <label className="block sm:col-span-2">Services you need<input name="services" placeholder="Decor, hosting, performances..." className={input} /></label>
       <label className="block sm:col-span-2">Anything else we should know<textarea name="details" rows={4} className={input} /></label>
+      <label className="block sm:col-span-2">Partner ID, if someone referred you (optional)<input name="referralId" placeholder="AILU-SP-000001" className={input} />{err("referralId") && <span className="text-sm text-red-700">{err("referralId")}</span>}</label>
       <input name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
       {state.status === "error" && <p role="alert" className="text-red-700 sm:col-span-2">{state.message}</p>}
       <button disabled={state.status === "sending"} className="rounded-full bg-ailu-yellow px-7 py-3 font-semibold disabled:opacity-60 sm:col-span-2 sm:justify-self-start">{state.status === "sending" ? "Sending..." : "Send enquiry"}</button>

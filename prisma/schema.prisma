@@ -18,22 +18,299 @@ enum EnquiryStatus {
 }
 
 model EventEnquiry {
-  seq       Int           @unique @default(autoincrement())
-  id        String        @id // AILU-EVT-000001, set right after insert inside one transaction
-  name      String
-  phone     String
-  email     String?
-  category  String
-  eventDate String?
-  location  String
-  guests    Int?
-  budget    String?
-  services  String?
-  details   String?
-  status    EnquiryStatus @default(SUBMITTED)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  seq            Int           @unique @default(autoincrement())
+  id             String        @id // AILU-EVT-000001, set right after insert inside one transaction
+  name           String
+  phone          String
+  email          String?
+  category       String
+  eventDate      String?
+  location       String
+  guests         Int?
+  budget         String?
+  services       String?
+  details        String?
+  referredBySpId String? // AILU-SP-xxxxxx of the sales partner who referred this enquiry
+  spam           Boolean       @default(false)
+  clientId       String?
+  eventId        String?
+  ownerId        String? // StaffUser responsible for following up
+  status         EnquiryStatus @default(SUBMITTED)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  client  Client?  @relation("ClientEventEnquiries", fields: [clientId], references: [id])
+  event   Event?   @relation("EventEnquiryEvent")
 
   @@index([phone])
   @@index([status, createdAt])
+  @@index([referredBySpId])
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  SHORTLISTED
+  CONTACTED
+  SELECTED
+  NOT_SELECTED
+  CLOSED
+}
+
+enum PartnerStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+// People applying to work with the AILU team
+model Application {
+  seq             Int               @unique @default(autoincrement())
+  id              String            @id // AILU-APP-000001, set right after insert inside one transaction
+  name            String
+  phone           String
+  email           String?
+  city            String
+  role            String
+  skills          String
+  experience      String?
+  portfolioUrl    String?
+  availability    String?
+  eventCategories String?
+  beginner        Boolean           @default(false)
+  notes           String?
+  status          ApplicationStatus @default(SUBMITTED)
+  internalNotes   String? // staff-only
+  decidedById     String? // staff who closed the decision
+  decidedAt       DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([phone])
+  @@index([status, createdAt])
+}
+
+// External partners who refer event clients
+model SalesPartner {
+  seq              Int           @unique @default(autoincrement())
+  id               String        @id // AILU-SP-000001
+  name             String
+  phone            String        @unique
+  email            String?
+  city             String
+  clientCategories String?
+  experience       String?
+  referralSource   String?
+  status           PartnerStatus @default(PENDING)
+  internalNotes    String? // staff-only
+  decidedById      String? // staff who approved/rejected
+  decidedAt        DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([status, createdAt])
+}
+
+// ---------- Admin system: phase A0 (see CRM_CMS_PLAN.md) ----------
+
+enum StaffRole {
+  OWNER
+  MANAGER
+  STAFF
+  ACCOUNTS
+}
+
+// AILU staff who may sign in to /admin. The allowlist itself: only these emails get in.
+model StaffUser {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+  role      StaffRole @default(STAFF)
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+}
+
+// Every admin change by staff: sign-in, status changes, edits (later phases)
+model AuditLog {
+  id       String   @id @default(cuid())
+  actorId  String?
+  action   String // e.g. "staff.sign_in", "staff.role_changed"
+  entity   String // e.g. "StaffUser"
+  entityId String
+  diff     Json?
+  at       DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([at])
+}
+
+// ---------- CRM core: phase A1 ----------
+
+enum ClientType {
+  INDIVIDUAL
+  COMPANY
+  COMMUNITY
+}
+
+enum ClientSource {
+  WEBSITE
+  PARTNER
+  REFERRAL
+  WALK_IN
+  SOCIAL
+  OTHER
+}
+
+// One client record; deduped by normalised phone. Never shown publicly.
+model Client {
+  seq              Int          @unique @default(autoincrement())
+  id               String       @id // AILU-CLI-000001
+  type             ClientType   @default(INDIVIDUAL)
+  name             String
+  companyName      String?
+  phone            String       @unique
+  altPhone         String?
+  email            String?
+  city             String?
+  address          String?
+  gstin            String? // corporate clients only
+  source           ClientSource @default(WEBSITE)
+  referredBySpId   String? // partner who introduced them
+  tags             String[]
+  notes            String?
+  consentToContact Boolean      @default(false)
+  archivedAt       DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  contacts   ClientContact[]
+  events     Event[]
+  enquiries  EventEnquiry[] @relation("ClientEventEnquiries")
+
+  @@index([name])
+  @@index([city])
+}
+
+// Extra people at a company / community client
+model ClientContact {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+  name     String
+  role     String?
+  phone    String?
+  email    String?
+}
+
+enum EventStatus {
+  LEAD
+  QUOTED
+  NEGOTIATION
+  CONFIRMED
+  PLANNING
+  EXECUTED
+  COMPLETED
+  CANCELLED
+  LOST
+}
+
+// The core record of every event AILU runs, from lead to money settled.
+model Event {
+  seq           Int         @unique @default(autoincrement())
+  id            String      @id // AILU-EVENT-000001
+  clientId      String
+  client        Client      @relation(fields: [clientId], references: [id])
+  enquiryId     String?     @unique // EventEnquiry.id it was converted from
+  title         String
+  category      String // EventCategory slug
+  tradition     String?
+  status        EventStatus @default(LEAD)
+  lostReason    String?
+  startDate     DateTime?
+  endDate       DateTime?
+  venueName     String?
+  venueCity     String?
+  venueAddress  String?
+  guestCount    Int?
+  budgetPaise   Int?
+  requirements  String?
+  internalNotes String?
+  ownerId       String? // StaffUser responsible
+  archivedAt    DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  quotations  Quotation[]
+  enquiry     EventEnquiry? @relation("EventEnquiryEvent", fields: [enquiryId], references: [id])
+
+  @@index([status, startDate])
+  @@index([clientId])
+}
+
+enum QuotationStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model Quotation {
+  id            String          @id @default(cuid())
+  eventId       String
+  event         Event           @relation(fields: [eventId], references: [id])
+  version       Int             @default(1)
+  status        QuotationStatus @default(DRAFT)
+  validUntil    DateTime?
+  discountPaise Int             @default(0)
+  taxPaise      Int             @default(0)
+  totalPaise    Int             @default(0) // computed server-side, never trusted from the client
+  terms         String?
+  createdAt     DateTime        @default(now())
+
+  items QuotationItem[]
+
+  @@unique([eventId, version])
+}
+
+model QuotationItem {
+  id             String    @id @default(cuid())
+  quotationId    String
+  quotation      Quotation @relation(fields: [quotationId], references: [id])
+  description    String
+  quantity       Int       @default(1)
+  unitPricePaise Int
+}
+
+// ---------- Work management (A1 basics; A4 extends) ----------
+
+model Task {
+  id         String    @id @default(cuid())
+  title      String
+  dueAt      DateTime?
+  doneAt     DateTime?
+  priority   String    @default("NORMAL")
+  assigneeId String? // StaffUser
+  clientId   String?
+  eventId    String?
+  enquiryId  String?
+  createdAt  DateTime  @default(now())
+
+  @@index([assigneeId, doneAt, dueAt])
+}
+
+// Timeline: calls, WhatsApp, meetings, notes, status changes
+model Activity {
+  id       String   @id @default(cuid())
+  kind     String // CALL WHATSAPP MEETING NOTE STATUS
+  body     String
+  byId     String? // StaffUser
+  clientId String?
+  eventId  String?
+  vendorId String?
+  at       DateTime @default(now())
+
+  @@index([clientId, at])
+  @@index([eventId, at])
 }
