@@ -94,12 +94,13 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 12. **CRM applications, team, partners and commissions (A3):** application review/conversion, team member directory and event assignments, partner status and referral history, manually entered commissions with eligibility checks and owner approval.
 13. **CRM dashboard, calendar and search (A4):** role-aware dashboard and finance widgets, tested needs-attention rules, a filtered month calendar with mobile agenda, and permission-filtered global search. No schema migration or new dependency.
 14. **Public website launch pass:** About, Contact, FAQ, Privacy, Terms, and Referral Policy pages; site-wide content source and empty-ready galleries; SEO/social metadata and structured data; robots/sitemap; honest footer/navigation; accessible form changes; 429 form abuse limits; error/loading/404 pages; and launch checklist. The CRM is unchanged except for the additive `RateLimit` table used by the public APIs.
+15. **Private "Fulfil Your Dreams" intake:** gated public form with adult/guardian paths, sensitive-pattern rejection, rate limits and duplicate detection; separate dream records and status history; OWNER/MANAGER-only review and access audit; OWNER-only typed-ID deletion; role-scoped dashboard count and needs-attention rule. Dreams are never published or included in global search.
 
-### Delivery status: **A0–A4 implemented; public website launch pass implemented on `feat/public-site-launch`; production launch verification pending**
-- Prisma CLI/client 7.10.1; schema has no datasource URL. Ten additive migrations are applied to the connected Neon database; never reset it.
+### Delivery status: **A0–A4, public website launch pass, and private dreams workflow implemented on `feat/dreams-private`; launch verification and legal/safeguarding decisions pending**
+- Prisma CLI/client 7.10.1; schema has no datasource URL. Eleven additive migrations are applied to the connected Neon database; never reset it.
 - `prisma validate`, `prisma generate`, elevated `prisma migrate status`, `npm run typecheck`, and the Vitest suite passed during this delivery.
 - Google OAuth sign-in could not be manually exercised without using the configured OAuth account. The code path is ready when the deployment has `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, and `ADMIN_BOOTSTRAP_EMAIL` configured.
-- Production build is blocked in the restricted environment because `next/font` cannot reach Google Fonts. Do not replace the brand fonts to bypass this; rerun the build where font access is available.
+- Production build needs network access for `next/font` to fetch Google Fonts; it fails with `EACCES` when network access is restricted. Do not replace the brand fonts to bypass this. The security-update and dreams-feature builds passed with network access enabled.
 - A2 schema, server services and admin pages are implemented. Its additive migration was applied after confirming the seven prior migrations.
 - A3 adds applications review and idempotent team-member conversion, team assignment and fee tracking, partner status/history, manual commission proposals, and a commission approval/payment queue. Its additive migration was applied after confirming the eight prior migrations; status confirmed all nine are applied.
 - Commission amount and basis are entered manually; no reward formula is assumed. Eligibility requires correct referral attribution, an approved partner, a completed event, an accepted quotation and a fully paid client balance. Owner approves/rejects; proposer cannot approve their own proposal; OWNER/ACCOUNTS records payment. STAFF cannot read commission or team fee amounts.
@@ -108,9 +109,14 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 - The public launch pass added the additive `20261103111506_website_rate_limit` migration. It stores only salted HMAC hashes for IP/phone counters. Enquiries are limited to 5/hour per IP and 3/hour per phone; applications and partner registrations are each limited to 3/day per IP.
 - Public enquiry, application, and partner APIs retain honeypot and duplicate checks. Contact-consent requirements are validated server-side; the current CRM models do not retain a separate consent timestamp, which is disclosed in the privacy draft and remains a pre-launch decision.
 - Public forms now have an event-enquiry consent checkbox and India-date past-event validation; partner/category URL prefill; inline error descriptions, focusable feedback, and a WhatsApp enquiry follow-up link.
-- Added content/metadata, About/Contact/FAQ/legal pages, robots/sitemap, Open Graph image, JSON-LD, 404/error/loading UI, and a floating WhatsApp button. Donation and dream submissions remain closed; `/my-ailu` is noindex.
+- Added content/metadata, About/Contact/FAQ/legal pages, robots/sitemap, Open Graph image, JSON-LD, 404/error/loading UI, and a floating WhatsApp button. Donation intake remains off; `/my-ailu` is noindex.
+- The private dreams feature adds the additive `20261103120225_dreams_private_submissions` migration. The `Dream` table is separate from clients/events and stores guardian contact instead of a child's own contact. `DreamStatusChange` stores status history and is deleted with the Dream row. Migration status confirmed all eleven migrations applied.
+- Public dream intake is controlled by `DREAMS_FORM_OPEN`; it defaults to `false` in `.env.example`. When closed, `/dreams` remains information-only and `POST /api/dreams` returns 503. When open, submissions are limited to 3/day per IP and 2/day per phone/email contact, duplicate-checked for 24 hours, and audited without dream text.
+- Only OWNER and MANAGER have dream read/manage permissions. STAFF and ACCOUNTS cannot access the list, details, actions, dashboard count, or dream attention rule. Dreams are not in global search or public content. OWNER deletion requires the exact typed reference ID and atomically records an audit entry with the reference ID and reason.
+- Dream view, status, notes, reason, submission, and deletion audit records contain no submitted dream text. Admin list pages show metadata only; full details appear only on the restricted detail page.
+- Dream form, role boundaries, rate limits, duplicate detection, sensitive-pattern rejection, status rules, dashboard attention and audit minimization have Vitest coverage. Keep `DREAMS_FORM_OPEN=false` until the launch checklist and legal/safeguarding decisions are complete.
 - ESLint was added for public code with `next/core-web-vitals` and `jsx-a11y/recommended`. The lint command excludes the existing CRM route group and admin components per the public-only scope.
-- Public test/typecheck/lint results passed during delivery. Production build could not fetch Google Fonts; no real-browser/mobile walkthrough has been completed yet. See `LAUNCH_CHECKLIST.md`.
+- Public and private-dream typecheck/lint passed; all 74 Vitest tests passed. Production build passed with network access enabled for Google Fonts. No real-browser/mobile walkthrough has been completed yet. See `LAUNCH_CHECKLIST.md`.
 - Authenticated runtime walkthrough for A2–A4 remains pending. The production build still needs Google Fonts network access.
 
 ---
@@ -143,7 +149,7 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 
 **API routes:** `POST /api/enquiries`, `/api/applications` (one per phone per 30 days), `/api/partners` (one per phone). All validate with Zod on the server, use a hidden honeypot field, and return friendly errors. They return 503 when `DATABASE_URL` is missing.
 
-**Pages:** `/`, `/events`, `/events/[slug]`, `/join`, `/join/team`, `/join/partner`, `/dreams` (info only), `/donate` (info only), `/my-ailu` (placeholder), `/coming-soon`.
+**Pages:** `/`, `/events`, `/events/[slug]`, `/join`, `/join/team`, `/join/partner`, `/dreams` (information-only by default; private form behind `DREAMS_FORM_OPEN`), `/donate` (info only), `/my-ailu` (placeholder), `/coming-soon`.
 
 ---
 
@@ -153,7 +159,7 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 - Animations (intro flight, scroll logo, hero 3D) were **never viewed in a browser** by the author. Please run them and fix visual issues: hand landing a few pixels off the logo's hand, compact logo spacing (`GAP` in `logoLayers.ts`), mobile performance.
 - A production `npm run build` needs network access to Google Fonts (`next/font`); it failed in this environment with `EACCES` while fetching Inter and Poppins.
 - Rate limiting is database-backed; production requires `RATE_LIMIT_SALT` to be configured before public forms will accept submissions.
-- `npm audit --omit=dev` currently reports nine production dependency advisories, including one critical Next.js issue and high-severity PostCSS/Zod advisories. The suggested automatic fix includes a major Next.js upgrade; review a supported upgrade path and run CRM regression before launch. Do not apply `npm audit fix --force` blindly.
+- `npm audit --omit=dev` still reports advisories across Next.js, Zod, glob and minimatch after same-major patching. Current Next 14 and Zod 3 have no fix for all reported ranges; glob/minimatch fixes require a major version. Review an approved major-upgrade path before production. Do not apply `npm audit fix --force` blindly.
 - The privacy, terms, and referral policy pages are drafts and need review by an Indian lawyer before launch. Data-retention periods, consent-evidence retention, and response expectations are undecided.
 - Real approved event photographs, About/story content, traditions/service details, and official social URLs are still needed.
 
@@ -172,7 +178,7 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 3. **Supply approved content:** About/story, category/traditions information, real photographs with permissions, and official social links.
 4. **Runtime verify A2–A4:** with authenticated OWNER, MANAGER, STAFF and ACCOUNTS accounts, walk finance, application conversion, assignments, commission eligibility/approval/payment, dashboard scopes, search visibility, calendar filters, and role boundaries.
 5. **Customer accounts:** phone number + OTP login (provider decision pending); "My AILU" dashboard for enquiries, applications, partner ID and referrals.
-6. **Private dream submission:** only after designing consent and guardian consent for minors, private moderation, and minimal data collection.
+6. **Dream launch readiness:** lawyer review; decide retention and closed-record policy, grievance contact, guardian verification, which staff may handle minors' dreams, and emergency response. Test adult/guardian submissions and OWNER deletion before setting `DREAMS_FORM_OPEN=true`.
 7. **Later:** CMS, reports, loyalty points only after a business decision, "Meet AILU" character/chat, notifications, and customer payments.
 
 ## 10. Open decisions (ask Rani, do not guess)
@@ -182,3 +188,7 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 - Referral reward rules (fixed vs percentage, which event types).
 - Legal entity and payment provider for donations.
 - When to switch `COMING_SOON` off.
+- Dream-data retention period and how long closed submissions remain.
+- Privacy grievance contact and response expectations for dream requests.
+- How AILU verifies a parent/guardian relationship and which individual staff may handle minors' dreams.
+- What staff should do if a submission describes an emergency or urgent medical/financial crisis.

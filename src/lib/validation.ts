@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { EVENT_CATEGORIES } from "./events";
 import { ROLES } from "./roles";
+import { containsSensitiveDreamPattern, DREAM_CATEGORIES } from "./dreams";
 
 const PHONE = /^(\+91[\s-]?)?[6-9](?:[\s-]?\d){9}$/;
 export const indianPhoneSchema = z.string().trim().regex(PHONE, "Enter a valid Indian mobile number");
@@ -66,3 +67,42 @@ export const partnerSchema = z.object({
   consent: z.literal(true, { errorMap: () => ({ message: "Please tick this box so we can contact you" }) }),
   website: z.string().max(0).optional(),
 });
+
+const optionalDreamText = (max: number) => z.union([
+  z.literal(""),
+  z.string().trim().max(max).refine((value) => !containsSensitiveDreamPattern(value), "Please remove identity, card or financial details and try again."),
+]).optional();
+const requiredDreamText = (max: number) => z.string().trim().min(1, "Tell us a little about the dream.").max(max)
+  .refine((value) => !containsSensitiveDreamPattern(value), "Please remove identity, card or financial details and try again.");
+const optionalDreamPhone = z.union([z.literal(""), indianPhoneSchema]).optional();
+const optionalDreamEmail = z.union([z.literal(""), z.string().trim().email().max(120)]).optional();
+const dreamName = z.string().trim().max(80).refine((value) => !containsSensitiveDreamPattern(value), "Please remove identity or financial details.");
+
+export const dreamSubmissionSchema = z.object({
+  isMinor: z.boolean(),
+  displayName: dreamName.optional(),
+  guardianName: dreamName.optional(),
+  guardianPhone: optionalDreamPhone,
+  guardianConsent: z.boolean().optional(),
+  contactPhone: optionalDreamPhone,
+  contactEmail: optionalDreamEmail,
+  city: z.string().trim().min(2).max(80).refine((value) => !containsSensitiveDreamPattern(value), "Please remove identity or financial details."),
+  category: z.enum(DREAM_CATEGORIES),
+  dream: requiredDreamText(2000),
+  whyItMatters: optionalDreamText(1500),
+  helpNeeded: optionalDreamText(1500),
+  consentToContact: z.literal(true, { errorMap: () => ({ message: "Please agree before sending your dream." }) }),
+  website: z.string().max(0).optional(),
+}).strict().superRefine((value, context) => {
+  if (value.isMinor) {
+    if (!value.guardianName || value.guardianName.trim().length < 2) context.addIssue({ code: z.ZodIssueCode.custom, path: ["guardianName"], message: "Enter the parent or guardian's name." });
+    if (!value.guardianPhone || !value.guardianPhone.trim()) context.addIssue({ code: z.ZodIssueCode.custom, path: ["guardianPhone"], message: "Enter the parent or guardian's mobile number." });
+    if (value.guardianConsent !== true) context.addIssue({ code: z.ZodIssueCode.custom, path: ["guardianConsent"], message: "A parent or guardian must agree before submitting." });
+    if (value.contactPhone || value.contactEmail) context.addIssue({ code: z.ZodIssueCode.custom, path: ["contactPhone"], message: "For a dreamer under 18, only the guardian's contact details may be sent." });
+  } else {
+    if (!value.displayName || value.displayName.trim().length < 2) context.addIssue({ code: z.ZodIssueCode.custom, path: ["displayName"], message: "Enter your name or nickname." });
+    if (!value.contactPhone?.trim() && !value.contactEmail?.trim()) context.addIssue({ code: z.ZodIssueCode.custom, path: ["contactPhone"], message: "Enter a phone number or email so AILU can contact you privately." });
+    if (value.guardianName || value.guardianPhone || value.guardianConsent) context.addIssue({ code: z.ZodIssueCode.custom, path: ["guardianName"], message: "Guardian details are only used when the dreamer is under 18." });
+  }
+});
+export type DreamSubmissionInput = z.infer<typeof dreamSubmissionSchema>;

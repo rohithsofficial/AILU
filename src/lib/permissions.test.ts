@@ -48,4 +48,13 @@ describe("staff permissions", () => {
     expect(can("ACCOUNTS", "commissions.mark_paid")).toBe(true);
     expect(can("STAFF", "commissions.read")).toBe(false);
   });
+
+  it("restricts every dream permission to OWNER and MANAGER", () => {
+    for (const action of ["dream.read", "dream.manage"] as const) {
+      expect(can("OWNER", action)).toBe(true);
+      expect(can("MANAGER", action)).toBe(true);
+      expect(can("STAFF", action)).toBe(false);
+      expect(can("ACCOUNTS", action)).toBe(false);
+    }
+  });
 });

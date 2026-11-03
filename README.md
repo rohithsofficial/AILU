@@ -32,6 +32,7 @@ Public launch settings:
 
 - `NEXT_PUBLIC_SITE_URL`: final canonical HTTPS website origin, used for metadata and sitemap URLs.
 - `RATE_LIMIT_SALT`: long random server-only secret used to hash public form rate-limit identifiers. Do not expose or reuse the preview secret.
+- `DREAMS_FORM_OPEN`: defaults to `false`. Set to `true` only after legal and safeguarding review; it opens private dream intake on `/dreams` and `POST /api/dreams`.
 - `COMING_SOON` and `PREVIEW_SECRET`: keep the public site hidden until launch checks pass; the preview secret stays private.
 - `NEXT_PUBLIC_WHATSAPP_NUMBER`: optional country-code digits; otherwise the number in `src/lib/brand.ts` is used.
 
@@ -49,7 +50,9 @@ Applications can be reviewed and converted to team members. Existing normalized 
 
 The A4 dashboard filters records and finance by role. It includes today's work, upcoming and unassigned queues, needs-attention rules, finance due lists, and estimated margin. The month calendar and global search use the same server-side event and record access scopes as the admin lists. Search requires two characters, waits 300 ms after typing, and returns at most five results per allowed group. A4 makes no schema changes or new dependencies.
 
-The public launch pass adds About, Contact, FAQ, and legal pages; canonical/Open Graph metadata, Organization/FAQ/Breadcrumb structured data, robots and sitemap routes; public form abuse limits; form consent and accessibility improvements; and 404/error/loading states. Rate-limit rows store salted hashes rather than raw IPs. The website collects no payments, dream submissions, analytics, or advertising trackers. Legal pages are drafts and need legal review. See `LAUNCH_CHECKLIST.md` before changing `COMING_SOON` to false.
+The public launch pass adds About, Contact, FAQ, and legal pages; canonical/Open Graph metadata, Organization/FAQ/Breadcrumb structured data, robots and sitemap routes; public form abuse limits; form consent and accessibility improvements; and 404/error/loading states. Rate-limit rows store salted hashes rather than raw IPs. The website collects no payments, analytics, or advertising trackers. Private dream intake is gated off by default with `DREAMS_FORM_OPEN=false`; when enabled it stores dream details separately from clients/events, restricts review to OWNER and MANAGER, and never publishes submissions. See `LAUNCH_CHECKLIST.md` before changing either public intake switch.
+
+Private dream review: `/admin/dreams` is available only to OWNER and MANAGER. Deletion is OWNER-only and permanently removes the submission and status history while retaining an audit record with the reference ID and deletion reason. Do not put submission text in logs, global search, public content, analytics or staff notes outside this restricted workflow. Apply the additive `dreams_private_submissions` migration with `npx prisma migrate deploy` before deploying this feature. Keep `DREAMS_FORM_OPEN=false` until the legal and safeguarding checklist is complete.
 
 ## Checks
 

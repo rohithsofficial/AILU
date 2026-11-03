@@ -17,6 +17,7 @@ const ITEMS: { href: string; label: string; ownerOnly?: boolean; roles?: StaffRo
   { href: "/admin/team", label: "Team" },
   { href: "/admin/partners", label: "Partners" },
   { href: "/admin/commissions", label: "Commissions", roles: ["OWNER", "MANAGER", "ACCOUNTS"] },
+  { href: "/admin/dreams", label: "Private dreams", roles: ["OWNER", "MANAGER"] },
   { href: "/admin/settings/staff", label: "Staff", ownerOnly: true },
   { href: "/admin/settings/audit", label: "Audit log", ownerOnly: true },
 ];

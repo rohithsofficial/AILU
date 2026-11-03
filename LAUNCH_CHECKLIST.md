@@ -36,7 +36,7 @@ Complete these checks before opening the public site. Keep `COMING_SOON=true` un
 - [ ] Confirm a sixth event enquiry from one IP in an hour receives HTTP 429 and a `Retry-After` header; confirm the per-phone limit too.
 - [ ] Test a team application and partner registration, their required consent, duplicate checks, and honeypot behavior.
 - [ ] Test missing database configuration returns the existing friendly HTTP 503 response.
-- [ ] Confirm no payment is taken, no dream submission form is open, and Donation Box stays off.
+- [ ] Confirm no payment is taken, `DREAMS_FORM_OPEN=false` until dream privacy and safeguarding review is complete, and Donation Box stays off.
 - [ ] Test the WhatsApp message and its prefilled text on mobile and desktop.
 - [ ] Check all public pages, the 404 page, and friendly error/retry pages.
 - [ ] Check keyboard-only navigation, focus indicators, mobile navigation Escape behavior, screen-reader labels, and forms at 360 px width.
@@ -49,6 +49,16 @@ Complete these checks before opening the public site. Keep `COMING_SOON=true` un
 
 - [ ] Have an Indian privacy lawyer review `/privacy`, `/terms`, and `/referral-policy`, including the DPDP Act and rules applicable at launch.
 - [ ] Decide and document data-retention periods and the process for access, correction, and deletion requests.
+- [ ] Before setting `DREAMS_FORM_OPEN=true`, have an Indian privacy lawyer review dream and children's data handling, consent, deletion, retention and emergency wording.
+- [ ] With dream intake open in a safe test environment, submit one adult request and one parent/guardian request; verify that the child's own phone and email fields do not exist.
+- [ ] Test that Aadhaar-like, PAN-like, and card-like numbers are rejected with a friendly error, and ordinary numbers are accepted.
+- [ ] Verify the fourth submission from one IP in a day receives 429 and the third submission for one contact in a day receives 429.
+- [ ] With `DREAMS_FORM_OPEN` unset or false, verify `/dreams` is information-only and `POST /api/dreams` returns 503.
+- [ ] Verify STAFF and ACCOUNTS cannot access `/admin/dreams` by URL or call its server actions; verify OWNER and MANAGER can review.
+- [ ] Open a dream detail as OWNER/MANAGER and confirm a `dream.viewed` audit entry contains the actor, time and reference ID only.
+- [ ] Exercise allowed status transitions and required reasons for Not possible / Closed; verify notes/status audit entries never contain dream text.
+- [ ] Test OWNER deletion with an incorrect typed ID and then the exact ID; confirm failed confirmation preserves the record and successful deletion leaves only the ID/reason audit record.
+- [ ] Confirm dream submissions never appear in global search, sitemap data, public responses, public stories, metadata, logs or analytics.
 - [ ] Confirm the enquiry/application/partner consent wording and whether consent evidence should be retained in the database in a future additive change.
 - [ ] Supply AILU-approved About/story content. Founder/team profiles remain absent until real details are supplied.
 - [ ] Add approved, real event images to `src/content/site.ts` and `public/gallery/`; use alt text and retain permission for identifiable people.

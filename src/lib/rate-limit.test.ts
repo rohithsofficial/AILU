@@ -54,10 +54,26 @@ describe("public form rate limits", () => {
     expect(PUBLIC_RATE_LIMITS.enquiryPhone.limit).toBe(3);
     expect(PUBLIC_RATE_LIMITS.applicationIp.limit).toBe(3);
     expect(PUBLIC_RATE_LIMITS.partnerIp.limit).toBe(3);
+    expect(PUBLIC_RATE_LIMITS.dreamIp.limit).toBe(3);
+    expect(PUBLIC_RATE_LIMITS.dreamContact.limit).toBe(2);
+    expect(PUBLIC_RATE_LIMITS.dreamIp.windowMs).toBe(24 * 60 * 60 * 1000);
+    expect(PUBLIC_RATE_LIMITS.dreamContact.windowMs).toBe(24 * 60 * 60 * 1000);
     vi.spyOn(Math, "random").mockReturnValue(0.5);
     const store = fakeStore();
     const results = [];
     for (let index = 0; index < 4; index += 1) results.push((await consumeRateLimit({ store, route: PUBLIC_RATE_LIMITS.enquiryPhone.route, identifier: "+919876543210", limit: PUBLIC_RATE_LIMITS.enquiryPhone.limit, windowMs: PUBLIC_RATE_LIMITS.enquiryPhone.windowMs, salt: "test-salt", now: new Date("2026-11-03T10:00:00Z") })).allowed);
     expect(results).toEqual([true, true, true, false]);
+  });
+
+  it("limits dream IPs to three and each contact to two per day", async () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.5);
+    const store = fakeStore();
+    const now = new Date("2026-11-03T10:00:00Z");
+    const ipResults = [];
+    for (let index = 0; index < 4; index += 1) ipResults.push((await consumeRateLimit({ store, route: PUBLIC_RATE_LIMITS.dreamIp.route, identifier: "203.0.113.3", limit: PUBLIC_RATE_LIMITS.dreamIp.limit, windowMs: PUBLIC_RATE_LIMITS.dreamIp.windowMs, salt: "test-salt", now })).allowed);
+    const contactResults = [];
+    for (let index = 0; index < 3; index += 1) contactResults.push((await consumeRateLimit({ store, route: PUBLIC_RATE_LIMITS.dreamContact.route, identifier: "phone:+919876543210", limit: PUBLIC_RATE_LIMITS.dreamContact.limit, windowMs: PUBLIC_RATE_LIMITS.dreamContact.windowMs, salt: "test-salt", now })).allowed);
+    expect(ipResults).toEqual([true, true, true, false]);
+    expect(contactResults).toEqual([true, true, false]);
   });
 });

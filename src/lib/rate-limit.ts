@@ -6,6 +6,8 @@ export const PUBLIC_RATE_LIMITS = {
   enquiryPhone: { route: "enquiries-phone", limit: 3, windowMs: 60 * 60 * 1000 },
   applicationIp: { route: "applications-ip", limit: 3, windowMs: 24 * 60 * 60 * 1000 },
   partnerIp: { route: "partners-ip", limit: 3, windowMs: 24 * 60 * 60 * 1000 },
+  dreamIp: { route: "dreams-ip", limit: 3, windowMs: 24 * 60 * 60 * 1000 },
+  dreamContact: { route: "dreams-contact", limit: 2, windowMs: 24 * 60 * 60 * 1000 },
 } as const;
 
 export function hashRateLimitKey(identifier: string, route: string, salt = process.env.RATE_LIMIT_SALT ?? "") {

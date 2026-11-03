@@ -529,13 +529,79 @@ model Activity {
 
 // Anonymous public-form abuse counters. The identifier is HMAC-hashed; raw IPs are never stored.
 model RateLimit {
-  id         String   @id @default(cuid())
-  keyHash    String
-  route      String
+  id          String   @id @default(cuid())
+  keyHash     String
+  route       String
   windowStart DateTime
-  count      Int      @default(0)
-  updatedAt  DateTime @updatedAt
+  count       Int      @default(0)
+  updatedAt   DateTime @updatedAt
 
   @@unique([keyHash, route, windowStart])
   @@index([windowStart])
+}
+
+// Private dream submissions are not linked to clients, events, or public content.
+enum DreamCategory {
+  MY_DREAM
+  FAMILY
+  CELEBRATION
+  HELPING_SOMEONE
+  COMMUNITY
+  CREATIVE_IDEA
+  SOMETHING_SPECIAL
+}
+
+enum DreamStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  NEED_MORE_INFO
+  SHORTLISTED
+  IN_PROGRESS
+  FULFILLED
+  NOT_POSSIBLE
+  CLOSED
+}
+
+model Dream {
+  seq              Int                 @unique @default(autoincrement())
+  id               String              @id // AILU-DRM-000001
+  displayName      String?             @db.VarChar(80)
+  city             String              @db.VarChar(80)
+  isMinor          Boolean             @default(false)
+  guardianName     String?             @db.VarChar(80)
+  guardianPhone    String?             @db.VarChar(16)
+  guardianConsent  Boolean             @default(false)
+  contactPhone     String?             @db.VarChar(16)
+  contactEmail     String?             @db.VarChar(120)
+  category         DreamCategory
+  dream            String              @db.VarChar(2000)
+  whyItMatters     String?             @db.VarChar(1500)
+  helpNeeded       String?             @db.VarChar(1500)
+  consentToContact Boolean             @default(false)
+  status           DreamStatus         @default(SUBMITTED)
+  internalNotes    String?             @db.VarChar(4000)
+  decidedById      String?
+  decidedAt        DateTime?
+  statusReason     String?             @db.VarChar(1000)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  statusHistory    DreamStatusChange[]
+
+  @@index([status, createdAt])
+  @@index([contactPhone, createdAt])
+  @@index([contactEmail, createdAt])
+  @@index([guardianPhone, createdAt])
+}
+
+model DreamStatusChange {
+  id          String       @id @default(cuid())
+  dreamId     String
+  dream       Dream        @relation(fields: [dreamId], references: [id], onDelete: Cascade)
+  fromStatus  DreamStatus?
+  toStatus    DreamStatus
+  reason      String?      @db.VarChar(1000)
+  changedById String?
+  createdAt   DateTime     @default(now())
+
+  @@index([dreamId, createdAt])
 }

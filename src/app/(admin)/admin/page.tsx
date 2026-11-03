@@ -26,6 +26,7 @@ export default async function AdminDashboard() {
     ...(data.counts.partners !== null ? [{ label: "Partners awaiting review", value: data.counts.partners, detail: "Registration pending", href: "/admin/partners?status=PENDING" }] : []),
     ...(data.counts.commissionsPending !== null ? [{ label: "Commissions to approve", value: data.counts.commissionsPending, detail: "Owner approval required", href: "/admin/commissions?status=PENDING_APPROVAL" }] : []),
     ...(data.counts.commissionsPayable !== null ? [{ label: "Approved commissions to pay", value: data.counts.commissionsPayable, detail: "Payment not recorded", href: "/admin/commissions?status=APPROVED" }] : []),
+    ...(data.counts.dreams !== null ? [{ label: "Dreams waiting for review", value: data.counts.dreams, detail: "Private submissions", href: "/admin/dreams?status=SUBMITTED" }] : []),
   ];
   const attentionGroups = [...new Set(data.attention.map((item) => item.rule))];
   return <div className="mx-auto max-w-7xl">

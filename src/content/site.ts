@@ -27,7 +27,7 @@ export const SITE_CONTENT = {
     { question: "Can I request North Indian or South Indian traditions?", answer: "Yes. Tell AILU which traditions, customs, and programme details matter to you so they can be discussed during planning." },
     { question: "How can I join the AILU team?", answer: "Use the team application form to share your contact details, interests, skills, and relevant experience. Applying does not guarantee employment or an assignment." },
     { question: "How does the sales partner programme work?", answer: "Register as a partner and share your partner ID with someone who enquires. A reward is considered only for a verified, completed, paid booking under terms AILU confirms. Earnings are not guaranteed." },
-    { question: "How does AILU handle dreams?", answer: "Dreams are not submitted through this site yet. Any future dream support is intended to remain private; stories are never published." },
+    { question: "How does AILU handle dreams?", answer: "When the private dream form is open, submissions are reviewed only by authorized OWNER and MANAGER staff and are never published or used as public stories. A parent or guardian must submit and consent for someone under 18. Sharing a dream does not guarantee support; AILU decides based on suitability, safety and available resources. The form is not for emergencies; if anyone is in immediate danger in India, call 112." },
     { question: "How is my information used?", answer: "Form details are stored in AILU's database and used to respond to your enquiry or manage an application or partner registration. See the Privacy page for details." },
     { question: "How do I contact AILU?", answer: `Call or WhatsApp ${BRAND.phone}, or email ${BRAND.email}.` },
   ],

@@ -18,13 +18,14 @@ const taskScope = (staff: Staff) => staff.role === "STAFF" ? { assigneeId: staff
 
 export async function dashboardA4Counts(staff: Staff) {
   const db = getPrisma();
-  const [applications, partners, commissionsPending, commissionsPayable] = await Promise.all([
+  const [applications, partners, commissionsPending, commissionsPayable, dreams] = await Promise.all([
     can(staff.role, "applications.read") ? db.application.count({ where: { status: "SUBMITTED" } }) : Promise.resolve(null),
     can(staff.role, "partners.read") ? db.salesPartner.count({ where: { status: "PENDING" } }) : Promise.resolve(null),
     can(staff.role, "commissions.approve") ? db.commission.count({ where: { status: "PENDING_APPROVAL" } }) : Promise.resolve(null),
     can(staff.role, "commissions.mark_paid") ? db.commission.count({ where: { status: "APPROVED" } }) : Promise.resolve(null),
+    can(staff.role, "dream.read") ? db.dream.count({ where: { status: "SUBMITTED" } }) : Promise.resolve(null),
   ]);
-  return { applications, partners, commissionsPending, commissionsPayable };
+  return { applications, partners, commissionsPending, commissionsPayable, dreams };
 }
 
 async function moneyDashboard(staff: Staff, now: Date) {
@@ -78,10 +79,11 @@ async function needsAttention(staff: Staff, now: Date, limit: number) {
   const overdueBefore = new Date(now.getTime() - ATTENTION_THRESHOLDS.overdueTaskDays * day);
   const enquiryBefore = new Date(now.getTime() - ATTENTION_THRESHOLDS.enquiryHours * 60 * 60 * 1000);
   const quotationBefore = new Date(now.getTime() - ATTENTION_THRESHOLDS.sentQuotationDays * day);
+  const dreamReviewBefore = new Date(now.getTime() - ATTENTION_THRESHOLDS.dreamReviewDays * day);
   const planningFrom = indiaDayStart(now);
   const planningUntil = addDays(planningFrom, ATTENTION_THRESHOLDS.preEventDays);
   const balanceUntil = addDays(planningFrom, ATTENTION_THRESHOLDS.balanceDueDays);
-  const [enquiries, quotations, planning, executed, overdueTasks, pendingPartners, clientMoney] = await Promise.all([
+  const [enquiries, quotations, planning, executed, overdueTasks, pendingPartners, clientMoney, dreams] = await Promise.all([
     inbox ? db.eventEnquiry.findMany({ where: { spam: false, createdAt: { lt: enquiryBefore }, OR: [{ ownerId: null }, { eventId: null }], ...(staff.role === "STAFF" ? { AND: [{ OR: [{ ownerId: staff.id }, { ownerId: null }] }] } : {}) }, select: { id: true, name: true, ownerId: true, eventId: true, spam: true, createdAt: true }, take: 1000 }) : Promise.resolve([]),
     db.quotation.findMany({ where: { status: "SENT", createdAt: { lt: quotationBefore }, event: scope }, select: { id: true, eventId: true, status: true, createdAt: true, event: { select: { title: true } } }, take: 1000 }),
     db.event.findMany({ where: { ...scope, status: { in: ["CONFIRMED", "PLANNING"] }, startDate: { gte: planningFrom, lte: planningUntil } }, select: { id: true, title: true, status: true, startDate: true, _count: { select: { vendorBookings: { where: { status: { not: "CANCELLED" } } }, assignments: { where: { status: { not: "DROPPED" } } } } } }, take: 1000 }),
@@ -89,6 +91,7 @@ async function needsAttention(staff: Staff, now: Date, limit: number) {
     db.task.findMany({ where: { doneAt: null, dueAt: { lt: overdueBefore }, OR: [{ eventId: { not: null } }, { clientId: { not: null } }], ...(staff.role === "STAFF" ? { assigneeId: staff.id } : {}) }, orderBy: { dueAt: "asc" }, select: { id: true, title: true, dueAt: true, eventId: true, clientId: true }, take: 1000 }),
     partners ? db.salesPartner.findMany({ where: { status: "PENDING", createdAt: { lt: new Date(now.getTime() - ATTENTION_THRESHOLDS.pendingPartnerDays * day) } }, select: { id: true, name: true, status: true, createdAt: true }, take: 1000 }) : Promise.resolve([]),
     finance ? db.event.findMany({ where: { ...scope, status: { notIn: ["CANCELLED", "LOST"] }, startDate: { gte: planningFrom, lte: balanceUntil }, quotations: { some: { status: "ACCEPTED" } } }, select: { id: true, title: true, startDate: true, quotations: { where: { status: "ACCEPTED" }, orderBy: { version: "desc" }, take: 1, select: { totalPaise: true } }, payments: { where: { direction: "IN" }, select: { amountPaise: true } } }, take: 1000 }) : Promise.resolve([]),
+    can(staff.role, "dream.read") ? db.dream.findMany({ where: { status: "SUBMITTED", createdAt: { lt: dreamReviewBefore } }, select: { id: true, status: true, createdAt: true }, take: 1000 }) : Promise.resolve([]),
   ]);
   const balances = clientMoney.map((event) => ({ id: event.id, title: event.title, startDate: event.startDate!, balanceDuePaise: outstandingPaise(event.quotations[0]?.totalPaise ?? null, event.payments.reduce((sum, payment) => sum + payment.amountPaise, 0)) }));
   const executionActivities = executed.length ? await db.activity.findMany({ where: { kind: "STATUS", eventId: { in: executed.map((event) => event.id) }, body: { contains: "→ EXECUTED" } }, orderBy: { at: "desc" }, select: { eventId: true, at: true } }) : [];
@@ -122,6 +125,7 @@ async function needsAttention(staff: Staff, now: Date, limit: number) {
     executedEvents: executed.map((event) => ({ ...event, executedAt: executedAtByEvent.get(event.id) ?? null })),
     overdueTasks: taskRows,
     pendingPartners,
+    dreams,
   }, now, finance);
   return rows.slice(0, Math.max(1, Math.min(1000, limit)));
 }

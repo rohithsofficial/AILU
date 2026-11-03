@@ -61,6 +61,16 @@ describe("A4 needs-attention rules", () => {
     expect(buildAttentionItems({ pendingPartners: [{ ...row, createdAt: ago(3 * day) }] }, now)).toHaveLength(0);
     expect(buildAttentionItems({ pendingPartners: [{ ...row, status: "APPROVED" }] }, now)).toHaveLength(0);
   });
+
+  it("flags private dreams waiting for review beyond three days without exposing their text", () => {
+    const row = { id: "AILU-DRM-000001", status: "SUBMITTED", createdAt: ago(3 * day + 1) };
+    const items = buildAttentionItems({ dreams: [row] }, now);
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({ rule: "Dreams", label: "Private dream submission", href: "/admin/dreams/AILU-DRM-000001" });
+    expect(items[0].message).not.toContain("dream text");
+    expect(buildAttentionItems({ dreams: [{ ...row, createdAt: ago(3 * day) }] }, now)).toHaveLength(0);
+    expect(buildAttentionItems({ dreams: [{ ...row, status: "UNDER_REVIEW" }] }, now)).toHaveLength(0);
+  });
 });
 
 describe("calendar range rules", () => {

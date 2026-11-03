@@ -6,6 +6,7 @@ export const ATTENTION_THRESHOLDS = {
   executedDays: 3,
   overdueTaskDays: 3,
   pendingPartnerDays: 3,
+  dreamReviewDays: 3,
 } as const;
 
 const hour = 60 * 60 * 1000;
@@ -33,6 +34,7 @@ export type AttentionInput = {
   executedEvents?: { id: string; title: string; status: string; startDate: Date | null; executedAt?: Date | null }[];
   overdueTasks?: { id: string; title: string; dueAt: Date; eventId: string | null; clientId: string | null }[];
   pendingPartners?: { id: string; name: string; status: string; createdAt: Date }[];
+  dreams?: { id: string; status: string; createdAt: Date }[];
 };
 
 export function buildAttentionItems(input: AttentionInput, now = new Date(), includeFinance = false): AttentionItem[] {
@@ -71,6 +73,10 @@ export function buildAttentionItems(input: AttentionInput, now = new Date(), inc
   for (const row of input.pendingPartners ?? []) {
     if (row.status !== "PENDING" || now.getTime() - row.createdAt.getTime() <= ATTENTION_THRESHOLDS.pendingPartnerDays * day) continue;
     add({ rule: "Partners", recordId: row.id, label: row.name, message: "Registration pending for over 3 days", href: `/admin/partners/${row.id}`, at: row.createdAt });
+  }
+  for (const row of input.dreams ?? []) {
+    if (row.status !== "SUBMITTED" || now.getTime() - row.createdAt.getTime() <= ATTENTION_THRESHOLDS.dreamReviewDays * day) continue;
+    add({ rule: "Dreams", recordId: row.id, label: "Private dream submission", message: "Waiting for review for over 3 days", href: `/admin/dreams/${row.id}`, at: row.createdAt });
   }
   return items.sort((a, b) => a.at.getTime() - b.at.getTime());
 }
