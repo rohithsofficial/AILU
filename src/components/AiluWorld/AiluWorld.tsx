@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import "./ailu-world.css";
+import "./world-brand.css";
 import { startAilu } from "./engine";
 import { HIDDEN_PLACES, WORLD_MARKUP } from "./worldMarkup";
 
