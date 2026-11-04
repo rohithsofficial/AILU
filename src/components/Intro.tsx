@@ -10,6 +10,17 @@ const HAND_FILL = 0.76; // the standalone hand artwork fills about 76% of its im
 type Box = { l: number; t: number; w: number; h: number };
 const setLogo = (v: "pending" | "ready") => { document.documentElement.dataset.logo = v; };
 
+// Where the hand lands: the navbar logo's hand layer, or the hand inside the AILU World header logo
+// (/ailu/img-08f725e1.png, where the hand covers about x 64–98% and y 10–95% of the image).
+function handTarget() {
+  const navHand = document.querySelector("[data-ailu-hand]");
+  if (navHand) return navHand.getBoundingClientRect();
+  const worldLogo = document.querySelector(".ailu .top img");
+  if (!worldLogo) return null;
+  const r = worldLogo.getBoundingClientRect();
+  return { left: r.left + r.width * 0.64, top: r.top + r.height * 0.1, width: r.width * 0.34, height: r.height * 0.85 };
+}
+
 // steps: 0 hand alone, 1 welcome, 2 the AILU feeling, 3 choose a path
 export default function Intro() {
   const router = useRouter();
@@ -30,7 +41,8 @@ export default function Intro() {
     if (rm) { setStep(3); return; }
     // Let the brand open quickly; visitors can enter or skip without waiting through a long intro.
     timers.current = [setTimeout(() => setStep(1), 450), setTimeout(() => setStep(2), 1200), setTimeout(() => setStep(3), 2300)];
-    return () => timers.current.forEach(clearTimeout);
+    // If the visitor leaves mid-intro, never leave the navbar logo and WhatsApp button hidden.
+    return () => { timers.current.forEach(clearTimeout); setLogo("ready"); };
   }, []);
 
   useEffect(() => { document.body.style.overflow = phase === "done" ? "" : "hidden"; return () => { document.body.style.overflow = ""; }; }, [phase]);
@@ -46,18 +58,19 @@ export default function Intro() {
     if (flight) return;
     timers.current.forEach(clearTimeout);
     const fromEl = handRef.current;
-    const toEl = document.querySelector("[data-ailu-hand]");
-    if (reduced || !fromEl || !toEl) return finishNow();
+    const t = handTarget();
+    if (reduced || !fromEl || !t) return finishNow();
     sessionStorage.setItem(KEY, "1");
     const f = fromEl.getBoundingClientRect();
-    const t = toEl.getBoundingClientRect();
     const w = t.width / HAND_FILL; // enlarge so the hand artwork itself lands on the logo's hand
     const h = w * 0.75;
     setFlight({ from: { l: f.left, t: f.top, w: f.width, h: f.height }, to: { l: t.left + t.width / 2 - w / 2, t: t.top + t.height / 2 - h / 2, w, h } });
   }
 
+  // Both paths leave the world for the Normal World, so there is no flight to the world logo.
   function choose(intent: "events" | "join") {
-    startFlight();
+    timers.current.forEach(clearTimeout);
+    finishNow();
     router.push(intent === "events" ? "/events" : "/join");
   }
 
