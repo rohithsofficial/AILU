@@ -18,3 +18,14 @@ Already handled by `worldMarkup.ts`; once the source has them, the matching patc
 
 1. Remove `['rewards','Rewards']` from `PLACES` and `'rewards'` from `prepList`, and delete the rewards sub-world and the `hands` / `rwFx` / `tally` / `rwReset` code. Until then `AiluWorld.tsx` removes the Rewards hotspot and dock button after start, and `worldMarkup.ts` keeps hidden stub elements so the engine does not crash.
 2. Remove the `.waForm` submit handler (including the `fetch('/')` POST) and the "Forms become short steps" block.
+3. Line ~615: canvas text uses `Manrope` and `Fraunces`. Use `Poppins` (headings) and `Inter` (body). Read the family names from `getComputedStyle(ROOT).getPropertyValue('--head')`, because next/font gives them generated names.
+4. `GOLD='#f4bb25'`, `CREAM='#fff7e6'`, `FIG='#0b0c0a'` and the 3D colours (`0xffd27a` and similar): use `#F5C400`, `#FFFDF7`, `#111111`.
+
+## CSS (`ailu-world.css`)
+
+`world-brand.css` overrides the variables, but these need the source:
+
+1. Delete line 1, the `@import url("https://fonts.googleapis.com/...")` for DM Sans, Fraunces and Manrope. It is render-blocking and loads fonts the brand does not use. The variables already point to the next/font Poppins and Inter.
+2. Set `--head` / `--body` / `--accent` to `var(--font-poppins)` / `var(--font-inter)` / `var(--font-poppins)`, and the colours to `#F5C400`, `#111111` and `#FFFDF7`. Replace the hard-coded `#0e100d`, `#14130c`, `rgba(14,16,13,…)`, `rgba(244,193,61,…)` and `rgba(244,187,37,…)` values with the variables.
+3. Prefix every `@keyframes` name and its `animation` uses with `ailu-`: `land`, `nudge`, `slide`, `ping`, `collect`, `rise`, `settle`. These names are global and stay loaded after leaving the world. `ping` clashes with Tailwind's `animate-ping`.
+4. Add `h3` to the `.ailu h1,.ailu h2{font-family:var(--head)…}` rule. `world-brand.css` does this for now.
