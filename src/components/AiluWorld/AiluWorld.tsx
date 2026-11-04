@@ -2,25 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import "./ailu-world.css";
-import { BODY_HTML } from "./body";
 import { startAilu } from "./engine";
+import { HIDDEN_PLACES, WORLD_MARKUP } from "./worldMarkup";
 
-/**
- * Links inside the world that should open a REAL page of your site.
- * Left side: the link used inside the world. Right side: your Next.js route.
- * Anything not listed here stays inside the world (wedding room, people, culture ...).
- * Edit this table freely.
- */
-const ROUTES: Record<string, string> = {
-  "#jobs": "/join/team",
-  "#apply": "/join/team",
-  "#dreams": "/dreams",
-  "#share": "/dreams",
-  "#enquire": "/events#enquire",
-  "#policies": "/privacy",
-  "#rewards": "/referral-policy",
-};
-const WORLD_MARKUP = BODY_HTML.replace(/href="(#jobs|#apply|#dreams|#share|#enquire|#policies|#rewards)"/g, (_match, path: string) => `href="${ROUTES[path]}"`);
+// The engine builds a hotspot and a dock button for every place. Remove the ones the site has switched off.
+function hidePlaces(root: HTMLElement) {
+  root.querySelectorAll<HTMLElement>("#hots > *, #dock > *").forEach((el) => {
+    if (HIDDEN_PLACES.includes(el.textContent?.trim() ?? "")) el.remove();
+  });
+}
 
 export default function AiluWorld() {
   const ref = useRef<HTMLDivElement>(null);
@@ -34,8 +24,8 @@ export default function AiluWorld() {
 
     // three.js loads only in the browser; without it the page falls back to the scroll film.
     import("three").then(
-      (THREE) => { if (!cancelled) stop = startAilu(root, THREE); },
-      () => { if (!cancelled) stop = startAilu(root, undefined); },
+      (THREE) => { if (!cancelled) { stop = startAilu(root, THREE); hidePlaces(root); } },
+      () => { if (!cancelled) { stop = startAilu(root, undefined); hidePlaces(root); } },
     );
 
     return () => {

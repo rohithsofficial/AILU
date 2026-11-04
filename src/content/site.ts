@@ -31,5 +31,23 @@ export const SITE_CONTENT = {
     { question: "How is my information used?", answer: "Form details are stored in AILU's database and used to respond to your enquiry or manage an application or partner registration. See the Privacy page for details." },
     { question: "How do I contact AILU?", answer: `Call or WhatsApp ${BRAND.phone}, or email ${BRAND.email}.` },
   ],
+  world: {
+    // The AILU World never collects data. Each in-world form is replaced by a link to the real form.
+    forms: {
+      enqForm: { lead: "Tell us about your occasion on our enquiry form. No payment is needed to enquire.", href: "/events#enquire", label: "Open the enquiry form", note: "An enquiry is not a confirmed booking." },
+      jobForm: { lead: "Introduce yourself on our team application form.", href: "/join/team", label: "Open the team application", note: "Applying does not guarantee employment or an assignment." },
+      dreamForm: { lead: "Dream support is handled privately on our dreams page. A parent or guardian must be involved for anyone under 18.", href: "/dreams", label: "Read about private dream support", note: "Dreams are never published. Sharing a dream does not guarantee support." },
+    },
+    partner: { status: "Open", title: "Sales partners", body: "Introduce clients to AILU with your partner ID. A reward is considered only for a verified, completed, paid booking under terms AILU confirms.", note: "Registration does not guarantee earnings.", href: "/join/partner", label: "Register as a partner" },
+    dreamsStatus: "Private",
+    dreamsShareLead: "Dreams are read in confidence and never published. The private dream form opens on our dreams page when AILU is ready.",
+    dreamsShareNote: "A parent or guardian must be involved for anyone under 18. Please don’t include identity documents or financial details.",
+    referral: { eyebrow: "Sales partner programme", title: "Introduce a client.", em: "Under clear terms.", body: "Partners share their partner ID with people who enquire. A reward is considered only for a verified, completed, paid booking, under terms AILU confirms. Registration does not guarantee earnings." },
+    policies: {
+      title: "A little clarity.", em: "A lot of care.",
+      body: "Our privacy notice, website terms and referral policy are on their own pages.",
+      links: [{ href: "/privacy", label: "Privacy" }, { href: "/terms", label: "Terms" }, { href: "/referral-policy", label: "Referral policy" }],
+    },
+  },
   galleries: Object.fromEntries(EVENT_CATEGORIES.map((category) => [category.slug, [] as { src: string; alt: string; caption?: string }[]])) as Record<string, { src: string; alt: string; caption?: string }[]>,
 };
