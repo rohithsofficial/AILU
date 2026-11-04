@@ -11,6 +11,7 @@ export const ROOT_DESCRIPTION = "AILU is an event management and celebration com
 
 export const PUBLIC_PAGE_CONTENT: Record<string, { title: string; description: string }> = {
   "/": { title: "AILU | Creating Moments. Delivering Smiles.", description: ROOT_DESCRIPTION },
+  "/classic": { title: "Normal site", description: "The classic AILU website: events, joining the team, partner registration, private dream support and contact details." },
   "/events": { title: "Events", description: "Explore AILU event planning services for personal, wedding, corporate, cultural, entertainment, and community celebrations." },
   "/about": { title: "About", description: "Learn about AILU, an event management and celebration company based in Udupi, planning celebrations across India." },
   "/contact": { title: "Contact", description: "Contact AILU in Udupi about celebrations, team applications, or the sales partner programme." },

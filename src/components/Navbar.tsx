@@ -75,7 +75,6 @@ export default function Navbar() {
 
   useEffect(() => setOpen(false), [pathname]);
 
-  if (pathname === "/coming-soon") return null;
   const destination = DESTINATIONS[active];
   const variants = sceneMotion[destination.scene];
 
