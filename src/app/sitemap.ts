@@ -9,6 +9,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   if (process.env.COMING_SOON === "true") return [];
   const base = publicSiteUrl();
   if (!base) return [];
-  const paths = [...PUBLIC_STATIC_ROUTES.filter((path) => path !== "/world"), ...EVENT_CATEGORIES.map((category) => `/events/${category.slug}`)];
+  const paths = [...PUBLIC_STATIC_ROUTES, ...EVENT_CATEGORIES.map((category) => `/events/${category.slug}`)];
   return paths.map((path) => ({ url: new URL(path, base).toString(), changeFrequency: "monthly", priority: path === "/" ? 1 : 0.6 }));
 }
