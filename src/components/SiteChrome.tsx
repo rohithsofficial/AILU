@@ -14,7 +14,7 @@ export default function SiteChrome({ children }: { children: React.ReactNode }) 
       <Intro />
       <Navbar />
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      <main id="main-content" tabIndex={-1}>{children}</main>
+      <main id="main-content" tabIndex={-1} className="bg-ailu-black text-ailu-cream">{children}</main>
       <FloatingWhatsApp />
       <Footer />
     </>

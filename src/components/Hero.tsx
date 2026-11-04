@@ -2,43 +2,49 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import { BRAND } from "@/lib/brand";
+import { canUse3D } from "@/lib/device";
+
+const HeroScene = dynamic(() => import("@/components/HeroScene"), { ssr: false });
 
 export default function Hero() {
-  const reduceMotion = useReducedMotion();
+  const [useScene, setUseScene] = useState(false);
+
+  useEffect(() => {
+    setUseScene(canUse3D());
+  }, []);
 
   return (
-    <section className="relative isolate flex min-h-[min(900px,calc(100svh-4.5rem))] overflow-hidden bg-ailu-black text-ailu-cream">
-      <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_52%_42%,rgba(245,196,0,.2),transparent_28%),radial-gradient(ellipse_at_50%_100%,rgba(245,196,0,.12),transparent_50%)]" />
-      <span aria-hidden className="absolute right-[12%] top-[17%] -z-10 font-display text-5xl text-ailu-yellow/70 sm:right-[19%] sm:top-[12%] sm:text-7xl">✳</span>
-      <span aria-hidden className="absolute bottom-[21%] left-[8%] -z-10 text-2xl text-ailu-cream/55 sm:left-[16%] sm:text-4xl">✦</span>
+    <section className="relative isolate flex min-h-[min(760px,calc(100svh-4.5rem))] overflow-hidden bg-ailu-black text-ailu-cream">
+      <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_72%_48%,rgba(245,196,0,.15),transparent_32%),radial-gradient(ellipse_at_50%_110%,rgba(245,196,0,.08),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-y-0 right-[12%] hidden w-px bg-white/[.06] lg:block" />
 
-      <div className="relative mx-auto flex w-full max-w-[1600px] flex-col justify-between px-6 pb-9 pt-14 sm:px-12 sm:pb-12 lg:px-20 lg:pt-16">
-        <p className="relative z-10 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[.32em] text-ailu-yellow sm:text-xs">
-          <span className="h-px w-9 bg-ailu-yellow" /> Udupi, Karnataka · Creating Moments. Delivering Smiles.
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col justify-between px-6 pb-8 pt-10 sm:px-10 sm:pb-10 sm:pt-12 lg:px-16">
+        <p className="relative z-10 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[.25em] text-ailu-yellow sm:text-xs">
+          <span className="h-px w-8 bg-ailu-yellow" /> AILU · Udupi, Karnataka
         </p>
 
-        <div className="relative flex flex-1 items-center justify-center py-4">
-          <motion.div aria-hidden className="absolute inset-y-[-8%] right-[-2%] w-[76%] sm:right-[-4%] sm:w-[65%] lg:right-[-25%] lg:w-[60%]" initial={false} animate={reduceMotion ? undefined : { y: [0, -13, 0], rotate: [0, 1.5, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}>
-            <Image src={BRAND.hand} alt="" fill sizes="(min-width: 1024px) 60vw, 76vw" className="object-contain opacity-65 drop-shadow-[0_20px_55px_rgba(245,196,0,.2)]" priority />
-          </motion.div>
-          <div className="relative z-10 w-full pb-8 pt-10 sm:pb-12 lg:pb-4">
-            <h1 className="font-display text-[clamp(3rem,9vw,8.5rem)] font-extrabold leading-[.82] tracking-[-.08em]">
-              <span className="block">Come in<span className="text-ailu-yellow">.</span></span>
-              <span className="ml-[10vw] mt-4 block text-ailu-cream/90 sm:ml-[18vw]">Feel what</span>
-              <span className="ml-[3vw] mt-4 block italic text-ailu-yellow">a day can be.</span>
+        <div className="relative grid flex-1 items-center py-14 lg:grid-cols-[1.1fr_.9fr] lg:py-10">
+          <div aria-hidden className="pointer-events-none absolute inset-y-[-4%] right-[-12%] w-[76%] opacity-70 sm:right-[-5%] sm:w-[65%] lg:inset-y-[-10%] lg:right-[-4%] lg:w-[58%]">
+            {useScene ? <HeroScene /> : <Image src={BRAND.hand} alt="" fill sizes="(min-width: 1024px) 58vw, 76vw" className="object-contain drop-shadow-[0_20px_55px_rgba(245,196,0,.18)]" priority />}
+          </div>
+          <div className="relative z-10 max-w-3xl py-6 lg:py-12">
+            <h1 className="max-w-[11ch] font-display text-[clamp(3.25rem,7vw,6.5rem)] font-semibold leading-[.94] tracking-[-.065em]">
+              Creating moments.<br /><span className="font-medium text-ailu-yellow">Delivering smiles.</span>
             </h1>
-            <p className="mt-8 max-w-sm text-sm leading-relaxed text-ailu-cream/75 sm:ml-[18vw] sm:text-base">A gathering, a tradition, a reason to bring everyone close. Tell us what you’re dreaming up.</p>
-            <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-3 sm:ml-[18vw]">
-              <Link href="/events#enquire" className="group inline-flex min-h-12 items-center gap-3 border-b border-ailu-yellow pb-1 font-semibold text-ailu-yellow transition-colors hover:text-ailu-cream">Bring us your idea <span aria-hidden className="transition-transform group-hover:translate-x-1">↗</span></Link>
-              <Link href="/join" className="inline-flex min-h-12 items-center text-sm font-medium text-ailu-cream/75 transition-colors hover:text-ailu-yellow">Come create with us</Link>
+            <p className="mt-6 max-w-md text-base leading-relaxed text-ailu-cream/70 sm:text-lg">A gathering, a tradition, a reason to bring everyone close. Tell us what you’re imagining.</p>
+            <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-2">
+              <Link href="/events#enquire" className="group inline-flex min-h-12 items-center gap-3 border-b border-ailu-yellow pb-1 font-semibold text-ailu-yellow transition-colors hover:text-ailu-cream">Plan a celebration <span aria-hidden className="transition-transform group-hover:translate-x-1">↗</span></Link>
+              <Link href="/join" className="inline-flex min-h-12 items-center text-sm font-medium text-ailu-cream/65 transition-colors hover:text-ailu-yellow">Join the AILU world</Link>
+              <Link href="/ailu-celebrations.html" className="inline-flex min-h-12 items-center gap-2 rounded-sm border border-ailu-cream/25 px-4 text-sm font-semibold text-ailu-cream transition-colors hover:border-ailu-yellow hover:text-ailu-yellow"><span aria-hidden>◉</span> Enter the 360° AILU world</Link>
             </div>
           </div>
         </div>
 
-        <a href="#celebration-world" className="relative z-10 flex min-h-10 items-center gap-3 self-start text-[10px] font-semibold uppercase tracking-[.28em] text-ailu-cream/55 transition-colors hover:text-ailu-yellow">
-          <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full border border-ailu-yellow/45 text-ailu-yellow">↓</span> Let the feeling take you
+        <a href="#celebration-world" className="relative z-10 flex min-h-10 items-center gap-3 self-start text-[10px] font-semibold uppercase tracking-[.24em] text-ailu-cream/50 transition-colors hover:text-ailu-yellow">
+          <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full border border-white/20 text-ailu-yellow">↓</span> Step inside a celebration
         </a>
       </div>
     </section>

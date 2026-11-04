@@ -14,15 +14,15 @@ export default function ApplicationForm() {
 
   if (state.status === "done") {
     return (
-      <div id="public-form-feedback" tabIndex={-1} role="status" className="rounded-2xl border border-ailu-yellow bg-white p-8 focus-visible:outline">
+      <div id="public-form-feedback" tabIndex={-1} role="status" className="rounded-sm border border-ailu-yellow/45 bg-white/[.04] p-6 text-ailu-cream focus-visible:outline">
         <p className="font-display text-2xl font-bold">Thank you for applying to AILU.</p>
         <p className="mt-2">Your application ID is <strong>{state.id}</strong>. Keep it safe. Our team will review your details and contact you if there is a fit.</p>
-        <p className="mt-2 text-sm text-black/65">Applying does not guarantee work or a paid assignment. Assignments depend on suitability, availability, event requirements and agreed terms.</p>
+        <p className="mt-2 text-sm text-ailu-cream/60">Applying does not guarantee work or a paid assignment. Assignments depend on suitability, availability, event requirements and agreed terms.</p>
       </div>
     );
   }
   return (
-    <form onSubmit={onSubmit} noValidate className="grid gap-4 rounded-2xl border border-black/10 bg-white p-6 sm:grid-cols-2">
+    <form onSubmit={onSubmit} noValidate className="grid gap-4 rounded-sm border border-white/10 bg-white/[.04] p-5 text-ailu-cream sm:grid-cols-2 sm:p-6">
       <label className="block">Full name<input name="name" required autoComplete="name" className={inputCls} aria-invalid={Boolean(err("name"))} aria-describedby={err("name") ? "application-name-error" : undefined} />{err("name") && <span id="application-name-error" className="text-sm font-medium text-red-800">Enter your name</span>}</label>
       <label className="block">Mobile number<input name="phone" required inputMode="tel" autoComplete="tel" className={inputCls} aria-invalid={Boolean(err("phone"))} aria-describedby={err("phone") ? "application-phone-error" : undefined} />{err("phone") && <span id="application-phone-error" className="text-sm font-medium text-red-800">{err("phone")}</span>}</label>
       <label className="block">Email (optional)<input name="email" type="email" autoComplete="email" className={inputCls} aria-invalid={Boolean(err("email"))} aria-describedby={err("email") ? "application-email-error" : undefined} />{err("email") && <span id="application-email-error" className="text-sm font-medium text-red-800">Enter a valid email</span>}</label>
@@ -45,7 +45,7 @@ export default function ApplicationForm() {
       {err("consent") && <p id="application-consent-error" className="text-sm font-medium text-red-800 sm:col-span-2">{err("consent")}</p>}
       {state.status === "error" && <p id="public-form-feedback" tabIndex={-1} role="alert" className="text-red-800 focus-visible:outline sm:col-span-2">{state.message}</p>}
       <button disabled={state.status === "sending"} className="rounded-full bg-ailu-yellow px-7 py-3 font-semibold disabled:opacity-60 sm:col-span-2 sm:justify-self-start">{state.status === "sending" ? "Sending..." : "Submit application"}</button>
-      <p className="text-sm text-black/60 sm:col-span-2">Please don&apos;t include identity documents or bank details.</p>
+      <p className="text-sm text-ailu-cream/55 sm:col-span-2">Please don&apos;t include identity documents or bank details.</p>
     </form>
   );
 }
