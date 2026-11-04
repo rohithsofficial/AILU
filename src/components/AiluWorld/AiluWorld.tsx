@@ -18,7 +18,6 @@ export default function AiluWorld() {
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
-    const title = document.title;
     let stop: (() => void) | undefined;
     let cancelled = false;
 
@@ -34,7 +33,7 @@ export default function AiluWorld() {
       root.innerHTML = WORLD_MARKUP; // restore pristine markup (React Strict Mode / navigation)
       root.className = "ailu";
       root.removeAttribute("style");
-      document.title = title;
+      // Do not restore document.title here: on navigation Next has already set the next page's title.
     };
   }, []);
 
