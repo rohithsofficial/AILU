@@ -86,8 +86,9 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-white/10 bg-ailu-black text-ailu-cream">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3" aria-label="Main">
+        <nav className="mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 px-4 py-3 sm:flex sm:justify-between" aria-label="Main">
           <Link href="/" aria-label="AILU home" data-ailu-logo className="block"><NavLogo compact={compact} /></Link>
+          <Link href="/" className="col-span-2 row-start-2 text-[11px] font-medium leading-4 text-ailu-cream/60 transition-colors hover:text-ailu-yellow sm:col-auto sm:row-auto sm:text-xs lg:ml-4">← Back to the world</Link>
           <div className="hidden items-center gap-6 text-sm text-ailu-cream/65 lg:flex">
             {[{ href: "/events", label: "Events" }, { href: "/join", label: "Join" }, { href: "/dreams", label: "Dream support" }, { href: "/about", label: "About" }].map((item) => <Link key={item.href} href={item.href} className="min-h-10 inline-flex items-center transition-colors hover:text-ailu-yellow">{item.label}</Link>)}
           </div>

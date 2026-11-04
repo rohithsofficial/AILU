@@ -9,6 +9,7 @@ import FloatingWhatsApp from "./FloatingWhatsApp";
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   if (pathname === "/coming-soon" || pathname.startsWith("/admin")) return <>{children}</>;
+  if (pathname === "/") return <>{children}</>;
   return (
     <>
       <Intro />

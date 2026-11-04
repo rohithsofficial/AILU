@@ -1,2 +1,5 @@
 src/app/(admin)/**
 src/components/admin/**
+src/components/AiluWorld/engine.ts
+src/components/AiluWorld/body.ts
+src/components/AiluWorld/ailu-world.css

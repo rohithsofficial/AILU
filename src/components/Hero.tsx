@@ -38,7 +38,7 @@ export default function Hero() {
             <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-2">
               <Link href="/events#enquire" className="group inline-flex min-h-12 items-center gap-3 border-b border-ailu-yellow pb-1 font-semibold text-ailu-yellow transition-colors hover:text-ailu-cream">Plan a celebration <span aria-hidden className="transition-transform group-hover:translate-x-1">↗</span></Link>
               <Link href="/join" className="inline-flex min-h-12 items-center text-sm font-medium text-ailu-cream/65 transition-colors hover:text-ailu-yellow">Join the AILU world</Link>
-              <Link href="/ailu-celebrations.html" className="inline-flex min-h-12 items-center gap-2 rounded-sm border border-ailu-cream/25 px-4 text-sm font-semibold text-ailu-cream transition-colors hover:border-ailu-yellow hover:text-ailu-yellow"><span aria-hidden>◉</span> Enter the 360° AILU world</Link>
+              <Link href="/world" className="inline-flex min-h-12 items-center gap-2 rounded-sm border border-ailu-cream/25 px-4 text-sm font-semibold text-ailu-cream transition-colors hover:border-ailu-yellow hover:text-ailu-yellow"><span aria-hidden>◉</span> Enter the 360° AILU world</Link>
             </div>
           </div>
         </div>

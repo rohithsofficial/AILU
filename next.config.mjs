@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ["three"],
+  async redirects() {
+    return [{ source: "/world", destination: "/", permanent: true }];
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
