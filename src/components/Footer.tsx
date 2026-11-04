@@ -13,7 +13,7 @@ export default function Footer() {
   return <footer className="bg-ailu-black pb-20 text-ailu-cream">
     <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-5">
       <div className="lg:col-span-2">
-        <Link href="/" aria-label="AILU home" className="inline-block rounded bg-ailu-black p-1"><Image src={BRAND.logo} alt="AILU" width={210} height={70} sizes="210px" /></Link>
+        <Link href={SITE_CONTENT.switch.toSite.href} aria-label="AILU home" className="inline-block rounded bg-ailu-black p-1"><Image src={BRAND.logo} alt="AILU" width={210} height={70} sizes="210px" /></Link>
         <p className="mt-4 font-display text-xl font-bold text-ailu-yellow">{BRAND.tagline}</p>
         <p className="mt-2 max-w-sm text-ailu-cream/90">Based in Udupi, Karnataka. Planning celebrations across India.</p>
         <p className="mt-4 text-sm text-ailu-cream/85">Call <a className="underline decoration-ailu-yellow underline-offset-4" href={`tel:${BRAND.phone.replace(/\s/g, "")}`}>{BRAND.phone}</a></p>

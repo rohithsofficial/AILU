@@ -67,6 +67,8 @@ const PATCHES: [RegExp, string | ((match: string, ...groups: string[]) => string
   [/<span class="status">Open<\/span><h3>AILU Dreamers<\/h3>/, () => `<span class="status">${esc(COPY.dreamsStatus)}</span><h3>AILU Dreamers</h3>`],
   [/<p class="lede">Your words stay between you and AILU\.[^<]*<\/p>/, () => `<p class="lede">${esc(COPY.dreamsShareLead)}</p>`],
   [/<p class="fine">Private submissions for adults\.[^<]*<\/p>/, () => `<p class="fine">${esc(COPY.dreamsShareNote)}</p>`],
+  // Footer: the real pages of the Normal World.
+  [/<span class="doors">[\s\S]*?<\/span>/, () => `<span class="doors">${[SITE_CONTENT.switch.toSite, ...SITE_CONTENT.worldLinks].map((link) => `<a href="${esc(link.href)}">${esc(link.label)}</a>`).join("")}</span>`],
 ];
 
 export function buildWorldMarkup(source: string = BODY_HTML) {

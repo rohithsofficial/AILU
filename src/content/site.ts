@@ -31,6 +31,19 @@ export const SITE_CONTENT = {
     { question: "How is my information used?", answer: "Form details are stored in AILU's database and used to respond to your enquiry or manage an application or partner registration. See the Privacy page for details." },
     { question: "How do I contact AILU?", answer: `Call or WhatsApp ${BRAND.phone}, or email ${BRAND.email}.` },
   ],
+  // The two worlds: "/" is the AILU World, "/classic" is the Normal World home.
+  switch: { toWorld: { href: "/", label: "Enter AILU World" }, toSite: { href: "/classic", label: "Normal site" } },
+  // Real pages listed inside the AILU World.
+  worldLinks: [
+    { href: "/events", label: "Events" },
+    { href: "/join", label: "Join AILU" },
+    { href: "/join/partner", label: "Become a partner" },
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
+    { href: "/faq", label: "FAQ" },
+    { href: "/terms", label: "Terms" },
+    { href: "/donate", label: "Donation Box" },
+  ],
   world: {
     // The AILU World never collects data. Each in-world form is replaced by a link to the real form.
     forms: {

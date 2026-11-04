@@ -29,6 +29,12 @@ describe("AILU World markup", () => {
     expect(WORLD_MARKUP).toContain("Registration does not guarantee earnings.");
   });
 
+  it("lists the real pages in the world footer", () => {
+    for (const href of ["/classic", "/events", "/join", "/join/partner", "/about", "/contact", "/faq", "/terms", "/donate"]) {
+      expect(WORLD_MARKUP).toMatch(new RegExp(`<span class="doors">[\\s\\S]*href="${href}"[\\s\\S]*</span>`));
+    }
+  });
+
   it("sends in-world action links to real pages", () => {
     expect(WORLD_MARKUP).not.toMatch(/href="#(jobs|apply|dreams|share|enquire|policies)"/);
     expect(BODY_HTML).toMatch(/href="#enquire"/);
