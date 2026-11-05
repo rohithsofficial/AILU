@@ -134,6 +134,9 @@ model StaffUser {
   role      StaffRole @default(STAFF)
   active    Boolean   @default(true)
   createdAt DateTime  @default(now())
+
+  passwordHash      String? // scrypt, see src/lib/password.ts
+  passwordChangedAt DateTime? // sessions from before this time are signed out
 }
 
 // Every admin change by staff: sign-in, status changes, edits (later phases)

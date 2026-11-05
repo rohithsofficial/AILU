@@ -25,7 +25,8 @@ Complete these checks before opening the public site. Keep `COMING_SOON=true` un
 
 - [ ] Add the final domain to Vercel and configure DNS records at the domain provider.
 - [ ] Confirm HTTPS works and `NEXT_PUBLIC_SITE_URL` matches the canonical domain exactly.
-- [ ] Add `https://<production-domain>/api/auth/callback/google` to the Google OAuth authorized redirect URIs.
+- [ ] Set the owner password with `npm run staff:password -- <owner email>` and add staff at `/admin/settings/staff`.
+- [ ] Only if Google sign-in is switched back on: add `https://<production-domain>/api/auth/callback/google` to the Google OAuth authorized redirect URIs.
 - [ ] Test the first OWNER sign-in with the configured bootstrap email, then add the right staff accounts and roles.
 - [ ] Verify OWNER, MANAGER, STAFF, and ACCOUNTS access boundaries, especially CRM finance and commission visibility.
 
