@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { BODY_HTML } from "./body";
-import { WORLD_MARKUP } from "./worldMarkup";
+import { SITE_CONTENT } from "@/content/site";
+import { buildWorldMarkup, WORLD_MARKUP } from "./worldMarkup";
 
 describe("AILU World markup", () => {
   it("contains no form or input that could collect data", () => {
@@ -43,5 +44,11 @@ describe("AILU World markup", () => {
   it("keeps the Join and Dreams menu items inside the world", () => {
     expect(WORLD_MARKUP).toContain('<a href="#jobs" data-v="jobs">');
     expect(WORLD_MARKUP).toContain('<a href="#dreams" data-v="dreams">');
+  });
+
+  it("uses CMS wording and then returns to the defaults", () => {
+    const edited = buildWorldMarkup(undefined, { ...SITE_CONTENT.world, dreamsShareLead: "Edited <wording>" });
+    expect(edited).toContain("Edited &lt;wording&gt;");
+    expect(buildWorldMarkup()).toBe(WORLD_MARKUP);
   });
 });

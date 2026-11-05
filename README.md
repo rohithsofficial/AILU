@@ -78,6 +78,7 @@ Vitest covers permissions, quotation and event-finance calculations, phone norma
 - `docs/AILU_MAIN_THEME.md`: original visual and experience brief.
 - `docs/CRM_CMS_PLAN.md`: CRM and CMS plan.
 - `docs/LAUNCH_CHECKLIST.md`: steps before going live.
+- `docs/CMS_GUIDE.md`: how to edit the website and its SEO.
 - `docs/VERCEL_PREVIEW_GUIDE.md`: how preview links work.
 - `docs/AUDIT.md` and `docs/WORK_SUMMARY.md`: past reports.
 

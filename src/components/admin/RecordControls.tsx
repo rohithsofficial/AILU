@@ -1,9 +1,11 @@
 "use client";
 
 /** A submit button that asks first. Use it for anything that cannot be undone. */
-export function ConfirmButton({ label, message, className }: { label: string; message: string; className?: string }) {
+export function ConfirmButton({ label, message, className, name, value }: { label: string; message: string; className?: string; name?: string; value?: string }) {
   return (
     <button
+      name={name}
+      value={value}
       className={className ?? "text-xs text-red-400 underline"}
       onClick={(event) => { if (!window.confirm(message)) event.preventDefault(); }}
     >

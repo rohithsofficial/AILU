@@ -4,6 +4,8 @@ import { metadataForPath, PUBLIC_PAGE_CONTENT, eventMetadata } from "./public-me
 import sitemap, { PUBLIC_STATIC_ROUTES } from "@/app/sitemap";
 import robots from "@/app/robots";
 
+vi.mock("@/server/cms", () => ({ getContent: async () => ({ seo: { pages: [] } }) }));
+
 describe("public metadata and indexing", () => {
   afterEach(() => vi.unstubAllEnvs());
 
@@ -24,15 +26,15 @@ describe("public metadata and indexing", () => {
     }
   });
 
-  it("returns public sitemap URLs when open and no URLs while coming soon", () => {
+  it("returns public sitemap URLs when open and no URLs while coming soon", async () => {
     vi.stubEnv("COMING_SOON", "false");
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://ailu.example");
-    const urls = sitemap();
+    const urls = await sitemap();
     expect(urls.some((entry) => entry.url === "https://ailu.example/about")).toBe(true);
     expect(urls.some((entry) => entry.url.includes("/events/"))).toBe(true);
     expect(urls.some((entry) => entry.url.includes("admin") || entry.url.includes("coming-soon") || entry.url.includes("my-ailu"))).toBe(false);
     vi.stubEnv("COMING_SOON", "true");
-    expect(sitemap()).toEqual([]);
+    expect(await sitemap()).toEqual([]);
   });
 
   it("blocks indexing of the complete site in coming-soon mode", () => {

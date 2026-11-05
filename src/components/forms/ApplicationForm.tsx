@@ -1,10 +1,11 @@
 "use client";
-import { EVENT_CATEGORIES } from "@/lib/events";
+import { useContent } from "@/components/ContentProvider";
 import { ROLES } from "@/lib/roles";
 import { inputCls, useFormSubmit } from "./useFormSubmit";
 import Link from "next/link";
 
 export default function ApplicationForm() {
+  const EVENT_CATEGORIES = useContent().celebrations.items;
   const { state, onSubmit, err } = useFormSubmit("/api/applications", (fd) => ({
     ...Object.fromEntries(fd.entries()),
     eventCategories: fd.getAll("eventCategories").join(", "),

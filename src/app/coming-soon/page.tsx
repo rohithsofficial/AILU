@@ -3,13 +3,15 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { BRAND } from "@/lib/brand";
+import { useContent } from "@/components/ContentProvider";
 
 // Optional, digits only with country code (91XXXXXXXXXX). Falls back to the number in lib/brand.ts.
 const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
-const WHATSAPP_LINK = WHATSAPP ? `https://wa.me/${WHATSAPP}` : BRAND.whatsapp;
 
 export default function ComingSoon() {
   const reduce = useReducedMotion();
+  const { comingSoon: copy, settings } = useContent();
+  const WHATSAPP_LINK = WHATSAPP ? `https://wa.me/${WHATSAPP}` : settings.whatsapp;
 
   // One orchestrated moment: hand appears, then logo takes its place,
   // then the words arrive. Everything else stays still.
@@ -75,7 +77,7 @@ export default function ComingSoon() {
         animate={{ opacity: 1, y: 0 }}
         transition={t(2.9)}
       >
-        Something to celebrate is on its way.
+        {copy.title}
       </motion.h1>
 
       <motion.p
@@ -84,9 +86,7 @@ export default function ComingSoon() {
         animate={{ opacity: 1, y: 0 }}
         transition={t(3.1)}
       >
-        AILU is an event and celebration company in Udupi. Our new website is
-        being built. Planning something before we launch? Message us and we
-        will help.
+        {copy.text}
       </motion.p>
 
       <motion.div
@@ -104,12 +104,12 @@ export default function ComingSoon() {
             rel="noopener noreferrer"
             className={`font-display rounded-full bg-[#F5C400] px-8 py-3.5 text-base font-semibold text-[#111111] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F5C400]`}
           >
-            Message us on WhatsApp
+            {copy.button}
           </a>
         )}
 
         <p className={`font-display text-sm font-medium text-[#F5C400]`}>
-          Creating Moments. Delivering Smiles.
+          {copy.tagline}
         </p>
       </motion.div>
     </main>
