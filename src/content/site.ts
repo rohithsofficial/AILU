@@ -32,6 +32,7 @@ export const SITE_CONTENT = {
     { question: "How do I contact AILU?", answer: `Call or WhatsApp ${BRAND.phone}, or email ${BRAND.email}.` },
   ],
   // The two worlds: "/" is the AILU World, "/classic" is the Normal World home.
+  worldTitle: "AILU | Enter the 360° world",
   switch: { toWorld: { href: "/", label: "Enter AILU World" }, toSite: { href: "/classic", label: "Normal site" } },
   // Real pages listed inside the AILU World.
   worldLinks: [
