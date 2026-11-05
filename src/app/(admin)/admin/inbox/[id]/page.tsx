@@ -1,7 +1,7 @@
 import NoteControls from "@/components/admin/NoteControls";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
+import { requireRolePage } from "@/lib/authz";
 import { getEnquiry, listActiveStaff } from "@/server/inbox";
 import { ENQUIRY_STATUSES } from "@/lib/enquiryStatus";
 import { formatIN } from "@/lib/format";
@@ -14,7 +14,7 @@ const box = "border border-white/10 bg-[#111114] p-6 rounded-2xl";
 const input = "mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-ailu-cream placeholder:text-ailu-cream/40";
 
 export default async function EnquiryDetail({ searchParams, params }: { searchParams: { msg?: string }; params: { id: string } }) {
-  const staff = await requireRolePage(STAFF_ROLES);
+  const staff = await requireRolePage(["OWNER", "MANAGER", "STAFF"]);
   const data = await getEnquiry(params.id);
   if (!data) notFound();
   const { enquiry, tasks, activity } = data;
