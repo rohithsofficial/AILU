@@ -23,6 +23,9 @@ Already handled by `worldMarkup.ts`; once the source has them, the matching patc
 5. In `stop()`: call `r.dispose()` on the renderer and dispose geometries, materials and textures. `AiluWorld.tsx` currently releases the WebGL context from outside with `WEBGL_lose_context`.
 6. Query from `ROOT` instead of `document` (`document.getElementById` and `document.querySelectorAll`, about 31 calls).
 7. Stop setting `document.title` in `routeWorld` and `route`. `AiluWorld.tsx` currently sets the title back after each in-world route.
+8. Speed: `setInside` calls `BUILD[name]()` during the click if the room is not ready, and `prepareNext` builds rooms and runs `r.compile(scene,cam)` on the main thread. Both block taps on slow devices. Split each room build into small steps, run them in `requestIdleCallback`, and pause while a pointer is down. Show the fade first, then build.
+9. Speed: `buildWorld()` runs as one long task at start (513ms on a fast PC). Split it so the intro stays smooth on phones.
+10. Speed: `low` only starts below about 28 frames a second (`slow>.036`). Raise that limit, and in `low` mode also cut particles, beams and crowd. `worldRenderer.ts` can only lower pixel density.
 
 ## CSS (`ailu-world.css`)
 

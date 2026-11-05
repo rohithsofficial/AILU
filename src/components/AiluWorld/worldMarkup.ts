@@ -9,11 +9,12 @@ const esc = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;"
 const linkBtn = (href: string, label: string, line = false) =>
   `<a class="btn${line ? " line" : ""}" href="${esc(href)}">${esc(label)} <span aria-hidden="true">↗</span></a>`;
 
-/** Links inside the world that open a real page of the site. Anything not listed stays inside the world. */
+/**
+ * Links inside the world that open a real page of the site. Anything not listed stays inside the world,
+ * including the Join (#jobs) and Dreams (#dreams) rooms; their form cards then link to the real pages.
+ */
 export const WORLD_ROUTES: Record<string, string> = {
-  "#jobs": "/join/team",
   "#apply": "/join/team",
-  "#dreams": "/dreams",
   "#share": "/dreams",
   "#enquire": "/events#enquire",
   "#policies": "/privacy",
