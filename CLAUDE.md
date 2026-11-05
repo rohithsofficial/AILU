@@ -66,6 +66,7 @@ The hand-and-heart logo is the main symbol.
 - The intro plays once per session, only on / (components/Intro.tsx, sessionStorage "ailu-intro-seen").
 - No form inside the world collects data. The rewards/points preview is removed. World copy changes are in src/content/site.ts (SITE_CONTENT.world).
 - World site changes live outside the generated files: worldMarkup.ts (markup patches, tested by worldMarkup.test.ts), AiluWorld.tsx (hides Rewards, releases WebGL, keeps the title, fixes Back), world-brand.css (brand fonts and colours).
+- Menu: Join and Dreams open their world rooms; only their form cards link to real pages. Speed: worldRenderer.ts lowers pixel density and drops quality on slow devices.
 - Open: components/AiluWorld/CHANGES_FOR_GENERATOR.md lists the edits Rani must make when regenerating body.ts, engine.ts and ailu-world.css. Until then the Google Fonts @import, unprefixed keyframes, off-brand 3D colours and canvas fonts remain, /#rewards still opens the rewards 3D room, and the rewards scene is still in the 3D world.
 - Checked at 390px and 1440px in the desktop browser pane only. Rani's mobile report still needs a check on a real phone.
 - three stays at 0.160.0 because the world port requires it.
