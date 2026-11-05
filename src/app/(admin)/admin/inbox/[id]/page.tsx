@@ -1,3 +1,4 @@
+import NoteControls from "@/components/admin/NoteControls";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
@@ -107,7 +108,7 @@ export default async function EnquiryDetail({ searchParams, params }: { searchPa
       </div>
       <section className={`${box} mt-4`}>
         <h2 className="font-display font-bold">Activity history</h2>
-        {activity.length === 0 ? <p className="mt-3 text-sm text-ailu-cream/50">No activity yet.</p> : <ul className="mt-3 space-y-2 text-sm">{activity.map((item) => <li key={item.id} className="flex flex-wrap gap-3 rounded-lg border border-white/10 px-3 py-2"><span className="text-xs text-ailu-cream/50">{formatIN(item.at)}</span><span className="text-xs font-semibold text-ailu-yellow">{item.kind}</span><span className="flex-1">{item.body}</span></li>)}</ul>}
+        {activity.length === 0 ? <p className="mt-3 text-sm text-ailu-cream/50">No activity yet.</p> : <ul className="mt-3 space-y-2 text-sm">{activity.map((item) => <li key={item.id} className="flex flex-wrap gap-3 rounded-lg border border-white/10 px-3 py-2"><span className="text-xs text-ailu-cream/50">{formatIN(item.at)}</span><span className="text-xs font-semibold text-ailu-yellow">{item.kind}</span><span className="flex-1">{item.body}</span><NoteControls note={item} staff={staff} back={`/admin/inbox/${enquiry.id}`} /></li>)}</ul>}
       </section>
     </div>
   );

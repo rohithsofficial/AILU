@@ -61,7 +61,7 @@ The hand-and-heart logo is the main symbol.
 
 ## Current state (update this section when things change)
 - A0, A1, A2 of the CRM done and migrated on Neon.
-- Two worlds built on branch feat/two-worlds (2026-11-05, not merged or pushed). / = AILU World in src/app/(world). /classic and all real pages = Normal World in src/app/(site). /world and public/ailu-celebrations.html are gone.
+- Two worlds built on branch feat/two-worlds (2026-11-05, PR #5, not merged). / = AILU World in src/app/(world). /classic and all real pages = Normal World in src/app/(site). /world and public/ailu-celebrations.html are gone.
 - Switch buttons done: "Enter AILU World" in the Navbar and its menu; "Normal site" and a Pages list in components/WorldSwitch.tsx.
 - The intro plays once per session, only on / (components/Intro.tsx, sessionStorage "ailu-intro-seen").
 - No form inside the world collects data. The rewards/points preview is removed. World copy changes are in src/content/site.ts (SITE_CONTENT.world).
@@ -70,4 +70,7 @@ The hand-and-heart logo is the main symbol.
 - Open: components/AiluWorld/CHANGES_FOR_GENERATOR.md lists the edits Rani must make when regenerating body.ts, engine.ts and ailu-world.css. Until then the Google Fonts @import, unprefixed keyframes, off-brand 3D colours and canvas fonts remain, /#rewards still opens the rewards 3D room, and the rewards scene is still in the 3D world.
 - Checked at 390px and 1440px in the desktop browser pane only. Rani's mobile report still needs a check on a real phone.
 - three stays at 0.160.0 because the world port requires it.
+- CRM login is email and password (src/lib/password.ts, scrypt, no new dependency). Google is off unless AUTH_GOOGLE_ENABLED=true. The passwordHash migration is applied on Neon. First owner password: npm run staff:password -- <email>.
+- CRM records: tasks, payments, expenses, vendor bookings, team assignments, draft quotations and timeline notes have edit and delete (src/app/(admin)/admin/records/actions.ts). Clients, events and vendors stay archive and restore. Rules are in src/lib/recordRules.ts.
+- Branch feat/crm-password-login is stacked on feat/two-worlds.
 - Audit: AUDIT.md (2026-11-04).

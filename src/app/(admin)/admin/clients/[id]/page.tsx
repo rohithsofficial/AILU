@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireRolePage, STAFF_ROLES, canWriteCRM, canEditClient } from "@/lib/authz";
 import { getClient, enquiriesForClient, activityForClient, tasksForClient } from "@/server/clients";
 import { formatIN } from "@/lib/format";
+import NoteControls from "@/components/admin/NoteControls";
 import { updateClientAction, archiveClientAction, addClientContactAction, logClientActivityAction, addClientTaskAction, updateClientContactAction, removeClientContactAction } from "../actions";
 import ClientForm from "@/components/admin/ClientForm";
 import { listActiveStaff } from "@/server/inbox";
@@ -134,7 +135,7 @@ export default async function ClientDetail({ searchParams, params }: { searchPar
         </section>
         <section className={box}>
           <h2 className="font-display font-bold">Activity timeline ({activity.length})</h2>
-          {activity.length === 0 ? <p className="mt-3 text-sm text-ailu-cream/50">No notes or contact history yet.</p> : <ul className="mt-3 max-h-80 space-y-2 overflow-y-auto text-sm">{activity.map((item) => <li key={item.id} className="rounded-lg border border-white/10 px-3 py-2"><div className="flex justify-between gap-2"><span className="text-xs font-semibold text-ailu-yellow">{item.kind}</span><time className="text-xs text-ailu-cream/50">{formatIN(item.at)}</time></div><p className="mt-1 whitespace-pre-wrap">{item.body}</p></li>)}</ul>}
+          {activity.length === 0 ? <p className="mt-3 text-sm text-ailu-cream/50">No notes or contact history yet.</p> : <ul className="mt-3 max-h-80 space-y-2 overflow-y-auto text-sm">{activity.map((item) => <li key={item.id} className="rounded-lg border border-white/10 px-3 py-2"><div className="flex justify-between gap-2"><span className="text-xs font-semibold text-ailu-yellow">{item.kind}</span><time className="text-xs text-ailu-cream/50">{formatIN(item.at)}</time></div><p className="mt-1 whitespace-pre-wrap">{item.body}</p><NoteControls note={item} staff={staff} back={`/admin/clients/${client.id}`} /></li>)}</ul>}
           {canEdit ? <form action={logClientActivityAction} className="mt-4 space-y-2"><input type="hidden" name="clientId" value={client.id} /><label className="block text-sm">Type<select name="kind" className="mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-ailu-cream"><option value="NOTE" className="text-black">Note</option><option value="CALL" className="text-black">Call</option><option value="WHATSAPP" className="text-black">WhatsApp</option><option value="MEETING" className="text-black">Meeting</option></select></label><label className="block text-sm">Details<textarea name="body" required minLength={2} maxLength={2000} rows={3} className="mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-ailu-cream" /></label><button className="rounded-lg border border-ailu-yellow/60 px-4 py-2 text-sm font-semibold text-ailu-yellow">Add to timeline</button></form> : null}
         </section>
       </div>
