@@ -1,9 +1,10 @@
 "use client";
-import { EVENT_CATEGORIES } from "@/lib/events";
+import { useContent } from "@/components/ContentProvider";
 import { inputCls, useFormSubmit } from "./useFormSubmit";
 import Link from "next/link";
 
 export default function PartnerForm() {
+  const EVENT_CATEGORIES = useContent().celebrations.items;
   const { state, onSubmit, err } = useFormSubmit("/api/partners", (fd) => ({
     ...Object.fromEntries(fd.entries()),
     clientCategories: fd.getAll("clientCategories").join(", "),

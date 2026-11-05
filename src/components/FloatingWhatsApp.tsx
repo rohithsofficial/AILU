@@ -1,9 +1,10 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BRAND } from "@/lib/brand";
+import { useContent } from "@/components/ContentProvider";
 
 export default function FloatingWhatsApp() {
+  const { settings } = useContent();
   const pathname = usePathname();
   const [avoid, setAvoid] = useState(false);
   // The site chrome stays mounted across client navigation, so look for the new page's forms on every route.
@@ -26,6 +27,6 @@ export default function FloatingWhatsApp() {
     return () => observer.disconnect();
   }, [pathname]);
   if (avoid) return null;
-  const href = `${BRAND.whatsapp}?text=${encodeURIComponent("Hi AILU, I would like to ask about planning a celebration.")}`;
+  const href = `${settings.whatsapp}?text=${encodeURIComponent(settings.whatsappMessage)}`;
   return <a className="whatsapp-float" href={href} target="_blank" rel="noopener noreferrer" aria-label="Chat with AILU on WhatsApp">WhatsApp</a>;
 }

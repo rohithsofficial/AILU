@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import AiluWorld from "@/components/AiluWorld/AiluWorld";
+import { buildWorldMarkup } from "@/components/AiluWorld/worldMarkup";
+import { BODY_HTML } from "@/components/AiluWorld/body";
 import { metadataForPath } from "@/lib/public-metadata";
-import { SITE_CONTENT } from "@/content/site";
+import { getContent } from "@/server/cms";
 
-const base = metadataForPath("/");
-export const metadata: Metadata = { ...base, title: { absolute: SITE_CONTENT.worldTitle } };
+export async function generateMetadata(): Promise<Metadata> {
+  const { seo } = await getContent();
+  const base = metadataForPath("/", seo);
+  return { ...base, title: { absolute: String(base.title) } };
+}
 
-export default function Home() {
-  return <AiluWorld />;
+export default async function Home() {
+  const { world } = await getContent();
+  return <AiluWorld markup={buildWorldMarkup(BODY_HTML, world)} />;
 }

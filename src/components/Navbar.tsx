@@ -9,14 +9,9 @@ import { BRAND } from "@/lib/brand";
 import NavLogo from "./NavLogo";
 import { SITE_CONTENT } from "@/content/site";
 
-const { toWorld: TO_WORLD, toSite: TO_SITE } = SITE_CONTENT.switch;
+import { useContent } from "@/components/ContentProvider";
 
-const DESTINATIONS = [
-  { label: "Discover", href: "/", cue: "The world of AILU", title: "Wander into the feeling.", copy: "A celebration can begin with a single idea. Find the moment that feels like yours.", scene: "discover", position: "discover" },
-  { label: "Celebrations", href: "/events", cue: "Make a day mean more", title: "Gather around what matters.", copy: "Explore celebrations, traditions and the ways AILU can help bring people together.", scene: "celebrations", position: "celebrations" },
-  { label: "Become part of AILU", href: "/join", cue: "Bring your spark", title: "There’s room for your kind of magic.", copy: "Join the team or help people find the celebration they have been dreaming of.", scene: "join", position: "join" },
-  { label: "About AILU", href: "/about", cue: "What brings us together", title: "Creating moments. Delivering smiles.", copy: "Meet the people and purpose behind a world built around celebration, opportunity and care.", scene: "about", position: "about" },
-] as const;
+const { toWorld: TO_WORLD, toSite: TO_SITE } = SITE_CONTENT.switch;
 
 const sceneMotion = {
   discover: { initial: { scale: 0.92, rotate: -2, opacity: 0 }, animate: { scale: 1, rotate: 0, opacity: 1 } },
@@ -26,6 +21,8 @@ const sceneMotion = {
 };
 
 export default function Navbar() {
+  const t = useContent().nav;
+  const DESTINATIONS = t.destinations;
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const [compact, setCompact] = useState(false);
@@ -79,7 +76,7 @@ export default function Navbar() {
   useEffect(() => setOpen(false), [pathname]);
 
   const destination = DESTINATIONS[active];
-  const variants = sceneMotion[destination.scene];
+  const variants = sceneMotion[destination.scene as keyof typeof sceneMotion];
 
   function handleDestinationKey(event: ReactKeyboardEvent<HTMLAnchorElement>, index: number) {
     if (event.key === "Enter" || event.key === " ") setActive(index);
@@ -147,7 +144,7 @@ export default function Navbar() {
               <div className="flex items-center justify-between">
                 <Link href={TO_SITE.href} aria-label="AILU home" onClick={() => setOpen(false)} className="rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow"><NavLogo compact={false} /></Link>
                 <button type="button" onClick={() => setOpen(false)} className="inline-flex min-h-11 items-center gap-3 rounded-full border border-white/30 px-4 text-sm font-semibold transition hover:border-ailu-yellow hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow" aria-label="Close and return to the page">
-                  <span aria-hidden className="relative block h-7 w-9"><Image src={BRAND.hand} alt="" fill sizes="36px" className="object-contain" /></span> Back to this moment
+                  <span aria-hidden className="relative block h-7 w-9"><Image src={BRAND.hand} alt="" fill sizes="36px" className="object-contain" /></span> {t.closeButton}
                 </button>
               </div>
 
@@ -160,7 +157,7 @@ export default function Navbar() {
                       <p className="mt-5 max-w-xl text-sm leading-relaxed text-ailu-cream/70 sm:text-lg">{destination.copy}</p>
                     </motion.div>
                   </AnimatePresence>
-                  <p className="mt-8 text-[10px] font-semibold uppercase tracking-[.25em] text-ailu-cream/40">Choose a direction to keep wandering</p>
+                  <p className="mt-8 text-[10px] font-semibold uppercase tracking-[.25em] text-ailu-cream/40">{t.menuHint}</p>
                 </div>
 
                 <nav aria-label="Explore AILU destinations" className="relative z-10 lg:min-h-[440px]">
@@ -174,7 +171,7 @@ export default function Navbar() {
                         onFocus={() => setActive(index)}
                         onKeyDown={(event) => handleDestinationKey(event, index)}
                         onClick={() => setOpen(false)}
-                        className={`group relative inline-flex max-w-full flex-col border-b pb-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow focus-visible:outline-offset-4 lg:absolute lg:max-w-[75%] ${item.position === "discover" ? "lg:left-[4%] lg:top-[8%]" : item.position === "celebrations" ? "lg:left-[42%] lg:top-[31%]" : item.position === "join" ? "lg:left-[8%] lg:top-[59%]" : "lg:left-[48%] lg:top-[73%]"} ${active === index ? "border-ailu-yellow text-ailu-yellow" : "border-white/20 text-ailu-cream/75 hover:border-ailu-yellow/70 hover:text-ailu-cream"}`}
+                        className={`group relative inline-flex max-w-full flex-col border-b pb-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow focus-visible:outline-offset-4 lg:absolute lg:max-w-[75%] ${item.scene === "discover" ? "lg:left-[4%] lg:top-[8%]" : item.scene === "celebrations" ? "lg:left-[42%] lg:top-[31%]" : item.scene === "join" ? "lg:left-[8%] lg:top-[59%]" : "lg:left-[48%] lg:top-[73%]"} ${active === index ? "border-ailu-yellow text-ailu-yellow" : "border-white/20 text-ailu-cream/75 hover:border-ailu-yellow/70 hover:text-ailu-cream"}`}
                       >
                         <span className="text-[10px] font-semibold uppercase tracking-[.2em] opacity-50">0{index + 1}</span>
                         <span className="mt-1 font-display text-[clamp(1.2rem,2.5vw,2.2rem)] font-bold leading-[.95] tracking-[-.045em]">{item.label}<span aria-hidden className={`ml-2 inline-block text-sm transition-transform ${active === index ? "translate-x-1" : "group-hover:translate-x-1"}`}>↗</span></span>
@@ -191,11 +188,11 @@ export default function Navbar() {
               </div>
 
               <div className="relative z-10 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/15 pt-4 text-xs text-ailu-cream/60 sm:gap-x-8 sm:pt-5">
-                <span className="mr-1 font-semibold uppercase tracking-[.18em] text-ailu-cream/40">Also in our world</span>
+                <span className="mr-1 font-semibold uppercase tracking-[.18em] text-ailu-cream/40">{t.alsoTitle}</span>
                 <Link href={TO_WORLD.href} onClick={() => setOpen(false)} className="min-h-11 inline-flex items-center rounded-full bg-ailu-yellow px-4 font-bold text-ailu-black hover:bg-ailu-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ailu-yellow">{TO_WORLD.label} ◉</Link>
-                <Link href="/dreams" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">Dream support ↗</Link>
-                <Link href="/contact" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">Contact ↗</Link>
-                <Link href="/events#enquire" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">Plan a celebration ↗</Link>
+                <Link href="/dreams" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">{t.dreamLink}</Link>
+                <Link href="/contact" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">{t.contactLink}</Link>
+                <Link href="/events#enquire" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">{t.planLink}</Link>
               </div>
             </div>
           </motion.div>

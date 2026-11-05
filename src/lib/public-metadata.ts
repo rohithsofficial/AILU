@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { getCategory } from "@/lib/events";
 
+type SeoPage = { path: string; title: string; description: string; shareImage: string; hideFromGoogle: boolean };
+type SeoContent = { defaultShareImage: string; pages: SeoPage[] };
+type CelebrationSeo = { slug: string; title: string; blurb: string; seoTitle: string; seoDescription: string; shareImage: string };
+
 export function publicSiteUrl() {
   const raw = process.env.NEXT_PUBLIC_SITE_URL;
   if (!raw) return undefined;
@@ -26,22 +30,28 @@ export const PUBLIC_PAGE_CONTENT: Record<string, { title: string; description: s
   "/referral-policy": { title: "Referral policy", description: "How AILU partner IDs are recorded and when a referral reward may be considered." },
 };
 
-export function metadataForPath(path: keyof typeof PUBLIC_PAGE_CONTENT): Metadata {
+export function metadataForPath(path: keyof typeof PUBLIC_PAGE_CONTENT, seo?: SeoContent): Metadata {
   const item = PUBLIC_PAGE_CONTENT[path];
-  return publicMetadata(item.title, item.description, path);
+  const page = seo?.pages.find((entry) => entry.path === path);
+  const metadata = publicMetadata(page?.title || item.title, page?.description || item.description, path, page?.shareImage || seo?.defaultShareImage);
+  return page?.hideFromGoogle ? { ...metadata, robots: { index: false, follow: false } } : metadata;
 }
 
-export function eventMetadata(slug: string): Metadata | undefined {
-  const category = getCategory(slug);
-  return category ? publicMetadata(category.title, `${category.blurb} Based in Udupi, planning celebrations across India.`, `/events/${category.slug}`) : undefined;
+export function eventMetadata(slug: string, celebrations?: CelebrationSeo[], defaultImage?: string): Metadata | undefined {
+  const edited = celebrations?.find((item) => item.slug === slug);
+  const category = edited ?? getCategory(slug);
+  if (!category) return undefined;
+  const description = edited?.seoDescription || `${category.blurb} Based in Udupi, planning celebrations across India.`;
+  return publicMetadata(edited?.seoTitle || category.title, description, `/events/${category.slug}`, edited?.shareImage || defaultImage);
 }
 
-export function publicMetadata(title: string, description: string, path: string): Metadata {
+export function publicMetadata(title: string, description: string, path: string, image?: string): Metadata {
+  const images = image ? [image] : undefined;
   return {
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { title: `${title} | AILU`, description, type: "website", url: path, siteName: "AILU" },
-    twitter: { card: "summary_large_image", title: `${title} | AILU`, description },
+    openGraph: { title: `${title} | AILU`, description, type: "website", url: path, siteName: "AILU", ...(images ? { images } : {}) },
+    twitter: { card: "summary_large_image", title: `${title} | AILU`, description, ...(images ? { images } : {}) },
   };
 }

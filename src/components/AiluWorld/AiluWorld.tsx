@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import "./ailu-world.css";
 import "./world-brand.css";
 import { startAilu } from "./engine";
-import { HIDDEN_PLACES, WORLD_MARKUP } from "./worldMarkup";
+import { HIDDEN_PLACES } from "./worldMarkup";
 import { withLightRenderer } from "./worldRenderer";
 import { steadyPhoneTurn } from "./phoneTurn";
 import { SITE_CONTENT } from "@/content/site";
@@ -28,7 +28,7 @@ function releaseWebGL(root: HTMLElement) {
   gl?.getExtension("WEBGL_lose_context")?.loseContext();
 }
 
-export default function AiluWorld() {
+export default function AiluWorld({ markup }: { markup: string }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,12 +70,12 @@ export default function AiluWorld() {
       window.removeEventListener("popstate", keepTitle);
       stop?.();                      // removes listeners, timers and the animation loop
       releaseWebGL(root);
-      root.innerHTML = WORLD_MARKUP; // restore pristine markup (React Strict Mode / navigation)
+      root.innerHTML = markup; // restore pristine markup (React Strict Mode / navigation)
       root.className = "ailu";
       root.removeAttribute("style");
       // Do not restore document.title here: on navigation Next has already set the next page's title.
     };
-  }, []);
+  }, [markup]);
 
-  return <div ref={ref} className="ailu" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: WORLD_MARKUP }} />;
+  return <div ref={ref} className="ailu" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: markup }} />;
 }

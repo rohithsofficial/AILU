@@ -4,18 +4,10 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { EVENT_CATEGORIES } from "@/lib/events";
 import { canUse3D } from "@/lib/device";
+import { useContent } from "@/components/ContentProvider";
 
 const CelebrationWorldScene = dynamic(() => import("@/components/CelebrationWorldScene"), { ssr: false });
-
-const chapters = [
-  { kind: "event", slug: "personal-celebrations", label: "Personal", cue: "A room full of your people", line: "The ones who make it yours." },
-  { kind: "event", slug: "wedding-celebrations", label: "Wedding", cue: "A promise, held together", line: "One day. So many beginnings." },
-  { kind: "event", slug: "cultural-regional-celebrations", label: "Culture", cue: "Every tradition has a rhythm", line: "Keep the rituals. Turn up the feeling." },
-  { kind: "join", label: "Join AILU", cue: "There’s a place in this story for you", line: "Bring your talent. Or bring people together." },
-  { kind: "event", slug: "community-cultural-events", label: "Community", cue: "When everyone comes together", line: "Make a whole crowd feel close." },
-].map((chapter) => ({ ...chapter, category: chapter.slug ? EVENT_CATEGORIES.find((category) => category.slug === chapter.slug) : undefined }));
 
 const scenes = [
   { surface: "bg-ailu-black text-ailu-cream", pattern: "conic-gradient(from 30deg at 78% 42%, transparent 0 18deg, rgba(245,196,0,.12) 19deg 20deg, transparent 21deg 38deg, rgba(245,196,0,.08) 39deg 40deg, transparent 41deg 60deg)" },
@@ -34,6 +26,8 @@ const entrances = [
 ];
 
 export default function CelebrationJourney() {
+  const { journey: t, celebrations } = useContent();
+  const chapters = t.chapters.map((chapter) => ({ ...chapter, category: celebrations.items.find((category) => category.slug === chapter.slug) }));
   const journey = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
   const [showWorld, setShowWorld] = useState(false);
@@ -98,17 +92,17 @@ export default function CelebrationJourney() {
               {chapter.category ? <>
                 <h2 className="mt-5 font-display text-[clamp(2.8rem,7vw,6.5rem)] font-semibold leading-[.9] tracking-[-.07em]">{chapter.category.title}</h2>
                 <p className="mt-6 max-w-xl text-base leading-relaxed opacity-75 sm:text-xl">{chapter.line} {chapter.category.blurb}</p>
-                <Link href={`/events/${chapter.category.slug}`} className="group mt-7 inline-flex min-h-11 items-center gap-3 border-b border-current/60 pb-1 text-sm font-semibold">Step into this celebration <span aria-hidden className="transition-transform group-hover:translate-x-1">↗</span></Link>
+                <Link href={`/events/${chapter.category.slug}`} className="group mt-7 inline-flex min-h-11 items-center gap-3 border-b border-current/60 pb-1 text-sm font-semibold">{t.celebrationLink} <span aria-hidden className="transition-transform group-hover:translate-x-1">↗</span></Link>
               </> : <>
-                <h2 className="mt-5 font-display text-[clamp(2.8rem,7vw,6.5rem)] font-semibold leading-[.9] tracking-[-.07em]">Not just a guest.<br /><span className="text-ailu-yellow">Part of the making.</span></h2>
-                <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed opacity-75 sm:text-xl">{chapter.line} Join the team or become an external sales partner. Different paths, one shared love of bringing people together.</p>
-                <Link href="/join" className="group mt-7 inline-flex min-h-11 items-center gap-3 border-b border-current/60 pb-1 text-sm font-semibold">Find your way in <span aria-hidden className="transition-transform group-hover:translate-x-1">↗</span></Link>
+                <h2 className="mt-5 font-display text-[clamp(2.8rem,7vw,6.5rem)] font-semibold leading-[.9] tracking-[-.07em]">{t.joinTitleLine1}<br /><span className="text-ailu-yellow">{t.joinTitleLine2}</span></h2>
+                <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed opacity-75 sm:text-xl">{chapter.line} {t.joinText}</p>
+                <Link href="/join" className="group mt-7 inline-flex min-h-11 items-center gap-3 border-b border-current/60 pb-1 text-sm font-semibold">{t.joinLink} <span aria-hidden className="transition-transform group-hover:translate-x-1">↗</span></Link>
               </>}
             </motion.div>
           </AnimatePresence>
         </div>
-        <div aria-hidden className="absolute bottom-7 left-7 z-20 text-[9px] font-semibold uppercase tracking-[.3em] text-ailu-cream/50 sm:left-12 lg:left-24">Keep wandering <span className="ml-2 text-ailu-yellow">↓</span></div>
-        <Link href="/events#enquire" className="absolute bottom-6 right-7 z-20 inline-flex min-h-11 items-center gap-2 border-b border-white/30 text-xs font-semibold sm:right-12 lg:right-24">Start an enquiry <span aria-hidden className="text-ailu-yellow">↗</span></Link>
+        <div aria-hidden className="absolute bottom-7 left-7 z-20 text-[9px] font-semibold uppercase tracking-[.3em] text-ailu-cream/50 sm:left-12 lg:left-24">{t.scrollHint} <span className="ml-2 text-ailu-yellow">↓</span></div>
+        <Link href="/events#enquire" className="absolute bottom-6 right-7 z-20 inline-flex min-h-11 items-center gap-2 border-b border-white/30 text-xs font-semibold sm:right-12 lg:right-24">{t.enquiryLink} <span aria-hidden className="text-ailu-yellow">↗</span></Link>
       </div>
     </section>
   );

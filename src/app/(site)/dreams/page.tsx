@@ -2,29 +2,32 @@ import { BRAND } from "@/lib/brand";
 import PageHero from "@/components/PageHero";
 import DreamForm from "@/components/forms/DreamForm";
 import { metadataForPath } from "@/lib/public-metadata";
-export const metadata = metadataForPath("/dreams");
+import { getContent } from "@/server/cms";
+export async function generateMetadata() { return metadataForPath("/dreams", (await getContent()).seo); }
 export const dynamic = "force-dynamic";
 
-export default function Dreams() {
+export default async function Dreams() {
+  const content = await getContent();
+  const t = content.dreams;
   const formOpen = process.env.DREAMS_FORM_OPEN === "true";
   return (
     <>
-    <PageHero title="Dreams, handled privately">AILU hopes to support people facing barriers to a dream when it is able to do so. Any support is private and not guaranteed.</PageHero>
+    <PageHero title={t.title}>{t.lead}</PageHero>
     <div className="mx-auto max-w-3xl px-4 py-12 text-ailu-cream">
-      <h2 className="font-display text-2xl font-semibold">Our promise</h2>
+      <h2 className="font-display text-2xl font-semibold">{t.promiseEyebrow}</h2>
       <ul className="mt-3 list-disc space-y-2 pl-6 text-sm leading-relaxed text-ailu-cream/65">
-        <li>Your story is never published or shared publicly. There are no public stories on this site.</li>
-        <li>We help with dignity and respect.</li>
-        <li>We will not publish your dream or story. Only AILU’s authorized owner and managers can review submissions privately.</li>
-        <li>Do not send Aadhaar, PAN, bank or card details, medical records, your home address, or identity documents.</li>
+        <li>{t.promiseText}</li>
+        <li>{t.dignityText}</li>
+        <li>{t.privacyText}</li>
+        <li>{t.safetyText}</li>
       </ul>
-      <p className="mt-6 text-sm leading-relaxed text-ailu-cream/60">Sharing a dream does not guarantee fulfilment. AILU decides whether it can help based on suitability, safety and available resources. If the dreamer is under 18, a parent or guardian must submit and consent. The child’s contact details are not requested.</p>
+      <p className="mt-6 text-sm leading-relaxed text-ailu-cream/60">{t.fulfilmentText}</p>
       {formOpen ? <section className="mt-10" aria-labelledby="dream-form-title">
-        <h2 id="dream-form-title" className="font-display text-2xl font-bold">Share privately with AILU</h2>
-        <p className="mt-2 text-sm text-ailu-cream/65">This form is not for emergencies or urgent medical or financial crises. If anyone is in immediate danger in India, call <a className="font-semibold underline" href="tel:112">112</a>.</p>
-        <p className="mt-3 rounded-xl border border-amber-700/30 bg-amber-50 p-4 text-sm text-black"><strong>Please keep your details safe.</strong> Do not enter Aadhaar, PAN, bank or card details, medical records, your home address, or identity documents. AILU will not ask for them here.</p>
+        <h2 id="dream-form-title" className="font-display text-2xl font-bold">{t.formTitle}</h2>
+        <p className="mt-2 text-sm text-ailu-cream/65">{t.emergencyText} <a className="font-semibold underline" href="tel:112">112</a>.</p>
+        <p className="mt-3 rounded-xl border border-amber-700/30 bg-amber-50 p-4 text-sm text-black"><strong>{t.safeTitle}</strong> {t.safeText}</p>
         <DreamForm />
-      </section> : <p className="mt-6 rounded-sm border border-ailu-yellow/45 bg-ailu-yellow/10 p-4 text-sm text-ailu-cream"><strong>The dream submission form is not open.</strong> Please do not email sensitive personal details. For general questions, call <a className="font-semibold underline" href={`tel:${BRAND.phone.replace(/\s/g, "")}`}>{BRAND.phone}</a> or write to <a className="font-semibold underline" href={`mailto:${BRAND.email}`}>{BRAND.email}</a>.</p>}
+      </section> : <p className="mt-6 rounded-sm border border-ailu-yellow/45 bg-ailu-yellow/10 p-4 text-sm text-ailu-cream"><strong>{t.closedTitle}</strong> {t.closedText} <a className="font-semibold underline" href={`tel:${content.settings.phone.replace(/\s/g, "")}`}>{content.settings.phone}</a> {t.closedOr} <a className="font-semibold underline" href={`mailto:${content.settings.email}`}>{content.settings.email}</a>.</p>}
     </div>
     </>
   );

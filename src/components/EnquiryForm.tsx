@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { EVENT_CATEGORIES } from "@/lib/events";
+import { useContent } from "@/components/ContentProvider";
 import { enquiryPrefill } from "@/lib/enquiry-prefill";
 import { todayInIndia } from "@/lib/validation";
 import { BRAND } from "@/lib/brand";
@@ -10,6 +10,7 @@ type State = { status: "idle" | "sending" | "done" | "error"; message?: string; 
 const input = "mt-1 min-h-11 w-full rounded-sm border border-white/20 bg-ailu-black px-3 py-3 text-ailu-cream placeholder:text-ailu-cream/40";
 
 export default function EnquiryForm({ defaultCategory }: { defaultCategory?: string }) {
+  const EVENT_CATEGORIES = useContent().celebrations.items;
   const [state, setState] = useState<State>({ status: "idle" });
   const [category, setCategory] = useState(defaultCategory ?? EVENT_CATEGORIES[0].slug);
   const [referralId, setReferralId] = useState("");

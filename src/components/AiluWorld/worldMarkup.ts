@@ -3,7 +3,7 @@ import { BODY_HTML } from "./body";
 
 // body.ts is generated from the original AILU Celebrations page and must not be edited by hand.
 // The site-specific changes are applied here instead, and worldMarkup.test.ts checks the result.
-const COPY = SITE_CONTENT.world;
+let COPY = SITE_CONTENT.world;
 
 const esc = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const linkBtn = (href: string, label: string, line = false) =>
@@ -72,7 +72,8 @@ const PATCHES: [RegExp, string | ((match: string, ...groups: string[]) => string
   [/<span class="doors">[\s\S]*?<\/span>/, () => `<span class="doors">${[SITE_CONTENT.switch.toSite, ...SITE_CONTENT.worldLinks].map((link) => `<a href="${esc(link.href)}">${esc(link.label)}</a>`).join("")}</span>`],
 ];
 
-export function buildWorldMarkup(source: string = BODY_HTML) {
+export function buildWorldMarkup(source: string = BODY_HTML, copy: typeof SITE_CONTENT.world = SITE_CONTENT.world) {
+  COPY = copy;
   let html = source;
   for (const [pattern, replacement] of PATCHES) html = html.replace(pattern, replacement as string);
   return html.replace(/href="(#[a-z]+)"/g, (match, hash: string) => (WORLD_ROUTES[hash] ? `href="${WORLD_ROUTES[hash]}"` : match));
