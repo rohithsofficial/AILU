@@ -35,3 +35,7 @@ Already handled by `worldMarkup.ts`; once the source has them, the matching patc
 2. Set `--head` / `--body` / `--accent` to `var(--font-poppins)` / `var(--font-inter)` / `var(--font-poppins)`, and the colours to `#F5C400`, `#111111` and `#FFFDF7`. Replace the hard-coded `#0e100d`, `#14130c`, `rgba(14,16,13,…)`, `rgba(244,193,61,…)` and `rgba(244,187,37,…)` values with the variables.
 3. Prefix every `@keyframes` name and its `animation` uses with `ailu-`: `land`, `nudge`, `slide`, `ping`, `collect`, `rise`, `settle`. These names are global and stay loaded after leaving the world. `ping` clashes with Tailwind's `animate-ping`.
 4. Add `h3` to the `.ailu h1,.ailu h2{font-family:var(--head)…}` rule. `world-brand.css` does this for now.
+
+## Phone turning
+
+`onGyro` in engine.ts writes raw sensor angles into `yaw`, which fights touch and room moves and shakes the view. phoneTurn.ts blocks those events and turns the view through wheel input. When regenerating, you can remove `onGyro` and the `deviceorientation` listener, but keep the button and its permission request.

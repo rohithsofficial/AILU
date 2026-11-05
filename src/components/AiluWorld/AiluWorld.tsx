@@ -6,6 +6,7 @@ import "./world-brand.css";
 import { startAilu } from "./engine";
 import { HIDDEN_PLACES, WORLD_MARKUP } from "./worldMarkup";
 import { withLightRenderer } from "./worldRenderer";
+import { steadyPhoneTurn } from "./phoneTurn";
 import { SITE_CONTENT } from "@/content/site";
 
 // The engine builds a hotspot and a dock button for every place. Remove the ones the site has switched off.
@@ -35,6 +36,7 @@ export default function AiluWorld() {
     if (!root) return;
     let stop: (() => void) | undefined;
     let cancelled = false;
+    const stopPhoneTurn = steadyPhoneTurn(root);
     const start = (THREE?: typeof import("three")) => {
       if (cancelled) return;
       try {
@@ -62,6 +64,7 @@ export default function AiluWorld() {
 
     return () => {
       cancelled = true;
+      stopPhoneTurn();
       window.removeEventListener("hashchange", keepNextState);
       window.removeEventListener("hashchange", keepTitle);
       window.removeEventListener("popstate", keepTitle);
