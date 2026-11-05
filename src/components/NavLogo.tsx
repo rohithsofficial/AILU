@@ -18,8 +18,6 @@ export default function NavLogo({ compact }: { compact: boolean }) {
         <span className="logo-hand absolute" style={{ ...handBox, "--hand-left": `${hand.left}%`, "--hand-left-compact": `${HAND_LEFT_COMPACT}%` } as React.CSSProperties}>
           <Image src={hand.src} alt="" fill sizes="120px" className="object-contain" priority />
         </span>
-        {/* Landing spot for the intro hand (always where the hand sits in the full logo) */}
-        <span data-ailu-hand aria-hidden className="pointer-events-none absolute" style={place(hand)} />
       </span>
     </span>
   );
