@@ -5,10 +5,11 @@ type SeoPage = { path: string; title: string; description: string; shareImage: s
 type SeoContent = { defaultShareImage: string; pages: SeoPage[] };
 type CelebrationSeo = { slug: string; title: string; blurb: string; seoTitle: string; seoDescription: string; shareImage: string };
 
+const LIVE_SITE_URL = "https://www.worldofailu.com";
+
+// Canonical links must be full addresses, so the live domain is the default.
 export function publicSiteUrl() {
-  const raw = process.env.NEXT_PUBLIC_SITE_URL;
-  if (!raw) return undefined;
-  try { return new URL(raw); } catch { return undefined; }
+  try { return new URL(process.env.NEXT_PUBLIC_SITE_URL || LIVE_SITE_URL); } catch { return new URL(LIVE_SITE_URL); }
 }
 
 export const ROOT_DESCRIPTION = "AILU is an event management and celebration company based in Udupi, planning celebrations across India.";
