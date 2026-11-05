@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "lint": "eslint src/app src/components src/content src/lib --ext .ts,.tsx",
+    "test": "vitest run",
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
@@ -20,7 +22,7 @@
     "dotenv": "^18.0.9",
     "firebase-admin": "^14.5.0",
     "framer-motion": "^11.2.0",
-    "next": "14.2.15",
+    "next": "14.2.35",
     "next-auth": "^5.0.0-beta.32",
     "pg": "^8.23.1",
     "react": "^18.3.1",
@@ -35,9 +37,16 @@
     "@types/react-dom": "^18",
     "@types/three": "^0.164.0",
     "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.38",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.35",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "postcss": "8.5.32",
     "prisma": "^7.10.1",
     "tailwindcss": "^3.4.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^2.1.9"
+  },
+  "overrides": {
+    "postcss": "$postcss"
   }
 }

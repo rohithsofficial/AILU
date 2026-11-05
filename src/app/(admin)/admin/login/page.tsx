@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { auth, authConfigured, devLoginEnabled, ownerAllowlist, signIn } from "@/auth";
+import { auth, authConfigured, bootstrapEmail, devLoginEnabled, signIn } from "@/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +8,7 @@ export default async function AdminLogin({ searchParams }: { searchParams: { err
   const session = await auth();
   if (session?.user) redirect("/admin");
 
-  const owners = ownerAllowlist();
+  const hasBootstrap = Boolean(bootstrapEmail());
   async function devSignIn(formData: FormData) {
     "use server";
     let target = "/admin";
@@ -59,7 +59,7 @@ export default async function AdminLogin({ searchParams }: { searchParams: { err
         </form>
       )}
 
-      {owners.length === 0 && (
+      {!hasBootstrap && (
         <p className="mt-4 text-center text-xs text-ailu-cream/45">
           No owner allowlist configured. Set STAFF_OWNER_EMAILS in the environment.
         </p>

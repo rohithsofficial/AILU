@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
-import { getClient } from "@/server/clients";
 import { EVENT_CATEGORIES } from "@/lib/events";
-import { formatINR } from "@/lib/money";
 import { createEventAction } from "../actions";
-import { EVENT_STATUSES, EVENT_STATUS_LABELS } from "@/lib/eventStatus";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +23,7 @@ export default async function NewEventPage() {
           <label className="block">Client
             <select name="clientId" className={input}>
               <option value="" className="text-black">Create new client (enter name & phone below)</option>
-              {(await (await import("@/server/clients")).listClients({ page: 1 })).rows.map((c) => (
+              {(await (await import("@/server/clients")).listClients({ page: 1, ownerId: staff.role === "STAFF" ? staff.id : undefined })).rows.map((c) => (
                 <option key={c.id} value={c.id} className="text-black">{c.name} — {c.phone}</option>
               ))}
             </select>
@@ -61,11 +58,7 @@ export default async function NewEventPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           <label className="block">Start date<input name="startDate" type="date" className={input} /></label>
           <label className="block">End date<input name="endDate" type="date" className={input} /></label>
-          <label className="block">Status
-            <select name="status" defaultValue="LEAD" className={input}>
-              {EVENT_STATUSES.map((s) => <option key={s} value={s} className="text-black">{EVENT_STATUS_LABELS[s as keyof typeof EVENT_STATUS_LABELS]}</option>)}
-            </select>
-          </label>
+          <input type="hidden" name="status" value="LEAD" />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -81,6 +74,7 @@ export default async function NewEventPage() {
         </div>
 
         <label className="block">Requirements & brief<textarea name="requirements" rows={4} className={input} /></label>
+        <label className="block">Internal notes (staff only)<textarea name="internalNotes" rows={3} className={input} /></label>
 
         <button className="rounded-full bg-ailu-yellow px-6 py-2.5 text-sm font-semibold text-ailu-black hover:brightness-105">Create event</button>
       </form>

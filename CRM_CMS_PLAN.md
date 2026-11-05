@@ -5,7 +5,7 @@ Companion to `AGENTS.md`. Read `AGENTS.md` first (rules, stack, current state). 
 - **CRM:** everything AILU knows about clients, vendors, partners, team members and every event, from first enquiry to money settled.
 - **CMS:** the content shown on the public website, editable without code.
 
-Status: **draft for Rani to confirm** (see section 11). Build in the phases of section 9, one Prisma migration per phase.
+Status: **A0–A4 implementation delivered; authenticated runtime walkthrough pending.** A3 applications, team, partners, and manual commissions and A4 dashboard, attention queue, calendar, and global search are implemented. A4 has no schema migration. Remaining business decisions in section 11 apply to later phases unless stated otherwise. Add migrations only when a later phase needs a schema change.
 
 ---
 
@@ -92,7 +92,7 @@ Enforce in `authz.ts` (one place), not scattered in pages.
 5. **Team:** applications (existing `Application`) → convert to **Team member** (roles, availability, fee notes, events worked).
 6. **Partners:** existing `SalesPartner` with approve/reject/suspend, their referred enquiries and events, and **commissions** (amount, basis, `PENDING_APPROVAL → APPROVED → PAID` or `REJECTED`).
 7. **Tasks and follow-ups:** due dates, assignee, linked to client/event/enquiry. "Today / overdue" view feeds the dashboard.
-8. **Dashboard:** new enquiries, pipeline counts by stage, upcoming events (next 30 days), overdue tasks, payments due from clients, vendor payments due, partner commissions awaiting approval.
+8. **Dashboard (A4):** role-scoped new enquiries, stage counts, today/overdue work, unassigned enquiries, upcoming events, needs-attention rules, role-limited client/vendor/team dues, completed-event margin estimate, and the existing application/partner/commission queues. `/admin/calendar` provides a filtered month grid and mobile agenda; global search is available in the admin top bar and at `/admin/search`.
 9. **Reports (later):** revenue and margin by month/category, source performance (website vs partner), vendor spend, CSV export.
 
 Client-facing: still only the public enquiry and join forms. No client login yet.
@@ -478,11 +478,11 @@ Not in the CMS: brand colors, logo, layout, intro animation. Those stay in code.
 
 **A1 Inbox, clients, events, quotations.** Inbox over `EventEnquiry`; Client CRUD; Event CRUD with pipeline; "Convert enquiry"; quotation builder with versions; tasks and notes basics; Activity timeline. *Done when:* a test website enquiry can be converted to a client + event, quoted, and moved to CONFIRMED, with the history visible.
 
-**A2 Vendors and money.** Vendor directory, vendor bookings per event, client payments in, vendor payments out, expenses, per-event balance and margin. *Done when:* an event shows total quoted, received, balance due, vendor costs and profit correctly.
+**A2 Vendors and money (implementation complete; runtime walkthrough pending).** Vendor directory, vendor bookings per event, client payments in, vendor payments out, expenses, per-event balance and margin. Current defaults: categories are free text; bank account details are not stored; optional UPI ID is restricted to OWNER/ACCOUNTS. The additive migration is applied and all eight migrations were confirmed up to date. *Done when:* an authenticated walkthrough confirms an event shows accepted quote, received, balance due, vendor costs, vendor payments and estimated margin correctly under the intended roles.
 
 **A3 Team and partners.** Applications review and "Convert to team member"; assignments; partner approve/reject; commissions with approval and "paid". *Done when:* a referred enquiry that completes and is paid produces a commission that waits for approval, and cannot be approved by the same person who proposed it if the owner enables that rule.
 
-**A4 Dashboard and reminders.** Dashboard widgets, "today/overdue" tasks, upcoming events, dues. Optional later: WhatsApp click-to-chat links and email notifications.
+**A4 Dashboard, reminders, calendar, and search (implemented; runtime walkthrough pending).** Role-aware dashboard and finance widgets, pure tested needs-attention rules, month calendar with URL filters, and role-filtered global search. No schema changes or new dependencies. Notifications remain later work and are not part of A4.
 
 **A5 CMS.** Categories, media, FAQ, banner, pages, settings, testimonials; public pages switch to database content with revalidation.
 
@@ -492,12 +492,12 @@ Later: client self-service portal and phone OTP, online payments (Razorpay) for 
 
 ---
 
-## 10. First instruction for the agent
+## 10. Current instruction for the agent
 
-1. Read `AGENTS.md` and this file. Confirm the section 11 answers with Rani before A0 (if unanswered, use the recommended defaults and say so).
-2. Run `npx prisma generate`, `npx prisma migrate status`; do not reset the database.
-3. Implement phase A0 only. Create one migration for it. Show the diff and the test steps, then wait before starting A1.
-4. Keep the public site working at all times.
+1. Read `AGENTS.md` and this file. A0–A4 are implemented; authenticated A2–A4 walkthrough remains.
+2. Before applying any future migration, inspect the schema/history and run `npx prisma migrate status`; if the database cannot be reached, leave the migration unapplied and report it. Never reset the database.
+3. Keep commission terms manual until AILU confirms reward rules. A4 does not change the schema.
+4. Keep the public site working at all times; do not start A5 without authorization.
 
 ## 11. Decisions to confirm with Rani (recommended default in bold)
 

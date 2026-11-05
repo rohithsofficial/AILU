@@ -4,18 +4,26 @@ const input = "mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py
 export default function ClientForm({
   action,
   client,
+  ownerId,
+  owners = [],
+  allowOwnerChange = false,
 }: {
   action: (fd: FormData) => Promise<void>;
   client?: {
     type: string; name: string; companyName?: string | null; phone: string; altPhone?: string | null;
     email?: string | null; city?: string | null; address?: string | null; gstin?: string | null;
     source: string; referredBySpId?: string | null; notes?: string | null; consentToContact: boolean;
-    id?: string;
+    tags?: string[];
+    id?: string; ownerId?: string | null;
   } | null;
+  ownerId?: string | null;
+  owners?: { id: string; name: string; email: string }[];
+  allowOwnerChange?: boolean;
 }) {
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-2">
       {client?.id ? <input type="hidden" name="id" value={client.id} /> : null}
+      {!allowOwnerChange ? <input type="hidden" name="ownerId" value={ownerId ?? client?.ownerId ?? ""} /> : null}
       <label className="block">Type
         <select name="type" defaultValue={client?.type ?? "INDIVIDUAL"} className={input}>
           {["INDIVIDUAL", "COMPANY", "COMMUNITY"].map((t) => <option key={t} value={t} className="text-black">{t === "INDIVIDUAL" ? "Individual" : t === "COMPANY" ? "Company" : "Community"}</option>)}
@@ -33,6 +41,8 @@ export default function ClientForm({
         </select>
       </label>
       <label className="block">Partner ID (if introduced by a partner)<input name="referredBySpId" defaultValue={client?.referredBySpId ?? ""} placeholder="AILU-SP-000001" className={input} /></label>
+      <label className="block">Tags (comma separated)<input name="tags" defaultValue={client?.tags?.join(", ") ?? ""} placeholder="wedding, repeat client" className={input} /></label>
+      {allowOwnerChange ? <label>Owner<select name="ownerId" defaultValue={ownerId ?? client?.ownerId ?? ""} className={input}><option value="" className="text-black">Unassigned</option>{owners.map((person) => <option key={person.id} value={person.id} className="text-black">{person.name || person.email}</option>)}</select></label> : null}
       <label className="block">Address<input name="address" defaultValue={client?.address ?? ""} className={input} /></label>
       <label className="block">GSTIN (company clients only)<input name="gstin" defaultValue={client?.gstin ?? ""} className={input} /></label>
       <label className="block sm:col-span-2">Private notes (staff only)<textarea name="notes" rows={3} defaultValue={client?.notes ?? ""} className={input} /></label>

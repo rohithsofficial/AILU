@@ -4,10 +4,10 @@ import { getPrisma } from "@/lib/db";
 export async function logActivity(
   kind: "CALL" | "WHATSAPP" | "MEETING" | "NOTE" | "STATUS",
   body: string,
-  links: { clientId?: string | null; eventId?: string | null; vendorId?: string | null },
+  links: { clientId?: string | null; eventId?: string | null; enquiryId?: string | null; vendorId?: string | null },
   byId?: string | null,
 ) {
   await getPrisma().activity.create({
-    data: { kind, body, byId: byId ?? null, clientId: links.clientId ?? null, eventId: links.eventId ?? null, vendorId: links.vendorId ?? null },
+    data: { kind, body, byId: byId ?? null, clientId: links.clientId ?? null, eventId: links.eventId ?? null, enquiryId: links.enquiryId ?? null, vendorId: links.vendorId ?? null },
   });
 }

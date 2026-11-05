@@ -39,8 +39,9 @@ model EventEnquiry {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  client  Client?  @relation("ClientEventEnquiries", fields: [clientId], references: [id])
-  event   Event?   @relation("EventEnquiryEvent")
+  client     Client?    @relation("ClientEventEnquiries", fields: [clientId], references: [id])
+  event      Event?     @relation("EventEnquiryEvent")
+  activities Activity[] @relation("EnquiryActivity")
 
   @@index([phone])
   @@index([status, createdAt])
@@ -66,26 +67,29 @@ enum PartnerStatus {
 
 // People applying to work with the AILU team
 model Application {
-  seq             Int               @unique @default(autoincrement())
-  id              String            @id // AILU-APP-000001, set right after insert inside one transaction
-  name            String
-  phone           String
-  email           String?
-  city            String
-  role            String
-  skills          String
-  experience      String?
-  portfolioUrl    String?
-  availability    String?
-  eventCategories String?
-  beginner        Boolean           @default(false)
-  notes           String?
-  status          ApplicationStatus @default(SUBMITTED)
-  internalNotes   String? // staff-only
-  decidedById     String? // staff who closed the decision
-  decidedAt       DateTime?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  seq                 Int               @unique @default(autoincrement())
+  id                  String            @id // AILU-APP-000001, set right after insert inside one transaction
+  name                String
+  phone               String
+  email               String?
+  city                String
+  role                String
+  skills              String
+  experience          String?
+  portfolioUrl        String?
+  availability        String?
+  eventCategories     String?
+  beginner            Boolean           @default(false)
+  notes               String?
+  status              ApplicationStatus @default(SUBMITTED)
+  internalNotes       String? // staff-only
+  decidedById         String? // staff who closed the decision
+  decidedAt           DateTime?
+  teamMemberId        String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  teamMember          TeamMember?       @relation("ApplicationTeamLink", fields: [teamMemberId], references: [id], onDelete: SetNull)
+  originForTeamMember TeamMember?       @relation("TeamMemberOrigin")
 
   @@index([phone])
   @@index([status, createdAt])
@@ -108,6 +112,7 @@ model SalesPartner {
   decidedAt        DateTime?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
+  commissions      Commission[]
 
   @@index([status, createdAt])
 }
@@ -177,6 +182,7 @@ model Client {
   gstin            String? // corporate clients only
   source           ClientSource @default(WEBSITE)
   referredBySpId   String? // partner who introduced them
+  ownerId          String? // StaffUser responsible for this client
   tags             String[]
   notes            String?
   consentToContact Boolean      @default(false)
@@ -184,19 +190,20 @@ model Client {
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 
-  contacts   ClientContact[]
-  events     Event[]
-  enquiries  EventEnquiry[] @relation("ClientEventEnquiries")
+  contacts  ClientContact[]
+  events    Event[]
+  enquiries EventEnquiry[]  @relation("ClientEventEnquiries")
 
   @@index([name])
   @@index([city])
+  @@index([ownerId])
 }
 
 // Extra people at a company / community client
 model ClientContact {
-  id       String @id @default(cuid())
+  id       String  @id @default(cuid())
   clientId String
-  client   Client @relation(fields: [clientId], references: [id])
+  client   Client  @relation(fields: [clientId], references: [id])
   name     String
   role     String?
   phone    String?
@@ -241,11 +248,213 @@ model Event {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  quotations  Quotation[]
-  enquiry     EventEnquiry? @relation("EventEnquiryEvent", fields: [enquiryId], references: [id])
+  quotations     Quotation[]
+  enquiry        EventEnquiry?     @relation("EventEnquiryEvent", fields: [enquiryId], references: [id])
+  vendorBookings VendorBooking[]
+  payments       Payment[]
+  expenses       Expense[]
+  assignments    EventAssignment[]
+  commissions    Commission[]
 
   @@index([status, startDate])
   @@index([clientId])
+}
+
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  DO_NOT_USE
+}
+
+enum VendorBookingStatus {
+  ENQUIRED
+  QUOTED
+  CONFIRMED
+  DONE
+  CANCELLED
+}
+
+enum PaymentDirection {
+  IN
+  OUT
+}
+
+enum PaymentMode {
+  CASH
+  UPI
+  BANK_TRANSFER
+  CARD
+  CHEQUE
+  OTHER
+}
+
+// Vendor directory; financial account numbers are deliberately not stored.
+model Vendor {
+  seq           Int             @unique @default(autoincrement())
+  id            String          @id // AILU-VEN-000001
+  name          String
+  category      String
+  contactPerson String?
+  phone         String
+  altPhone      String?
+  email         String?
+  city          String?
+  address       String?
+  gstin         String?
+  rateNotes     String?
+  rating        Int?
+  status        VendorStatus    @default(ACTIVE)
+  tags          String[]
+  notes         String?
+  upiId         String?
+  archivedAt    DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  bookings      VendorBooking[]
+
+  @@index([name])
+  @@index([category, status])
+  @@index([city])
+}
+
+model VendorBooking {
+  id                String              @id @default(cuid())
+  eventId           String
+  event             Event               @relation(fields: [eventId], references: [id])
+  vendorId          String
+  vendor            Vendor              @relation(fields: [vendorId], references: [id])
+  service           String
+  agreedAmountPaise Int?
+  status            VendorBookingStatus @default(ENQUIRED)
+  notes             String?
+  payments          Payment[]
+  expenses          Expense[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([eventId, status])
+  @@index([vendorId])
+}
+
+model Payment {
+  id              String           @id @default(cuid())
+  direction       PaymentDirection
+  purpose         String
+  eventId         String?
+  event           Event?           @relation(fields: [eventId], references: [id])
+  vendorBookingId String?
+  vendorBooking   VendorBooking?   @relation(fields: [vendorBookingId], references: [id])
+  assignmentId    String?
+  assignment      EventAssignment? @relation(fields: [assignmentId], references: [id])
+  amountPaise     Int
+  mode            PaymentMode
+  reference       String?
+  paidOn          DateTime
+  recordedById    String?
+  note            String?
+  createdAt       DateTime         @default(now())
+
+  @@index([eventId, direction, paidOn])
+  @@index([vendorBookingId])
+  @@index([assignmentId])
+}
+
+model Expense {
+  id              String         @id @default(cuid())
+  eventId         String
+  event           Event          @relation(fields: [eventId], references: [id])
+  vendorBookingId String?
+  vendorBooking   VendorBooking? @relation(fields: [vendorBookingId], references: [id])
+  category        String
+  amountPaise     Int
+  spentOn         DateTime
+  note            String?
+  recordedById    String?
+  createdAt       DateTime       @default(now())
+
+  @@index([eventId, spentOn])
+}
+
+enum EventAssignmentStatus {
+  ASSIGNED
+  CONFIRMED
+  DONE
+  DROPPED
+}
+
+model TeamMember {
+  seq           Int      @unique @default(autoincrement())
+  id            String   @id // AILU-TM-000001
+  name          String
+  phone         String   @unique
+  email         String?
+  city          String?
+  roles         String[]
+  applicationId String?  @unique
+  feeNotes      String?
+  active        Boolean  @default(true)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  application        Application?      @relation("TeamMemberOrigin", fields: [applicationId], references: [id], onDelete: SetNull)
+  linkedApplications Application[]     @relation("ApplicationTeamLink")
+  assignments        EventAssignment[]
+
+  @@index([name])
+  @@index([city, active])
+}
+
+model EventAssignment {
+  id           String                @id @default(cuid())
+  eventId      String
+  event        Event                 @relation(fields: [eventId], references: [id])
+  teamMemberId String
+  teamMember   TeamMember            @relation(fields: [teamMemberId], references: [id])
+  role         String
+  feePaise     Int?
+  status       EventAssignmentStatus @default(ASSIGNED)
+  notes        String?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  payments     Payment[]
+
+  @@unique([eventId, teamMemberId, role])
+  @@index([teamMemberId, status])
+}
+
+enum CommissionStatus {
+  PENDING_APPROVAL
+  APPROVED
+  PAID
+  REJECTED
+}
+
+model Commission {
+  id               String           @id @default(cuid())
+  partnerId        String
+  partner          SalesPartner     @relation(fields: [partnerId], references: [id])
+  eventId          String
+  event            Event            @relation(fields: [eventId], references: [id])
+  version          Int              @default(1)
+  basis            String
+  amountPaise      Int
+  status           CommissionStatus @default(PENDING_APPROVAL)
+  proposedById     String
+  decidedById      String?
+  decidedAt        DateTime?
+  rejectionReason  String?
+  paidOn           DateTime?
+  paymentMode      PaymentMode?
+  paymentReference String?
+  paidById         String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@unique([partnerId, eventId, version])
+  @@index([status, createdAt])
+  @@index([partnerId, status])
+  @@index([eventId])
 }
 
 enum QuotationStatus {
@@ -302,15 +511,97 @@ model Task {
 
 // Timeline: calls, WhatsApp, meetings, notes, status changes
 model Activity {
-  id       String   @id @default(cuid())
-  kind     String // CALL WHATSAPP MEETING NOTE STATUS
-  body     String
-  byId     String? // StaffUser
-  clientId String?
-  eventId  String?
-  vendorId String?
-  at       DateTime @default(now())
+  id        String        @id @default(cuid())
+  kind      String // CALL WHATSAPP MEETING NOTE STATUS
+  body      String
+  byId      String? // StaffUser
+  clientId  String?
+  eventId   String?
+  enquiryId String?
+  vendorId  String?
+  at        DateTime      @default(now())
+  enquiry   EventEnquiry? @relation("EnquiryActivity", fields: [enquiryId], references: [id], onDelete: SetNull)
 
   @@index([clientId, at])
   @@index([eventId, at])
+  @@index([enquiryId, at])
+}
+
+// Anonymous public-form abuse counters. The identifier is HMAC-hashed; raw IPs are never stored.
+model RateLimit {
+  id          String   @id @default(cuid())
+  keyHash     String
+  route       String
+  windowStart DateTime
+  count       Int      @default(0)
+  updatedAt   DateTime @updatedAt
+
+  @@unique([keyHash, route, windowStart])
+  @@index([windowStart])
+}
+
+// Private dream submissions are not linked to clients, events, or public content.
+enum DreamCategory {
+  MY_DREAM
+  FAMILY
+  CELEBRATION
+  HELPING_SOMEONE
+  COMMUNITY
+  CREATIVE_IDEA
+  SOMETHING_SPECIAL
+}
+
+enum DreamStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  NEED_MORE_INFO
+  SHORTLISTED
+  IN_PROGRESS
+  FULFILLED
+  NOT_POSSIBLE
+  CLOSED
+}
+
+model Dream {
+  seq              Int                 @unique @default(autoincrement())
+  id               String              @id // AILU-DRM-000001
+  displayName      String?             @db.VarChar(80)
+  city             String              @db.VarChar(80)
+  isMinor          Boolean             @default(false)
+  guardianName     String?             @db.VarChar(80)
+  guardianPhone    String?             @db.VarChar(16)
+  guardianConsent  Boolean             @default(false)
+  contactPhone     String?             @db.VarChar(16)
+  contactEmail     String?             @db.VarChar(120)
+  category         DreamCategory
+  dream            String              @db.VarChar(2000)
+  whyItMatters     String?             @db.VarChar(1500)
+  helpNeeded       String?             @db.VarChar(1500)
+  consentToContact Boolean             @default(false)
+  status           DreamStatus         @default(SUBMITTED)
+  internalNotes    String?             @db.VarChar(4000)
+  decidedById      String?
+  decidedAt        DateTime?
+  statusReason     String?             @db.VarChar(1000)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  statusHistory    DreamStatusChange[]
+
+  @@index([status, createdAt])
+  @@index([contactPhone, createdAt])
+  @@index([contactEmail, createdAt])
+  @@index([guardianPhone, createdAt])
+}
+
+model DreamStatusChange {
+  id          String       @id @default(cuid())
+  dreamId     String
+  dream       Dream        @relation(fields: [dreamId], references: [id], onDelete: Cascade)
+  fromStatus  DreamStatus?
+  toStatus    DreamStatus
+  reason      String?      @db.VarChar(1000)
+  changedById String?
+  createdAt   DateTime     @default(now())
+
+  @@index([dreamId, createdAt])
 }

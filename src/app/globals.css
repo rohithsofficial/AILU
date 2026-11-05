@@ -7,6 +7,11 @@ html { scroll-behavior: smooth; }
 body { background: var(--cream); color: var(--black); font-family: var(--font-inter), system-ui, sans-serif; }
 h1, h2, h3 { font-family: var(--font-poppins), system-ui, sans-serif; }
 :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+.skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 100; transform: translateY(-180%); border-radius: .5rem; background: var(--yellow); color: var(--black); padding: .75rem 1rem; font-weight: 700; }
+.skip-link:focus { transform: translateY(0); }
+.whatsapp-float { position: fixed; z-index: 35; right: calc(env(safe-area-inset-right, 0px) + 1rem); bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem); display: inline-flex; min-height: 44px; align-items: center; justify-content: center; border: 2px solid var(--cream); border-radius: 9999px; background: var(--yellow); padding: .65rem 1rem; color: var(--black); font-weight: 700; box-shadow: 0 8px 28px rgb(17 17 17 / 30%); }
+html[data-logo="pending"] .whatsapp-float { display: none; }
+@media (max-width: 640px) { .whatsapp-float { right: calc(env(safe-area-inset-right, 0px) + .75rem); bottom: calc(env(safe-area-inset-bottom, 0px) + .75rem); } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 
 /* Nav logo: three layers (A, IL, hand). Revealed left to right after the intro hand lands, compact on scroll. */

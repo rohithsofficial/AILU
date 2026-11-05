@@ -2,14 +2,14 @@ import Link from "next/link";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
 import { listEnquiries } from "@/server/inbox";
 import { ENQUIRY_STATUSES } from "@/lib/enquiryStatus";
-import { formatIN } from "@/lib/format";
+import { formatIN, humanize } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default async function InboxPage({ searchParams }: { searchParams: { q?: string; status?: string; spam?: string; page?: string } }) {
-  await requireRolePage(STAFF_ROLES);
+export default async function InboxPage({ searchParams }: { searchParams: { q?: string; status?: string; spam?: string; conversion?: string; owner?: string; page?: string } }) {
+  const staff = await requireRolePage(["OWNER", "MANAGER", "STAFF"]);
   const page = Number(searchParams.page ?? "1") || 1;
-  const { rows, total, pages } = await listEnquiries({ q: searchParams.q, status: searchParams.status, spam: searchParams.spam, page });
+  const { rows, total, pages } = await listEnquiries({ q: searchParams.q, status: searchParams.status, spam: searchParams.spam, conversion: searchParams.conversion, owner: searchParams.owner, staffId: staff.role === "STAFF" ? staff.id : undefined, page });
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -22,13 +22,15 @@ export default async function InboxPage({ searchParams }: { searchParams: { q?: 
           <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search name, phone, ID, location" className="w-56 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm placeholder:text-ailu-cream/40" />
           <select name="status" defaultValue={searchParams.status ?? ""} className="rounded-lg border border-white/20 bg-white/10 px-2 py-2 text-sm">
             <option value="" className="text-black">All statuses</option>
-            {ENQUIRY_STATUSES.map((s) => <option key={s} value={s} className="text-black">{formatIN(s)}</option>)}
+            {ENQUIRY_STATUSES.map((s) => <option key={s} value={s} className="text-black">{humanize(s)}</option>)}
           </select>
           <select name="spam" defaultValue={searchParams.spam ?? ""} className="rounded-lg border border-white/20 bg-white/10 px-2 py-2 text-sm">
             <option value="" className="text-black">Hiding spam</option>
             <option value="all" className="text-black">Show all incl. spam</option>
             <option value="only" className="text-black">Only spam</option>
           </select>
+          <select name="conversion" defaultValue={searchParams.conversion ?? ""} className="rounded-lg border border-white/20 bg-white/10 px-2 py-2 text-sm"><option value="" className="text-black">All enquiries</option><option value="unconverted" className="text-black">Unconverted</option><option value="converted" className="text-black">Converted</option></select>
+          <select name="owner" defaultValue={searchParams.owner ?? ""} className="rounded-lg border border-white/20 bg-white/10 px-2 py-2 text-sm"><option value="" className="text-black">All owners</option><option value="unassigned" className="text-black">Unassigned</option></select>
           <button className="rounded-lg border border-white/20 px-4 py-2 text-sm hover:bg-white/10">Filter</button>
         </form>
       </div>
@@ -57,7 +59,7 @@ export default async function InboxPage({ searchParams }: { searchParams: { q?: 
                     <div>{r.location}</div>
                     <div className="text-xs text-ailu-cream/50">{r.eventDate || "date not set"} · {formatIN(r.createdAt)}</div>
                   </td>
-                  <td className="px-4 py-3 text-xs">{formatIN(r.status)}</td>
+                  <td className="px-4 py-3 text-xs">{humanize(r.status)}</td>
                   <td className="px-4 py-3">
                     {r.event
                       ? <Link href={`/admin/events/${r.event.id}`} className="font-mono text-xs text-ailu-yellow hover:underline">{r.event.id}</Link>
@@ -75,9 +77,9 @@ export default async function InboxPage({ searchParams }: { searchParams: { q?: 
         {pages > 1 && (
           <>
             {" · "}
-            <Link href={`/admin/inbox?page=${Math.max(1, page - 1)}&q=${encodeURIComponent(searchParams.q ?? "")}&status=${searchParams.status ?? ""}&spam=${searchParams.spam ?? ""}`} className="underline">← prev</Link>
+            <Link href={`/admin/inbox?page=${Math.max(1, page - 1)}&q=${encodeURIComponent(searchParams.q ?? "")}&status=${searchParams.status ?? ""}&spam=${searchParams.spam ?? ""}&conversion=${searchParams.conversion ?? ""}&owner=${searchParams.owner ?? ""}`} className="underline">← prev</Link>
             {" · "}
-            <Link href={`/admin/inbox?page=${Math.min(pages, page + 1)}&q=${encodeURIComponent(searchParams.q ?? "")}&status=${searchParams.status ?? ""}&spam=${searchParams.spam ?? ""}`} className="underline">next →</Link>
+            <Link href={`/admin/inbox?page=${Math.min(pages, page + 1)}&q=${encodeURIComponent(searchParams.q ?? "")}&status=${searchParams.status ?? ""}&spam=${searchParams.spam ?? ""}&conversion=${searchParams.conversion ?? ""}&owner=${searchParams.owner ?? ""}`} className="underline">next →</Link>
           </>
         )}
       </p>

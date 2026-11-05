@@ -22,7 +22,7 @@ The CRM is not a replacement for accounting software, a public customer account 
 - **Brand colors:** AILU yellow `#F5C400`, black `#111111`, and warm white `#FFFDF7`.
 - **Fonts:** Poppins for display headings and Inter for body text.
 - **Logo:** white A, I, L and the golden “I love you” hand that forms the U, with a gold heart under the A. It needs a dark background.
-- **Contact:** +91 74488 11611 · worldofailu24@gmail.com · [WhatsApp](https://wa.me/917448811611).
+- **Contact:** +91 82967 93486 · worldofailu24@gmail.com · [WhatsApp](https://wa.me/918296793486).
 
 Business copy and workflows must stay honest:
 
@@ -203,7 +203,7 @@ These are the local project branches and the changes they contain. The A4 branch
 - Adds no schema migration, dependency, or environment variable.
 - Latest A4 commits: `6839ad5` feature implementation and `dec0925` documentation.
 
-Branches pushed to `origin` include `main`, `feat/crm-a0-a1`, `feat/crm-a3`, and `feat/crm-a4`. Check the remote repository if branch state changes after this guide is written.
+Branches pushed to `origin` include `main`, `feat/crm-a0-a1`, `feat/crm-a3`, `feat/crm-a4`, and `feat/public-site-launch`. The public site launch pass is based on `feat/crm-a4` because CRM has not been merged into `main`.
 
 ## 10. Database and secret safety — read before changing data
 
@@ -306,3 +306,11 @@ Do not start a later phase or decide a business policy by guessing. Current open
 - `README.md` — shorter repository setup and route overview.
 
 When documents conflict, follow current non-negotiable instructions in `AGENTS.md` and the later AILU vision there. For example, dreams remain private even if an older theme document suggests public stories, and loyalty points remain undecided.
+
+## 16. Public launch-readiness pass
+
+After the A4 CRM work, `feat/public-site-launch` was started from `feat/crm-a4` because the CRM branch had not been merged into `main`. It adds public-facing About, Contact, FAQ, Privacy, Terms, and Referral Policy pages; a typed content source; optional empty galleries; canonical and social metadata; robots/sitemap rules; accessible navigation, forms, errors, and WhatsApp contact; and an additive public-form rate-limit table. The delivery does not add CMS, customer login, dream submissions, donation processing, reward points, or an AI character.
+
+The migration `20261103111506_website_rate_limit` adds the `RateLimit` table. It was applied to the connected Neon database after confirming the preceding migrations; current status is ten migrations applied. Rate-limit identifiers are salted HMAC hashes, never raw IP addresses. Set `RATE_LIMIT_SALT` and `NEXT_PUBLIC_SITE_URL` in the deployment environment before launch. Run `npx prisma migrate deploy` against production only after reviewing the production branch and backup.
+
+The public launch branch also requires legal review, real photos and their permissions, AILU's About/story copy, confirmed tradition/service information, and official social URLs. Data retention, consent evidence retention, response-time expectations, and referral reward terms are still open. A production dependency audit also reports nine advisories, including a critical Next.js issue, and needs a compatible upgrade plan before launch. See `LAUNCH_CHECKLIST.md`. Local tests, typecheck, lint, Prisma validation, and migration status passed; production build still needs access to Google Fonts, and real-browser mobile checks are pending.

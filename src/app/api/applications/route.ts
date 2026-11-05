@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbConfigured, getPrisma } from "@/lib/db";
 import { applicationSchema, normalizePhone } from "@/lib/validation";
+import { checkPublicRateLimit, clientIpFrom, PUBLIC_RATE_LIMITS } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -16,6 +17,9 @@ export async function POST(req: Request) {
   const { website, consent, email, portfolioUrl, experience, availability, eventCategories, notes, phone, beginner, ...rest } = parsed.data; void website; void consent;
   const phoneN = normalizePhone(phone);
   try {
+    if (!process.env.RATE_LIMIT_SALT) return NextResponse.json({ error: "Applications are temporarily unavailable. Please WhatsApp us." }, { status: 503 });
+    const limit = await checkPublicRateLimit({ ...PUBLIC_RATE_LIMITS.applicationIp, identifier: clientIpFrom(req.headers) });
+    if (!limit.allowed) return NextResponse.json({ error: "Too many applications from this connection. Please try again later or WhatsApp us." }, { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } });
     const db = getPrisma();
     // One application per phone number in any 30 day window, so the team is not flooded with duplicates.
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);

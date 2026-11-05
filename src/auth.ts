@@ -2,29 +2,32 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { getPrisma } from "@/lib/db";
+import type { StaffRole } from "@prisma/client";
 
-// Bootstrap allowlist: these emails become OWNER the first time they sign in.
-// Everyone else must be added to StaffUser by an OWNER before they can sign in.
-export const ownerAllowlist = () =>
-  (process.env.STAFF_OWNER_EMAILS ?? "")
-    .split(/[,;\s]+/)
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
+export const bootstrapEmail = () => (process.env.ADMIN_BOOTSTRAP_EMAIL ?? "").trim().toLowerCase();
 
 // Dev-only password login so role gating can be tested without Google credentials.
 // Never enable in production: it is ignored unless ADMIN_DEV_LOGIN=true AND NODE_ENV !== "production".
 export const devLoginEnabled =
   process.env.ADMIN_DEV_LOGIN === "true" && process.env.NODE_ENV !== "production";
 
-export const authConfigured = () => !!process.env.GOOGLE_CLIENT_ID && !!process.env.GOOGLE_CLIENT_SECRET;
+export const authConfigured = () => !!process.env.AUTH_GOOGLE_ID && !!process.env.AUTH_GOOGLE_SECRET;
 
 async function recogniseStaff(email: string, name: string) {
   const db = getPrisma();
   const lower = email.toLowerCase();
   let staff = await db.staffUser.findUnique({ where: { email: lower } });
   if (!staff) {
-    if (!ownerAllowlist().includes(lower)) return null; // not allowlisted
-    staff = await db.staffUser.create({ data: { email: lower, name: name || lower, role: "OWNER", active: true } });
+    // The bootstrap address is valid only while the staff table is empty.
+    // Once an owner has been created, all new staff must be added by an owner.
+    if (lower !== bootstrapEmail() || (await db.staffUser.count()) !== 0) return null;
+    try {
+      staff = await db.staffUser.create({ data: { email: lower, name: name || lower, role: "OWNER", active: true } });
+    } catch (error) {
+      // Handle two first-time OAuth callbacks racing to create the bootstrap owner.
+      staff = await db.staffUser.findUnique({ where: { email: lower } });
+      if (!staff) throw error;
+    }
   }
   if (!staff.active) return null;
   return staff;
@@ -34,8 +37,8 @@ const providers = [];
 if (authConfigured()) {
   providers.push(
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
     }),
   );
 }
@@ -58,8 +61,7 @@ if (devLoginEnabled) {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
-  // AUTH_SECRET is preferred; PREVIEW_SECRET is already a long server-only random string and serves as a safe fallback.
-  secret: process.env.AUTH_SECRET || process.env.PREVIEW_SECRET,
+  secret: process.env.AUTH_SECRET,
   providers,
   session: { strategy: "jwt", maxAge: 12 * 60 * 60 }, // staff sessions last half a day
   callbacks: {
@@ -72,6 +74,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         data: { actorId: staff.id, action: "staff.sign_in", entity: "StaffUser", entityId: staff.id },
       });
       return true;
+    },
+    jwt: async ({ token }) => {
+      const email = token.email?.toLowerCase();
+      if (!email) return token;
+      const staff = await getPrisma().staffUser.findUnique({ where: { email } });
+      token.staffId = staff?.active ? staff.id : undefined;
+      token.role = staff?.active ? staff.role : undefined;
+      return token;
+    },
+    session: async ({ session, token }) => {
+      if (session.user) {
+        session.user.id = typeof token.staffId === "string" ? token.staffId : "";
+        session.user.role = token.role as StaffRole | undefined;
+      }
+      return session;
     },
   },
 });

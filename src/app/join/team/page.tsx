@@ -1,6 +1,7 @@
 import PageHero from "@/components/PageHero";
 import ApplicationForm from "@/components/forms/ApplicationForm";
-export const metadata = { title: "Join the AILU team" };
+import { metadataForPath } from "@/lib/public-metadata";
+export const metadata = metadataForPath("/join/team");
 
 export default function TeamPage() {
   return (
