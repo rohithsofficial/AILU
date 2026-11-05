@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth, googleEnabled, signIn } from "@/auth";
+import SignInButton from "@/components/admin/SignInButton";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,7 @@ export default async function AdminLogin({ searchParams }: { searchParams: { err
       <form action={passwordSignIn} className="mt-6">
         <label className="block text-sm">Email<input name="email" type="email" autoComplete="username" required className={input} /></label>
         <label className="mt-3 block text-sm">Password<input name="password" type="password" autoComplete="current-password" required className={input} /></label>
-        <button className="mt-5 w-full rounded-full bg-ailu-yellow px-6 py-3 font-semibold text-ailu-black transition hover:brightness-105">Sign in</button>
+        <SignInButton />
       </form>
 
       {googleEnabled() && (
