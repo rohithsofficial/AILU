@@ -20,6 +20,9 @@ Already handled by `worldMarkup.ts`; once the source has them, the matching patc
 2. Remove the `.waForm` submit handler (including the `fetch('/')` POST) and the "Forms become short steps" block.
 3. Line ~615: canvas text uses `Manrope` and `Fraunces`. Use `Poppins` (headings) and `Inter` (body). Read the family names from `getComputedStyle(ROOT).getPropertyValue('--head')`, because next/font gives them generated names.
 4. `GOLD='#f4bb25'`, `CREAM='#fff7e6'`, `FIG='#0b0c0a'` and the 3D colours (`0xffd27a` and similar): use `#F5C400`, `#FFFDF7`, `#111111`.
+5. In `stop()`: call `r.dispose()` on the renderer and dispose geometries, materials and textures. `AiluWorld.tsx` currently releases the WebGL context from outside with `WEBGL_lose_context`.
+6. Query from `ROOT` instead of `document` (`document.getElementById` and `document.querySelectorAll`, about 31 calls).
+7. Stop setting `document.title` in `routeWorld` and `route`. `AiluWorld.tsx` currently sets the title back after each in-world route.
 
 ## CSS (`ailu-world.css`)
 
