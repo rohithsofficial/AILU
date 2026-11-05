@@ -4,7 +4,7 @@ import { indianPhoneSchema, normalizePhone } from "@/lib/validation";
 import { audit } from "@/lib/audit";
 import { z } from "zod";
 
-// Client logic for phase A1 (CRM_CMS_PLAN.md section 4.2). Phones are the dedupe key.
+// Client logic for phase A1 (docs/CRM_CMS_PLAN.md section 4.2). Phones are the dedupe key.
 
 const idCode = (seq: number) => `AILU-CLI-${String(seq).padStart(6, "0")}`;
 

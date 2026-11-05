@@ -117,7 +117,7 @@ model SalesPartner {
   @@index([status, createdAt])
 }
 
-// ---------- Admin system: phase A0 (see CRM_CMS_PLAN.md) ----------
+// ---------- Admin system: phase A0 (see docs/CRM_CMS_PLAN.md) ----------
 
 enum StaffRole {
   OWNER

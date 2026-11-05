@@ -3,7 +3,7 @@ import { getPrisma } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { canChangeNote } from "@/lib/recordRules";
 
-// Timeline entries (calls, WhatsApp, meetings, notes, status changes). CRM_CMS_PLAN.md section 5.
+// Timeline entries (calls, WhatsApp, meetings, notes, status changes). docs/CRM_CMS_PLAN.md section 5.
 export async function logActivity(
   kind: "CALL" | "WHATSAPP" | "MEETING" | "NOTE" | "STATUS",
   body: string,

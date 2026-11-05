@@ -6,7 +6,7 @@ import { can, canEditAssignedRecord } from "@/lib/permissions";
 export { can, canEditAssignedRecord } from "@/lib/permissions";
 export type { StaffAction } from "@/lib/permissions";
 
-// The one place authorisation is enforced (CRM_CMS_PLAN.md section 2).
+// The one place authorisation is enforced (docs/CRM_CMS_PLAN.md section 2).
 // Hiding a button is never security: every page / action / route must call one of these helpers.
 
 export type Staff = { id: string; email: string; name: string; role: StaffRole; active: boolean };

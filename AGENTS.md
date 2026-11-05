@@ -116,7 +116,7 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 - Dream view, status, notes, reason, submission, and deletion audit records contain no submitted dream text. Admin list pages show metadata only; full details appear only on the restricted detail page.
 - Dream form, role boundaries, rate limits, duplicate detection, sensitive-pattern rejection, status rules, dashboard attention and audit minimization have Vitest coverage. Keep `DREAMS_FORM_OPEN=false` until the launch checklist and legal/safeguarding decisions are complete.
 - ESLint was added for public code with `next/core-web-vitals` and `jsx-a11y/recommended`. The lint command excludes the existing CRM route group and admin components per the public-only scope.
-- Public and private-dream typecheck/lint passed; all 74 Vitest tests passed. Production build passed with network access enabled for Google Fonts. No real-browser/mobile walkthrough has been completed yet. See `LAUNCH_CHECKLIST.md`.
+- Public and private-dream typecheck/lint passed; all 74 Vitest tests passed. Production build passed with network access enabled for Google Fonts. No real-browser/mobile walkthrough has been completed yet. See `docs/LAUNCH_CHECKLIST.md`.
 - Authenticated runtime walkthrough for A2–A4 remains pending. The production build still needs Google Fonts network access.
 
 ---
@@ -173,7 +173,7 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 
 ## 9. What to do next (in order)
 
-1. **Launch verification:** follow `LAUNCH_CHECKLIST.md`; verify forms, mobile/accessibility behavior, Vercel/Neon production configuration, OAuth, rate limits, SEO, and `COMING_SOON=false` only at the end.
+1. **Launch verification:** follow `docs/LAUNCH_CHECKLIST.md`; verify forms, mobile/accessibility behavior, Vercel/Neon production configuration, OAuth, rate limits, SEO, and `COMING_SOON=false` only at the end.
 2. **Review policies and business details:** lawyer review, data retention, consent evidence, response expectations, referral reward terms, and legal donation setup.
 3. **Supply approved content:** About/story, category/traditions information, real photographs with permissions, and official social links.
 4. **Runtime verify A2–A4:** with authenticated OWNER, MANAGER, STAFF and ACCOUNTS accounts, walk finance, application conversion, assignments, commission eligibility/approval/payment, dashboard scopes, search visibility, calendar filters, and role boundaries.
