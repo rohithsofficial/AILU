@@ -39,3 +39,7 @@ Already handled by `worldMarkup.ts`; once the source has them, the matching patc
 ## Phone turning
 
 `onGyro` in engine.ts writes raw sensor angles into `yaw`, which fights touch and room moves and shakes the view. phoneTurn.ts blocks those events and turns the view through wheel input. When regenerating, you can remove `onGyro` and the `deviceorientation` listener, but keep the button and its permission request.
+
+## Fonts
+
+scripts/strip-world-font-import.cjs removes the Google Fonts `@import` from ailu-world.css during the build, because it blocked the first paint. When regenerating, remove the `@import` from the source. The loader then does nothing and can be deleted.

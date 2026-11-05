@@ -27,7 +27,7 @@ The hand-and-heart logo is the main symbol.
 2. Normal World (classic site): the regular pages with Navbar and Footer (home, events, join, dreams, about, contact, legal pages).
 - The two worlds must feel clearly separate.
 - Visitors can switch between them with one easy, always visible button, from either side, on desktop and on phone:
-  - in the AILU World: a button "Normal site" (goes to the classic home)
+  - in the AILU World: a button "Explore Website" (goes to the classic home)
   - in the Normal World: a button "Enter AILU World" (goes to the world)
 - Never force-redirect people or search engine crawlers between the worlds.
 - Real forms, the CRM and legal pages live in the Normal World. Links inside the AILU World that need an action open the real page (see the ROUTES table in AiluWorld.tsx).
@@ -64,13 +64,13 @@ The hand-and-heart logo is the main symbol.
 ## Current state (update this section when things change)
 - A0, A1, A2 of the CRM done and migrated on Neon.
 - Two worlds merged to main on 2026-11-05 (PR #5). / = AILU World in src/app/(world). /classic and all real pages = Normal World in src/app/(site). /world and public/ailu-celebrations.html are gone.
-- Switch buttons done: "Enter AILU World" in the Navbar and its menu; "Normal site" and a Pages list in components/WorldSwitch.tsx.
+- Switch buttons done: "Enter AILU World" in the Navbar and its menu; "Explore Website" and a Quick Links list in components/WorldSwitch.tsx.
 - The intro plays once per session, only on / (components/Intro.tsx, sessionStorage "ailu-intro-seen").
 - No form inside the world collects data. The rewards/points preview is removed. World copy changes are in src/content/site.ts (SITE_CONTENT.world).
 - World site changes live outside the generated files: worldMarkup.ts (markup patches, tested by worldMarkup.test.ts), AiluWorld.tsx (hides Rewards, releases WebGL, keeps the title, fixes Back), world-brand.css (brand fonts and colours).
 - Menu: Join and Dreams open their world rooms; only their form cards link to real pages. Speed: worldRenderer.ts lowers pixel density and drops quality on slow devices.
 - Open: components/AiluWorld/CHANGES_FOR_GENERATOR.md lists the edits Rani must make when regenerating body.ts, engine.ts and ailu-world.css. Until then the Google Fonts @import, unprefixed keyframes, off-brand 3D colours and canvas fonts remain, /#rewards still opens the rewards 3D room, and the rewards scene is still in the 3D world.
-- Phone fixes (2026-11-05): 3D hero and journey scenes run only at 1024px and wider. World phone rules are in world-brand.css. Skip intro fades out, with no hand flight. Intro buttons are Enter AILU World and Normal site. Phone turning goes through phoneTurn.ts. Checked at 320, 360, 390, 768 and 1440px in the browser pane, not yet on a real phone.
+- Phone fixes (2026-11-05): 3D hero and journey scenes run only at 1024px and wider. World phone rules are in world-brand.css. Skip intro fades out, with no hand flight. Intro buttons are Enter AILU World and Explore Website, and their names are in the CMS Intro section. Phone turning goes through phoneTurn.ts. A first visit starts the 3D engine only from the intro (src/lib/worldStart.ts); WorldPoster shows until it is ready. scripts/strip-world-font-import.cjs removes the blocking font import at build time. Checked at 320, 360, 390, 768 and 1440px in the browser pane, not yet on a real phone.
 - three stays at 0.160.0 because the world port requires it.
 - CRM login is email and password (src/lib/password.ts, scrypt, no new dependency). Google is off unless AUTH_GOOGLE_ENABLED=true. The passwordHash migration is applied on Neon. First owner password: npm run staff:password -- <email>.
 - CRM records: tasks, payments, expenses, vendor bookings, team assignments, draft quotations and timeline notes have edit and delete (src/app/(admin)/admin/records/actions.ts). Clients and events stay archive and restore. An owner can delete a vendor only if it has no event bookings; otherwise archive it. Rules are in src/lib/recordRules.ts.

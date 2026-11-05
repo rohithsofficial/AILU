@@ -5,17 +5,18 @@ type SeoPage = { path: string; title: string; description: string; shareImage: s
 type SeoContent = { defaultShareImage: string; pages: SeoPage[] };
 type CelebrationSeo = { slug: string; title: string; blurb: string; seoTitle: string; seoDescription: string; shareImage: string };
 
+const LIVE_SITE_URL = "https://www.worldofailu.com";
+
+// Canonical links must be full addresses, so the live domain is the default.
 export function publicSiteUrl() {
-  const raw = process.env.NEXT_PUBLIC_SITE_URL;
-  if (!raw) return undefined;
-  try { return new URL(raw); } catch { return undefined; }
+  try { return new URL(process.env.NEXT_PUBLIC_SITE_URL || LIVE_SITE_URL); } catch { return new URL(LIVE_SITE_URL); }
 }
 
 export const ROOT_DESCRIPTION = "AILU is an event management and celebration company based in Udupi, planning celebrations across India.";
 
 export const PUBLIC_PAGE_CONTENT: Record<string, { title: string; description: string }> = {
   "/": { title: "AILU | Creating Moments. Delivering Smiles.", description: ROOT_DESCRIPTION },
-  "/classic": { title: "Normal site", description: "The classic AILU website: events, joining the team, partner registration, private dream support and contact details." },
+  "/classic": { title: "Home", description: "The AILU website: events, joining the team, partner registration, private dream support and contact details." },
   "/events": { title: "Events", description: "Explore AILU event planning services for personal, wedding, corporate, cultural, entertainment, and community celebrations." },
   "/about": { title: "About", description: "Learn about AILU, an event management and celebration company based in Udupi, planning celebrations across India." },
   "/contact": { title: "Contact", description: "Contact AILU in Udupi about celebrations, team applications, or the sales partner programme." },

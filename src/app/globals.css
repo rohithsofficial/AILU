@@ -27,6 +27,11 @@ html[data-logo="pending"] .nav-logo-img { clip-path: inset(0 100% 0 0); transiti
 .logo-hand { left: var(--hand-left); transition: left .6s cubic-bezier(.65, 0, .35, 1); }
 .nav-logo[data-compact="true"] .logo-hand { left: var(--hand-left-compact); }
 
+@keyframes intro-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.intro-rise { animation: intro-rise .45s ease-out both; }
+@keyframes intro-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.intro-float { animation: intro-float 4s ease-in-out infinite; will-change: transform; }
+
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .marquee-track { animation: marquee 38s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
