@@ -33,7 +33,7 @@ export const SITE_CONTENT = {
   ],
   // The two worlds: "/" is the AILU World, "/classic" is the Normal World home.
   worldTitle: "AILU | Enter the 360° world",
-  switch: { toWorld: { href: "/", label: "Enter AILU World" }, toSite: { href: "/classic", label: "Normal site" } },
+  switch: { toWorld: { href: "/", label: "Enter AILU World" }, toSite: { href: "/classic", label: "Explore Website" } },
   // Real pages listed inside the AILU World.
   worldLinks: [
     { href: "/events", label: "Events" },

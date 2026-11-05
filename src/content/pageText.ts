@@ -107,7 +107,10 @@ export const PAGE_TEXT = {
     welcome: "Hi, welcome to AILU.",
     feeling: "A feeling becomes a gathering. A gathering becomes a memory.",
     question: "How would you like to explore?",
-    questionText: "Step into the 360° world, or use the normal site. You can switch at any time."
+    questionText: "Step into the 360° world, or explore the website. You can switch at any time.",
+    worldButton: "Enter AILU World",
+    websiteButton: "Explore Website",
+    quickLinksButton: "Quick Links"
   },
   about: {
     eyebrow: "The feeling behind AILU",

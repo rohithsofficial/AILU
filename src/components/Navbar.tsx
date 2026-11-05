@@ -21,7 +21,7 @@ const sceneMotion = {
 };
 
 export default function Navbar() {
-  const t = useContent().nav;
+  const { nav: t, intro } = useContent();
   const DESTINATIONS = t.destinations;
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -92,7 +92,7 @@ export default function Navbar() {
           </div>
           <div className="flex shrink-0 items-center gap-2">
           <Link href={TO_WORLD.href} className="inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full bg-ailu-yellow px-3 text-xs font-bold text-ailu-black transition-colors hover:bg-ailu-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ailu-yellow sm:px-4 sm:text-sm">
-            {TO_WORLD.label} <span aria-hidden className="hidden min-[400px]:inline">◉</span>
+            {intro.worldButton} <span aria-hidden className="hidden min-[400px]:inline">◉</span>
           </Link>
           <button
             ref={triggerRef}
@@ -189,7 +189,7 @@ export default function Navbar() {
 
               <div className="relative z-10 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/15 pt-4 text-xs text-ailu-cream/60 sm:gap-x-8 sm:pt-5">
                 <span className="mr-1 font-semibold uppercase tracking-[.18em] text-ailu-cream/40">{t.alsoTitle}</span>
-                <Link href={TO_WORLD.href} onClick={() => setOpen(false)} className="min-h-11 inline-flex items-center rounded-full bg-ailu-yellow px-4 font-bold text-ailu-black hover:bg-ailu-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ailu-yellow">{TO_WORLD.label} ◉</Link>
+                <Link href={TO_WORLD.href} onClick={() => setOpen(false)} className="min-h-11 inline-flex items-center rounded-full bg-ailu-yellow px-4 font-bold text-ailu-black hover:bg-ailu-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ailu-yellow">{intro.worldButton} ◉</Link>
                 <Link href="/dreams" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">{t.dreamLink}</Link>
                 <Link href="/contact" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">{t.contactLink}</Link>
                 <Link href="/events#enquire" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">{t.planLink}</Link>
