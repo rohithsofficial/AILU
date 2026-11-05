@@ -40,6 +40,7 @@ export default function AiluWorld({ markup }: { markup: string }) {
     const stopPhoneTurn = steadyPhoneTurn(root);
     const start = (THREE?: typeof import("three")) => {
       if (cancelled) return;
+      root.classList.add("world-starting"); // the engine measures the page, so it must be in the layout
       try {
         stop = startAilu(root, THREE);
         hidePlaces(root);

@@ -37,7 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${poppins.variable} ${inter.variable}`}>
       <body>
-        <noscript><style>{"#ailu-intro{display:none!important}body{overflow:auto!important}div.ailu>*{visibility:visible!important}.world-poster{display:none!important}"}</style></noscript>
+        <noscript><style>{"#ailu-intro{display:none!important}body{overflow:auto!important}div.ailu{display:block!important}div.ailu>*{visibility:visible!important}.world-poster{display:none!important}"}</style></noscript>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\\u003c") }} />
         <ContentProvider value={clientContent(content)}>{children}</ContentProvider>
       </body>

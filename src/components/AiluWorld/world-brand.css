@@ -15,8 +15,10 @@ div.ailu {
 }
 html:has(div.ailu), body:has(div.ailu) { background: #111111; }
 
-/* Until the engine has started, the markup is plain page content. Keep it hidden so it never flashes. */
-div.ailu:not(.world-ready) > * { visibility: hidden; }
+/* Until the engine starts, the markup is plain page content. Taking it out of the layout keeps it from flashing,
+   and saves the phone from laying out the whole world and loading its images before anyone enters. */
+div.ailu:not(.world-ready):not(.world-starting) { display: none; }
+div.ailu.world-starting:not(.world-ready) > * { visibility: hidden; }
 
 /* globals.css styles h1–h3 for the Normal World; inside the world the generated CSS only resets h1 and h2. */
 div.ailu h3 { font-family: var(--head); }
@@ -91,7 +93,6 @@ div.ailu h3 { font-family: var(--head); }
   background: radial-gradient(ellipse at 50% 42%, rgb(245 196 0 / 16%), transparent 60%), #111111;
   color: #FFFDF7;
 }
-.world-poster img { width: min(260px, 62vw); height: auto; }
 .world-poster p { margin: 0; font: 600 clamp(1.7rem, 7.5vw, 3rem)/1.1 var(--font-poppins), ui-sans-serif, system-ui, sans-serif; }
 .world-poster span { font: 500 .9rem var(--font-inter), ui-sans-serif, system-ui, sans-serif; color: rgb(255 253 247 / 62%); }
 div.ailu.world-ready + .world-poster { display: none; }
