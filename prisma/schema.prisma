@@ -608,3 +608,32 @@ model DreamStatusChange {
 
   @@index([dreamId, createdAt])
 }
+
+// ---------- CMS ----------
+// One row per website section. `draft` is unpublished work, `published` is what visitors see, and `previous`
+// is the version before the last publish, for undo. The default wording lives in src/content.
+model CmsSection {
+  key           String    @id
+  draft         Json?
+  published     Json?
+  previous      Json?
+  updatedById   String?
+  publishedById String?
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// Files uploaded to Vercel Blob. Only the link and details are stored here.
+model CmsMedia {
+  id           String   @id @default(cuid())
+  url          String   @unique
+  pathname     String
+  alt          String
+  contentType  String
+  sizeBytes    Int
+  uploadedById String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
