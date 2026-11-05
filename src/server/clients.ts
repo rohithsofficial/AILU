@@ -104,7 +104,7 @@ export async function createClient(actor: { id: string; role?: string }, fd: For
   const { phone: _rawPhone, ...rest } = input;
   const created = await db.$transaction(async (tx) => {
     const row = await tx.client.create({
-      data: { ...rest, phone, tags: [], id: `tmp-${crypto.randomUUID()}` },
+      data: { ...rest, phone, id: `tmp-${crypto.randomUUID()}` },
     });
     return tx.client.update({ where: { seq: row.seq }, data: { id: idCode(row.seq) } });
   });
