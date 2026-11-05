@@ -5,32 +5,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BRAND } from "@/lib/brand";
 const KEY = "ailu-intro-seen";
-const HAND_FILL = 0.76; // the standalone hand artwork fills about 76% of its image box
 
-type Box = { l: number; t: number; w: number; h: number };
 const setLogo = (v: "pending" | "ready") => { document.documentElement.dataset.logo = v; };
-
-// Where the hand lands: the navbar logo's hand layer, or the hand inside the AILU World header logo
-// (/ailu/img-08f725e1.png, where the hand covers about x 64–98% and y 10–95% of the image).
-function handTarget() {
-  const navHand = document.querySelector("[data-ailu-hand]");
-  if (navHand) return navHand.getBoundingClientRect();
-  const worldLogo = document.querySelector(".ailu .top img");
-  if (!worldLogo) return null;
-  const r = worldLogo.getBoundingClientRect();
-  return { left: r.left + r.width * 0.64, top: r.top + r.height * 0.1, width: r.width * 0.34, height: r.height * 0.85 };
-}
 
 // steps: 0 hand alone, 1 welcome, 2 the AILU feeling, 3 choose a path
 export default function Intro() {
   const router = useRouter();
-  const handRef = useRef<HTMLDivElement>(null);
   const skipRef = useRef<HTMLButtonElement>(null);
   const [phase, setPhase] = useState<"pending" | "playing" | "done">("pending");
   const [step, setStep] = useState(0);
   const [reduced, setReduced] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const [flight, setFlight] = useState<{ from: Box; to: Box } | null>(null);
+  const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
     if (sessionStorage.getItem(KEY)) { setLogo("ready"); setPhase("done"); return; }
@@ -53,21 +39,14 @@ export default function Intro() {
 
   const finishNow = () => { sessionStorage.setItem(KEY, "1"); setLogo("ready"); setPhase("done"); };
 
-  // Used by both the two entrance buttons and "Skip intro": the hand leaves the centre and lands on the logo.
-  function startFlight() {
-    if (flight) return;
+  // "Skip intro" fades the whole intro away, hand included.
+  function skip() {
     timers.current.forEach(clearTimeout);
-    const fromEl = handRef.current;
-    const t = handTarget();
-    if (reduced || !fromEl || !t) return finishNow();
-    sessionStorage.setItem(KEY, "1");
-    const f = fromEl.getBoundingClientRect();
-    const w = t.width / HAND_FILL; // enlarge so the hand artwork itself lands on the logo's hand
-    const h = w * 0.75;
-    setFlight({ from: { l: f.left, t: f.top, w: f.width, h: f.height }, to: { l: t.left + t.width / 2 - w / 2, t: t.top + t.height / 2 - h / 2, w, h } });
+    if (reduced) return finishNow();
+    setLeaving(true);
   }
 
-  // Both paths leave the world for the Normal World, so there is no flight to the world logo.
+  // Both paths leave the world for the Normal World.
   function choose(intent: "events" | "join") {
     timers.current.forEach(clearTimeout);
     finishNow();
@@ -76,14 +55,13 @@ export default function Intro() {
 
   if (phase !== "playing") return null;
   return (
-    <div id="ailu-intro" className={`fixed inset-0 z-50 ${flight ? "pointer-events-none" : ""}`} role="dialog" aria-modal="true" aria-label="Welcome to AILU">
-      <motion.div className="absolute inset-0 bg-ailu-black" animate={{ opacity: flight ? 0 : 1 }} transition={{ duration: 1.1 }} />
-      {(
-        <motion.div className="relative flex h-full flex-col items-center overflow-y-auto px-4 py-8 text-ailu-cream" animate={{ opacity: flight ? 0 : 1 }} transition={{ duration: 0.35 }}>
-          <button ref={skipRef} onClick={startFlight} className="absolute right-4 top-4 z-10 min-h-11 rounded-full border border-white/50 px-4 py-2 text-sm">Skip intro</button>
+    <motion.div id="ailu-intro" className={`fixed inset-0 z-50 ${leaving ? "pointer-events-none" : ""}`} animate={{ opacity: leaving ? 0 : 1 }} transition={{ duration: 0.4 }} onAnimationComplete={() => { if (leaving) finishNow(); }} role="dialog" aria-modal="true" aria-label="Welcome to AILU">
+      <div className="absolute inset-0 bg-ailu-black" />
+      <div className="relative flex h-full flex-col items-center overflow-y-auto px-4 py-8 text-ailu-cream">
+          <button ref={skipRef} onClick={skip} className="absolute right-4 top-4 z-10 min-h-11 rounded-full border border-white/50 px-4 py-2 text-sm">Skip intro</button>
           <div className="my-auto flex w-full max-w-lg flex-col items-center">
             <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: reduced ? 0 : 1.6, ease: "easeOut" }}>
-              <div ref={handRef} className={`relative aspect-[4/3] transition-[width] duration-700 ${step >= 3 ? "w-36" : "w-[min(72vw,320px)]"}`}>
+              <div className={`relative aspect-[4/3] transition-[width] duration-700 ${step >= 3 ? "w-36" : "w-[min(72vw,320px)]"}`}>
                 <div className="absolute inset-0 rounded-full bg-ailu-yellow/25 blur-3xl" aria-hidden />
                 <motion.div className="absolute inset-0" animate={reduced ? {} : { y: [0, -8, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
                   <Image src={BRAND.hand} alt="AILU hand symbol" fill sizes="320px" className="object-contain" priority />
@@ -107,21 +85,7 @@ export default function Intro() {
               </motion.div>
             )}
           </div>
-        </motion.div>
-      )}
-
-      {/* The hand leaves the centre of the screen and settles where the logo's hand is, then the logo wipes in */}
-      {flight && (
-        <motion.img
-          src={BRAND.hand}
-          alt=""
-          className="fixed z-[60] max-w-none object-contain drop-shadow-[0_10px_30px_rgba(245,196,0,.4)]"
-          initial={{ left: flight.from.l, top: flight.from.t, width: flight.from.w, height: flight.from.h }}
-          animate={{ left: flight.to.l, top: flight.to.t, width: flight.to.w, height: flight.to.h }}
-          transition={{ duration: 1.4, ease: [0.65, 0, 0.35, 1] }}
-          onAnimationComplete={() => { setLogo("ready"); setTimeout(() => setPhase("done"), 1400); }}
-        />
-      )}
-    </div>
+      </div>
+    </motion.div>
   );
 }
