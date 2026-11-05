@@ -1,4 +1,6 @@
 import type { Prisma } from "@prisma/client";
+import { linkedMoneyError } from "@/lib/recordRules";
+import type { StaffRole } from "@prisma/client";
 import { getPrisma } from "@/lib/db";
 import { audit } from "@/lib/audit";
 import { logActivity } from "@/server/activity";
@@ -130,6 +132,39 @@ export async function setAssignmentStatus(actor: { id: string }, eventId: string
   await audit(actor, status === "DROPPED" ? "team_assignment.dropped" : "team_assignment.status_changed", "EventAssignment", assignmentId, { from: old.status, to: status });
   await logActivity("STATUS", `${old.teamMember.name}'s assignment status changed to ${status}.`, { eventId }, actor.id);
   return result;
+}
+
+async function assignmentOnEvent(eventId: string, assignmentId: string) {
+  const assignment = await getPrisma().eventAssignment.findUnique({ where: { id: assignmentId }, include: { teamMember: { select: { name: true } }, _count: { select: { payments: true } } } });
+  if (!assignment || assignment.eventId !== eventId) throw new Error("That assignment does not belong to this event.");
+  return assignment;
+}
+
+export async function updateAssignment(actor: { id: string; role: StaffRole }, eventId: string, assignmentId: string, fd: FormData) {
+  const old = await assignmentOnEvent(eventId, assignmentId);
+  const parsed = z.object({ role: z.string().trim().min(2, "Enter a role.").max(80), fee: z.string().trim().max(30), notes: z.string().trim().max(1000) }).safeParse({ role: String(fd.get("role") ?? ""), fee: String(fd.get("fee") ?? ""), notes: String(fd.get("notes") ?? "") });
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Check the assignment details.");
+  const role = parsed.data.role.toUpperCase();
+  const clash = await getPrisma().eventAssignment.findFirst({ where: { eventId, teamMemberId: old.teamMemberId, role, id: { not: assignmentId } }, select: { id: true } });
+  if (clash) throw new Error("This person already has that role on this event.");
+  // STAFF cannot see team fees, so their edits never touch them.
+  let fee = {};
+  if (actor.role !== "STAFF") {
+    const feePaise = parsed.data.fee ? parseINRToPaise(parsed.data.fee) : null;
+    if (parsed.data.fee && feePaise === null) throw new Error("Enter a valid agreed fee in rupees.");
+    fee = { feePaise };
+  }
+  await getPrisma().eventAssignment.update({ where: { id: assignmentId }, data: { role, notes: parsed.data.notes || null, ...fee } });
+  await audit(actor, "team_assignment.updated", "EventAssignment", assignmentId, { eventId, fields: ["role", "notes", ...Object.keys(fee)] });
+}
+
+export async function deleteAssignment(actor: { id: string }, eventId: string, assignmentId: string) {
+  const old = await assignmentOnEvent(eventId, assignmentId);
+  const blocked = linkedMoneyError("assignment", old._count);
+  if (blocked) throw new Error(blocked);
+  await getPrisma().eventAssignment.delete({ where: { id: assignmentId } });
+  await audit(actor, "team_assignment.deleted", "EventAssignment", assignmentId, { eventId, teamMemberId: old.teamMemberId, role: old.role });
+  await logActivity("NOTE", `${old.teamMember.name} removed from this event.`, { eventId }, actor.id);
 }
 
 export const TEAM_ROLES = teamRoles;

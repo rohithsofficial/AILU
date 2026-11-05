@@ -4,6 +4,7 @@ import { audit } from "@/lib/audit";
 import { logActivity } from "@/server/activity";
 import { formatINR, quotationTotalPaise, parseINRToPaise } from "@/lib/money";
 import { EVENT_CATEGORIES } from "@/lib/events";
+import { quotationDeleteError } from "@/lib/recordRules";
 
 // Quotations: versions with line items. Totals are always computed on the server from the items.
 
@@ -107,6 +108,17 @@ export async function updateQuotation(actor: { id: string }, eventId: string, qu
   await audit({ id: actor.id }, "quotation.updated", "Quotation", quotationId, { version: updated.version, totalPaise });
   await logActivity("NOTE", `Quotation v${updated.version} edited — total ${formatINR(updated.totalPaise)}`, { eventId, clientId: existing.event.clientId }, actor.id);
   return updated;
+}
+
+export async function deleteQuotation(actor: { id: string }, eventId: string, quotationId: string) {
+  const db = getPrisma();
+  const quotation = await db.quotation.findUnique({ where: { id: quotationId }, select: { eventId: true, status: true, version: true } });
+  if (!quotation || quotation.eventId !== eventId) throw new Error("That quotation does not belong to this event.");
+  const blocked = quotationDeleteError(quotation.status);
+  if (blocked) throw new Error(blocked);
+  await db.$transaction([db.quotationItem.deleteMany({ where: { quotationId } }), db.quotation.delete({ where: { id: quotationId } })]);
+  await audit(actor, "quotation.deleted", "Quotation", quotationId, { eventId, version: quotation.version });
+  await logActivity("NOTE", `Draft quotation v${quotation.version} deleted.`, { eventId }, actor.id);
 }
 
 export async function setQuotationStatus(actor: { id: string }, quotationId: string, status: string) {

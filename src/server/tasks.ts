@@ -55,7 +55,7 @@ export async function createTask(actor: { id: string; role?: StaffRole }, fd: Fo
   return created;
 }
 
-export async function toggleTaskDone(actor: { id: string; role?: StaffRole }, taskId: string, done: boolean) {
+async function changeableTask(actor: { id: string; role?: StaffRole }, taskId: string) {
   const db = getPrisma();
   const existing = await db.task.findUnique({ where: { id: taskId } });
   if (!existing) throw new Error("That task does not exist.");
@@ -63,6 +63,35 @@ export async function toggleTaskDone(actor: { id: string; role?: StaffRole }, ta
     const event = existing.eventId ? await db.event.findUnique({ where: { id: existing.eventId }, select: { ownerId: true } }) : null;
     if (event?.ownerId !== actor.id) throw new Error("This task is not assigned to you.");
   }
+  return existing;
+}
+
+export async function updateTask(actor: { id: string; role?: StaffRole }, taskId: string, fd: FormData) {
+  const db = getPrisma();
+  const existing = await changeableTask(actor, taskId);
+  const parsed = taskSchema.safeParse({ title: String(fd.get("title") ?? ""), dueAt: String(fd.get("dueAt") ?? "") || undefined, priority: String(fd.get("priority") ?? "NORMAL") });
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Check the task details.");
+  const due = parsed.data.dueAt ? new Date(parsed.data.dueAt) : null;
+  if (due && Number.isNaN(due.getTime())) throw new Error("That due date is not valid.");
+  let assigneeId = existing.assigneeId;
+  if (actor.role !== "STAFF") {
+    assigneeId = String(fd.get("assigneeId") ?? "").trim() || null;
+    if (assigneeId && assigneeId !== existing.assigneeId && !(await db.staffUser.findFirst({ where: { id: assigneeId, active: true } }))) throw new Error("Choose an active staff member.");
+  }
+  await db.task.update({ where: { id: taskId }, data: { title: parsed.data.title, dueAt: due, priority: parsed.data.priority, assigneeId } });
+  await audit({ id: actor.id }, "task.updated", "Task", taskId, { fields: ["title", "dueAt", "priority", "assigneeId"] });
+}
+
+export async function deleteTask(actor: { id: string; role?: StaffRole }, taskId: string) {
+  const existing = await changeableTask(actor, taskId);
+  await getPrisma().task.delete({ where: { id: taskId } });
+  await audit({ id: actor.id }, "task.deleted", "Task", taskId, { title: existing.title });
+  await logActivity("NOTE", `Task deleted: ${existing.title}`, { eventId: existing.eventId, clientId: existing.clientId, enquiryId: existing.enquiryId }, actor.id);
+}
+
+export async function toggleTaskDone(actor: { id: string; role?: StaffRole }, taskId: string, done: boolean) {
+  const db = getPrisma();
+  const existing = await changeableTask(actor, taskId);
   const updated = await db.task.update({ where: { id: taskId }, data: { doneAt: done ? new Date() : null } });
   await audit({ id: actor.id }, done ? "task.done" : "task.reopened", "Task", taskId);
   await logActivity("NOTE", done ? `Task done: ${updated.title}` : `Task reopened: ${updated.title}`, { eventId: existing.eventId, clientId: existing.clientId, enquiryId: existing.enquiryId }, actor.id);

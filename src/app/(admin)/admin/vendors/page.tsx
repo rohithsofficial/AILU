@@ -6,10 +6,10 @@ import { createVendorAction } from "./actions";
 export const dynamic = "force-dynamic";
 const input = "rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-ailu-cream placeholder:text-ailu-cream/40";
 
-export default async function VendorsPage({ searchParams }: { searchParams: { q?: string; category?: string; status?: string; msg?: string } }) {
+export default async function VendorsPage({ searchParams }: { searchParams: { q?: string; category?: string; status?: string; archived?: string; msg?: string } }) {
   const staff = await requireRolePage(STAFF_ROLES);
   if (!can(staff.role, "vendors.read")) return <p className="p-8">You do not have access to vendors.</p>;
-  const rows = await listVendors(searchParams);
+  const rows = await listVendors({ ...searchParams, includeArchived: staff.role === "OWNER" && searchParams.archived === "all" });
   const categories = [...new Set(rows.map((v) => v.category))].sort();
   return <div className="mx-auto max-w-6xl">
     <h1 className="font-display text-2xl font-bold">Vendors</h1>
@@ -19,6 +19,7 @@ export default async function VendorsPage({ searchParams }: { searchParams: { q?
       <input name="q" defaultValue={searchParams.q ?? ""} placeholder="Search name, category, city, phone" className={input} />
       <select name="category" defaultValue={searchParams.category ?? ""} className={input}><option value="" className="text-black">All categories</option>{categories.map((c) => <option key={c} className="text-black">{c}</option>)}</select>
       <select name="status" defaultValue={searchParams.status ?? ""} className={input}><option value="" className="text-black">All statuses</option>{["ACTIVE", "INACTIVE", "DO_NOT_USE"].map((s) => <option key={s} value={s} className="text-black">{s.replaceAll("_", " ")}</option>)}</select>
+      {staff.role === "OWNER" ? <select name="archived" defaultValue={searchParams.archived ?? ""} aria-label="Archived vendors" className={input}><option value="" className="text-black">Hide archived</option><option value="all" className="text-black">Include archived</option></select> : null}
       <button className="rounded-lg border border-white/20 px-4 py-2 text-sm">Filter</button>
     </form>
 

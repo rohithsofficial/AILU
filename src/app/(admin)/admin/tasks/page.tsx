@@ -1,3 +1,5 @@
+import { ConfirmButton, EditBox } from "@/components/admin/RecordControls";
+import { deleteTaskAction, updateTaskAction } from "../records/actions";
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
 import { listTasks } from "@/server/tasks";
@@ -46,6 +48,14 @@ export default async function TasksPage({ searchParams }: { searchParams: { view
             <span className="text-xs text-ailu-cream/60">{task.assigneeName}</span>
             <span className={`text-xs ${!task.doneAt && task.dueAt && task.dueAt < new Date() ? "text-red-400" : "text-ailu-cream/60"}`}>{task.dueAt ? formatIN(task.dueAt) : "No due date"}</span>
             <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] uppercase">{task.priority}</span>
+            {canEdit ? <form action={deleteTaskAction}><input type="hidden" name="id" value={task.id} /><input type="hidden" name="back" value={`/admin/tasks?view=${view}`} /><ConfirmButton label="Delete" message="Delete this task? This cannot be undone." /></form> : null}
+            {canEdit ? <EditBox><form action={updateTaskAction} className="grid gap-2 sm:grid-cols-4"><input type="hidden" name="id" value={task.id} /><input type="hidden" name="back" value={`/admin/tasks?view=${view}`} />
+              <label className="sm:col-span-2">Task<input name="title" required minLength={2} maxLength={200} defaultValue={task.title} className={input} /></label>
+              <label>Due date<input name="dueAt" type="date" defaultValue={task.dueAt ? task.dueAt.toISOString().slice(0, 10) : ""} className={input} /></label>
+              <label>Priority<select name="priority" defaultValue={task.priority} className={input}><option value="NORMAL" className="text-black">Normal</option><option value="HIGH" className="text-black">High</option><option value="LOW" className="text-black">Low</option></select></label>
+              {staff.role !== "STAFF" ? <label>Assignee<select name="assigneeId" defaultValue={task.assigneeId ?? ""} className={input}><option value="" className="text-black">Unassigned</option>{people.map((person) => <option key={person.id} value={person.id} className="text-black">{person.name || person.email}</option>)}</select></label> : null}
+              <button className="self-end rounded-lg border border-ailu-yellow/60 px-3 py-2 text-xs font-semibold text-ailu-yellow">Save task</button>
+            </form></EditBox> : null}
           </li>)}
         </ul>}
       </div>
