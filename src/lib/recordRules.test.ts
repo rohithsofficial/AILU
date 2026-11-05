@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canChangeNote, linkedMoneyError, quotationDeleteError, safeAdminPath } from "./recordRules";
+import { canChangeNote, linkedMoneyError, quotationDeleteError, safeAdminPath, vendorDeleteError } from "./recordRules";
 
 describe("CRM record rules", () => {
   it("lets authors, owners and managers change notes, never status lines", () => {
@@ -15,6 +15,11 @@ describe("CRM record rules", () => {
     expect(linkedMoneyError("booking", { payments: 0, expenses: 0 })).toBeNull();
     expect(linkedMoneyError("booking", { payments: 1, expenses: 0 })).toMatch(/linked/);
     expect(linkedMoneyError("assignment", { payments: 0, expenses: 2 })).toMatch(/linked/);
+  });
+
+  it("only deletes vendors with no event bookings", () => {
+    expect(vendorDeleteError(0)).toBeNull();
+    expect(vendorDeleteError(1)).toMatch(/archive/);
   });
 
   it("only deletes draft quotations", () => {

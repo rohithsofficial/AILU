@@ -71,6 +71,6 @@ The hand-and-heart logo is the main symbol.
 - Checked at 390px and 1440px in the desktop browser pane only. Rani's mobile report still needs a check on a real phone.
 - three stays at 0.160.0 because the world port requires it.
 - CRM login is email and password (src/lib/password.ts, scrypt, no new dependency). Google is off unless AUTH_GOOGLE_ENABLED=true. The passwordHash migration is applied on Neon. First owner password: npm run staff:password -- <email>.
-- CRM records: tasks, payments, expenses, vendor bookings, team assignments, draft quotations and timeline notes have edit and delete (src/app/(admin)/admin/records/actions.ts). Clients, events and vendors stay archive and restore. Rules are in src/lib/recordRules.ts.
+- CRM records: tasks, payments, expenses, vendor bookings, team assignments, draft quotations and timeline notes have edit and delete (src/app/(admin)/admin/records/actions.ts). Clients and events stay archive and restore. An owner can delete a vendor only if it has no event bookings; otherwise archive it. Rules are in src/lib/recordRules.ts.
 - Branch feat/crm-password-login is stacked on feat/two-worlds.
 - Audit: AUDIT.md (2026-11-04).

@@ -5,7 +5,7 @@ import { logActivity } from "@/server/activity";
 import { parseINRToPaise, MAX_PAISE } from "@/lib/money";
 import { normalizePhone, indianPhoneSchema } from "@/lib/validation";
 import { calculateEventFinancials } from "@/lib/eventFinance";
-import { linkedMoneyError } from "@/lib/recordRules";
+import { linkedMoneyError, vendorDeleteError } from "@/lib/recordRules";
 import type { StaffRole } from "@prisma/client";
 
 const vendorIdCode = (seq: number) => `AILU-VEN-${String(seq).padStart(6, "0")}`;
@@ -95,6 +95,16 @@ export async function setVendorArchived(actor: { id: string }, id: string, archi
   const result = await getPrisma().vendor.update({ where: { id }, data: { archivedAt: archived ? new Date() : null } });
   await audit(actor, archived ? "vendor.archived" : "vendor.restored", "Vendor", id);
   return result;
+}
+
+export async function deleteVendor(actor: { id: string }, id: string) {
+  const db = getPrisma();
+  const vendor = await db.vendor.findUnique({ where: { id }, select: { name: true, _count: { select: { bookings: true } } } });
+  if (!vendor) throw new Error("That vendor no longer exists.");
+  const blocked = vendorDeleteError(vendor._count.bookings);
+  if (blocked) throw new Error(blocked);
+  await db.$transaction([db.activity.deleteMany({ where: { vendorId: id } }), db.vendor.delete({ where: { id } })]);
+  await audit(actor, "vendor.deleted", "Vendor", id, { name: vendor.name });
 }
 
 const amountSchema = z.string().trim().min(1, "Enter an amount.").max(30);
