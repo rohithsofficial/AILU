@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${poppins.variable} ${inter.variable}`}>
       <body>
-        <noscript><style>{"#ailu-intro{display:none!important}body{overflow:auto!important}"}</style></noscript>
+        <noscript><style>{"#ailu-intro{display:none!important}body{overflow:auto!important}div.ailu>*{visibility:visible!important}"}</style></noscript>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\\u003c") }} />
         {children}
       </body>
