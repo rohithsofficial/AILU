@@ -7,6 +7,7 @@ import { startAilu } from "./engine";
 import { HIDDEN_PLACES } from "./worldMarkup";
 import { withLightRenderer } from "./worldRenderer";
 import { steadyPhoneTurn } from "./phoneTurn";
+import { ENTER_WORLD_EVENT, INTRO_SEEN_KEY, whenIdle } from "@/lib/worldStart";
 import { SITE_CONTENT } from "@/content/site";
 
 // The engine builds a hotspot and a dock button for every place. Remove the ones the site has switched off.
@@ -43,7 +44,11 @@ export default function AiluWorld({ markup }: { markup: string }) {
         stop = startAilu(root, THREE);
         hidePlaces(root);
       } finally {
-        root.classList.add("world-ready"); // even after an engine error, never leave a blank page
+        // The first frames are the slowest, so the poster stays until they are drawn. The timer covers a hidden
+        // tab, where frames do not run. Even after an engine error, never leave a blank page.
+        const ready = () => root.classList.add("world-ready");
+        requestAnimationFrame(() => requestAnimationFrame(ready));
+        setTimeout(ready, 3000);
       }
       keepTitle();
       // Registered after the engine's own listeners, so these run after it has changed the title.
@@ -52,7 +57,13 @@ export default function AiluWorld({ markup }: { markup: string }) {
     };
 
     // three.js loads only in the browser; without it the page falls back to the scroll film.
-    import("three").then((THREE) => start(withLightRenderer(THREE)), () => start(undefined));
+    const loadThree = () => import("three");
+    const boot = () => { loadThree().then((THREE) => start(withLightRenderer(THREE)), () => start(undefined)); };
+    // A first visit starts the engine only when the visitor enters the world. The download happens quietly
+    // before that, so entering is quick. A returning visitor starts as soon as the browser is free.
+    const firstVisit = !sessionStorage.getItem(INTRO_SEEN_KEY);
+    if (firstVisit) window.addEventListener(ENTER_WORLD_EVENT, boot, { once: true });
+    const cancelIdle = whenIdle(firstVisit ? () => { void loadThree(); } : boot, firstVisit ? 4000 : 800);
 
     // The engine moves around with location.hash, which creates history entries without Next's state.
     // Next ignores those on Back, so the URL would change to /#place while the Normal World stayed on screen.
@@ -64,6 +75,8 @@ export default function AiluWorld({ markup }: { markup: string }) {
 
     return () => {
       cancelled = true;
+      cancelIdle();
+      window.removeEventListener(ENTER_WORLD_EVENT, boot);
       stopPhoneTurn();
       window.removeEventListener("hashchange", keepNextState);
       window.removeEventListener("hashchange", keepTitle);

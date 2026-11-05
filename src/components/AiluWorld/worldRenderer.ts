@@ -4,7 +4,7 @@ type ThreeModule = typeof Three;
 
 // Pixel density is the main cost of the world: the GPU falls behind, and taps and clicks then feel stuck.
 // engine.ts is generated, so its renderer settings are limited here, through the THREE it is given.
-export const START_RATIO = { phone: 1.15, desktop: 1.25 };
+export const START_RATIO = { phone: 1, desktop: 1.25 };
 export const FLOOR_RATIO = 0.75;
 const STEP = 0.15;
 const SLOW_FRAME_MS = 24; // under about 40 frames a second

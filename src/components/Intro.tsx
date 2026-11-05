@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { BRAND } from "@/lib/brand";
 import { SITE_CONTENT } from "@/content/site";
 import { useContent } from "@/components/ContentProvider";
-const KEY = "ailu-intro-seen";
+import { ENTER_WORLD_EVENT, INTRO_SEEN_KEY as KEY } from "@/lib/worldStart";
 const { toWorld, toSite } = SITE_CONTENT.switch;
 
 const setLogo = (v: "pending" | "ready") => { document.documentElement.dataset.logo = v; };
@@ -46,8 +46,10 @@ export default function Intro() {
   // "Skip intro" and "Enter AILU World" fade the intro away to show the world behind it.
   function enterWorld() {
     timers.current.forEach(clearTimeout);
-    if (reduced) return finishNow();
+    const done = () => { finishNow(); window.dispatchEvent(new Event(ENTER_WORLD_EVENT)); };
+    if (reduced) return done();
     setLeaving(true);
+    timers.current = [setTimeout(done, 420)];
   }
 
   function goToNormalSite() {
@@ -58,7 +60,7 @@ export default function Intro() {
 
   if (phase !== "playing") return null;
   return (
-    <motion.div id="ailu-intro" className={`fixed inset-0 z-50 ${leaving ? "pointer-events-none" : ""}`} animate={{ opacity: leaving ? 0 : 1 }} transition={{ duration: 0.4 }} onAnimationComplete={() => { if (leaving) finishNow(); }} role="dialog" aria-modal="true" aria-label="Welcome to AILU">
+    <motion.div id="ailu-intro" className={`fixed inset-0 z-50 ${leaving ? "pointer-events-none" : ""}`} animate={{ opacity: leaving ? 0 : 1 }} transition={{ duration: 0.4 }} role="dialog" aria-modal="true" aria-label="Welcome to AILU">
       <div className="absolute inset-0 bg-ailu-black" />
       <div className="relative flex h-full flex-col items-center overflow-y-auto px-4 py-8 text-ailu-cream">
           <button ref={skipRef} onClick={enterWorld} className="absolute right-4 top-4 z-10 min-h-11 rounded-full border border-white/50 px-4 py-2 text-sm">{t.skipButton}</button>
