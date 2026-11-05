@@ -16,6 +16,8 @@ html[data-logo="pending"] .whatsapp-float { display: none; }
 
 /* Nav logo: three layers (A, IL, hand). Revealed left to right after the intro hand lands, compact on scroll. */
 .nav-logo { --h: 3rem; position: relative; display: block; height: var(--h); width: calc(var(--h) * var(--r)); transition: width .6s cubic-bezier(.65, 0, .35, 1); }
+@media (max-width: 399px) { .nav-logo { --h: 2.25rem; } }
+@media (max-width: 339px) { .nav-logo { --h: 1.9rem; } }
 @media (min-width: 768px) { .nav-logo { --h: 3.5rem; } }
 .nav-logo[data-compact="true"] { width: calc(var(--h) * var(--r) * var(--compact-w)); }
 .nav-logo-img { position: absolute; left: 0; top: 0; height: 100%; aspect-ratio: var(--r); clip-path: inset(0 0 0 0); transition: clip-path 1.2s cubic-bezier(.65, 0, .35, 1); }

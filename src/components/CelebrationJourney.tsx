@@ -45,7 +45,8 @@ export default function CelebrationJourney() {
   const entrance = entrances[active];
 
   useEffect(() => {
-    setShowWorld(canUse3D());
+    // Phones skip the 3D scene: it ran behind the text and made it hard to read.
+    setShowWorld(window.matchMedia("(min-width: 1024px)").matches && canUse3D());
   }, []);
 
   function goToChapter(index: number) {

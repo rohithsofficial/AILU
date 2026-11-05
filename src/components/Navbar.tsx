@@ -95,7 +95,7 @@ export default function Navbar() {
           </div>
           <div className="flex shrink-0 items-center gap-2">
           <Link href={TO_WORLD.href} className="inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full bg-ailu-yellow px-3 text-xs font-bold text-ailu-black transition-colors hover:bg-ailu-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ailu-yellow sm:px-4 sm:text-sm">
-            {TO_WORLD.label} <span aria-hidden>◉</span>
+            {TO_WORLD.label} <span aria-hidden className="hidden min-[400px]:inline">◉</span>
           </Link>
           <button
             ref={triggerRef}
@@ -104,9 +104,9 @@ export default function Navbar() {
             aria-controls="celebration-portal"
             aria-label={open ? "Close the AILU celebration world" : "Explore the AILU celebration world"}
             onClick={() => setOpen((value) => !value)}
-            className="group inline-flex min-h-12 items-center gap-2 rounded-full border border-ailu-yellow/50 px-3 py-1.5 text-sm font-semibold text-ailu-cream transition-colors hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow sm:gap-3 sm:px-5"
+            className="group inline-flex min-h-12 items-center gap-2 rounded-full border border-ailu-yellow/50 px-2 py-1.5 min-[400px]:px-3 text-sm font-semibold text-ailu-cream transition-colors hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow sm:gap-3 sm:px-5"
           >
-            <span className="relative block h-8 w-10 overflow-hidden">
+            <span className="relative block h-7 w-8 overflow-hidden min-[400px]:h-8 min-[400px]:w-10">
               <Image src={BRAND.hand} alt="" fill sizes="40px" className="object-contain transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110" />
             </span>
             <span className="hidden sm:inline">{open ? "Return" : "Explore AILU"}</span>
