@@ -37,8 +37,12 @@ export default function AiluWorld() {
     let cancelled = false;
     const start = (THREE?: typeof import("three")) => {
       if (cancelled) return;
-      stop = startAilu(root, THREE);
-      hidePlaces(root);
+      try {
+        stop = startAilu(root, THREE);
+        hidePlaces(root);
+      } finally {
+        root.classList.add("world-ready"); // even after an engine error, never leave a blank page
+      }
       keepTitle();
       // Registered after the engine's own listeners, so these run after it has changed the title.
       window.addEventListener("hashchange", keepTitle);

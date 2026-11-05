@@ -15,5 +15,8 @@ div.ailu {
 }
 html:has(div.ailu), body:has(div.ailu) { background: #111111; }
 
+/* Until the engine has started, the markup is plain page content. Keep it hidden so it never flashes. */
+div.ailu:not(.world-ready) > * { visibility: hidden; }
+
 /* globals.css styles h1–h3 for the Normal World; inside the world the generated CSS only resets h1 and h2. */
 div.ailu h3 { font-family: var(--head); }
