@@ -47,8 +47,17 @@ export default function AiluWorld() {
     // three.js loads only in the browser; without it the page falls back to the scroll film.
     import("three").then(start, () => start(undefined));
 
+    // The engine moves around with location.hash, which creates history entries without Next's state.
+    // Next ignores those on Back, so the URL would change to /#place while the Normal World stayed on screen.
+    const nextState = window.history.state;
+    const keepNextState = () => {
+      if (nextState && !window.history.state) window.history.replaceState(nextState, "", window.location.href);
+    };
+    window.addEventListener("hashchange", keepNextState);
+
     return () => {
       cancelled = true;
+      window.removeEventListener("hashchange", keepNextState);
       window.removeEventListener("hashchange", keepTitle);
       window.removeEventListener("popstate", keepTitle);
       stop?.();                      // removes listeners, timers and the animation loop
