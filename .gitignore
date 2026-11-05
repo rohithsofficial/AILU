@@ -1,10 +1,17 @@
+# Packages and build output
 node_modules
 .next
-.env*.local
-.env
 next-env.d.ts
 *.tsbuildinfo
-*.patch
+
+# Secrets
+.env
+.env*.local
 google_cloud_auth_api.json
-references
-ZIP FILES
+
+# Local extras: zip files, patches and source references live in _local/
+_local/
+*.zip
+*.rar
+*.7z
+*.patch

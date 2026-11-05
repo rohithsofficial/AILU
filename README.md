@@ -55,7 +55,7 @@ Applications can be reviewed and converted to team members. Existing normalized 
 
 The A4 dashboard filters records and finance by role. It includes today's work, upcoming and unassigned queues, needs-attention rules, finance due lists, and estimated margin. The month calendar and global search use the same server-side event and record access scopes as the admin lists. Search requires two characters, waits 300 ms after typing, and returns at most five results per allowed group. A4 makes no schema changes or new dependencies.
 
-The public launch pass adds About, Contact, FAQ, and legal pages; canonical/Open Graph metadata, Organization/FAQ/Breadcrumb structured data, robots and sitemap routes; public form abuse limits; form consent and accessibility improvements; and 404/error/loading states. Rate-limit rows store salted hashes rather than raw IPs. The website collects no payments, analytics, or advertising trackers. Private dream intake is gated off by default with `DREAMS_FORM_OPEN=false`; when enabled it stores dream details separately from clients/events, restricts review to OWNER and MANAGER, and never publishes submissions. See `LAUNCH_CHECKLIST.md` before changing either public intake switch.
+The public launch pass adds About, Contact, FAQ, and legal pages; canonical/Open Graph metadata, Organization/FAQ/Breadcrumb structured data, robots and sitemap routes; public form abuse limits; form consent and accessibility improvements; and 404/error/loading states. Rate-limit rows store salted hashes rather than raw IPs. The website collects no payments, analytics, or advertising trackers. Private dream intake is gated off by default with `DREAMS_FORM_OPEN=false`; when enabled it stores dream details separately from clients/events, restricts review to OWNER and MANAGER, and never publishes submissions. See `docs/LAUNCH_CHECKLIST.md` before changing either public intake switch.
 
 Private dream review: `/admin/dreams` is available only to OWNER and MANAGER. Deletion is OWNER-only and permanently removes the submission and status history while retaining an audit record with the reference ID and deletion reason. Do not put submission text in logs, global search, public content, analytics or staff notes outside this restricted workflow. Apply the additive `dreams_private_submissions` migration with `npx prisma migrate deploy` before deploying this feature. Keep `DREAMS_FORM_OPEN=false` until the legal and safeguarding checklist is complete.
 
@@ -69,3 +69,16 @@ Private dream review: `/admin/dreams` is available only to OWNER and MANAGER. De
 - `npx prisma migrate status`
 
 Vitest covers permissions, quotation and event-finance calculations, phone normalization, enquiry conversion mapping, event status transitions, public metadata/indexing, enquiry prefill/date/consent validation, and rate-limit window/hash behavior.
+
+## Project documents
+
+`README.md`, `AGENTS.md` and `CLAUDE.md` stay in the root because tools read them there. Everything else is in `docs/`:
+
+- `docs/AILU_PROJECT_GUIDE.md`: full project guide.
+- `docs/AILU_MAIN_THEME.md`: original visual and experience brief.
+- `docs/CRM_CMS_PLAN.md`: CRM and CMS plan.
+- `docs/LAUNCH_CHECKLIST.md`: steps before going live.
+- `docs/VERCEL_PREVIEW_GUIDE.md`: how preview links work.
+- `docs/AUDIT.md` and `docs/WORK_SUMMARY.md`: past reports.
+
+Local extras such as zip files, patches and source references go in `_local/`, which Git ignores.
