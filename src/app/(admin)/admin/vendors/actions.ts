@@ -39,6 +39,16 @@ export async function archiveVendorAction(fd: FormData) {
   redirect("/admin/vendors");
 }
 
+export async function deleteVendorAction(fd: FormData) {
+  const id = String(fd.get("id") ?? "");
+  try {
+    const staff = await requireRole(["OWNER"]);
+    await vendors.deleteVendor(staff, id);
+    revalidatePath("/admin/vendors");
+  } catch (error) { fail(`/admin/vendors/${id}`, error); }
+  redirect(`/admin/vendors?msg=${encodeURIComponent("Vendor deleted.")}`);
+}
+
 export async function addVendorNoteAction(fd: FormData) {
   const id = String(fd.get("id") ?? "");
   try {
@@ -72,7 +82,7 @@ export async function setVendorBookingStatusAction(fd: FormData) {
     const { getEvent } = await import("@/server/events"); const { canEditEvent } = await import("@/lib/authz");
     const event = await getEvent(eventId);
     if (!event || !canEditEvent(staff, event)) throw new Error("You cannot update this event.");
-    await vendors.setVendorBookingStatus(staff, bookingId, String(fd.get("status") ?? ""));
+    await vendors.setVendorBookingStatus(staff, eventId, bookingId, String(fd.get("status") ?? ""));
     revalidatePath(`/admin/events/${eventId}`);
   } catch (error) { fail(`/admin/events/${eventId}`, error); }
   redirect(`/admin/events/${eventId}#vendors`);

@@ -12,7 +12,8 @@
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "staff:password": "node scripts/set-staff-password.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
@@ -20,14 +21,13 @@
     "@react-three/drei": "^9.105.0",
     "@react-three/fiber": "^8.16.0",
     "dotenv": "^18.0.9",
-    "firebase-admin": "^14.5.0",
     "framer-motion": "^11.2.0",
     "next": "14.2.35",
     "next-auth": "^5.0.0-beta.32",
     "pg": "^8.23.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "three": "^0.164.1",
+    "three": "^0.160.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -35,7 +35,7 @@
     "@types/pg": "^8.23.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/three": "^0.164.0",
+    "@types/three": "^0.160.0",
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.35",

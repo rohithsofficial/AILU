@@ -5,6 +5,8 @@ import { logActivity } from "@/server/activity";
 import { parseINRToPaise, MAX_PAISE } from "@/lib/money";
 import { normalizePhone, indianPhoneSchema } from "@/lib/validation";
 import { calculateEventFinancials } from "@/lib/eventFinance";
+import { linkedMoneyError, vendorDeleteError } from "@/lib/recordRules";
+import type { StaffRole } from "@prisma/client";
 
 const vendorIdCode = (seq: number) => `AILU-VEN-${String(seq).padStart(6, "0")}`;
 const optional = (max: number) => z.string().trim().max(max).optional().default("");
@@ -95,6 +97,16 @@ export async function setVendorArchived(actor: { id: string }, id: string, archi
   return result;
 }
 
+export async function deleteVendor(actor: { id: string }, id: string) {
+  const db = getPrisma();
+  const vendor = await db.vendor.findUnique({ where: { id }, select: { name: true, _count: { select: { bookings: true } } } });
+  if (!vendor) throw new Error("That vendor no longer exists.");
+  const blocked = vendorDeleteError(vendor._count.bookings);
+  if (blocked) throw new Error(blocked);
+  await db.$transaction([db.activity.deleteMany({ where: { vendorId: id } }), db.vendor.delete({ where: { id } })]);
+  await audit(actor, "vendor.deleted", "Vendor", id, { name: vendor.name });
+}
+
 const amountSchema = z.string().trim().min(1, "Enter an amount.").max(30);
 function amountPaise(raw: string) {
   const parsed = amountSchema.safeParse(raw);
@@ -122,15 +134,22 @@ export async function createVendorBooking(actor: { id: string }, eventId: string
   return booking;
 }
 
-export async function setVendorBookingStatus(actor: { id: string }, bookingId: string, status: string) {
+async function bookingOnEvent(eventId: string, bookingId: string) {
+  const booking = await getPrisma().vendorBooking.findUnique({ where: { id: bookingId }, include: { vendor: { select: { name: true } }, _count: { select: { payments: true, expenses: true } } } });
+  if (!booking || booking.eventId !== eventId) throw new Error("That vendor booking does not belong to this event.");
+  return booking;
+}
+
+export async function setVendorBookingStatus(actor: { id: string }, eventId: string, bookingId: string, status: string) {
   if (!(["ENQUIRED", "QUOTED", "CONFIRMED", "DONE", "CANCELLED"] as const).includes(status as never)) throw new Error("That booking status is not valid.");
+  await bookingOnEvent(eventId, bookingId);
   const result = await getPrisma().vendorBooking.update({ where: { id: bookingId }, data: { status: status as "ENQUIRED" | "QUOTED" | "CONFIRMED" | "DONE" | "CANCELLED" }, include: { vendor: true } });
   await audit(actor, "vendor_booking.status_changed", "VendorBooking", bookingId, { status });
   await logActivity("STATUS", `Vendor booking status changed to ${status}: ${result.vendor.name}.`, { eventId: result.eventId, vendorId: result.vendorId }, actor.id);
   return result;
 }
 
-export async function createPayment(actor: { id: string }, eventId: string, fd: FormData) {
+async function paymentData(eventId: string, fd: FormData) {
   const eventExists = await getPrisma().event.findUnique({ where: { id: eventId }, select: { id: true } });
   if (!eventExists) throw new Error("That event does not exist.");
   const parsed = z.object({ direction: z.enum(["IN", "OUT"]), purpose: z.string().trim().max(80), amount: amountSchema, mode: z.enum(["CASH", "UPI", "BANK_TRANSFER", "CARD", "CHEQUE", "OTHER"]), reference: z.string().trim().max(120), paidOn: z.string(), vendorBookingId: z.string().max(100), assignmentId: z.string().max(100), note: z.string().trim().max(500) }).safeParse({
@@ -151,13 +170,17 @@ export async function createPayment(actor: { id: string }, eventId: string, fd: 
     const assignment = await getPrisma().eventAssignment.findUnique({ where: { id: assignmentId }, select: { eventId: true } });
     if (!assignment || assignment.eventId !== eventId) throw new Error("That team assignment does not belong to this event.");
   }
-  const result = await getPrisma().payment.create({ data: { eventId, direction: parsed.data.direction, purpose: assignmentId ? "TEAM_FEE" : parsed.data.purpose, amountPaise: amountPaise(parsed.data.amount), mode: parsed.data.mode, reference: parsed.data.reference || null, paidOn: validDate(parsed.data.paidOn), vendorBookingId: bookingId, assignmentId, recordedById: actor.id, note: parsed.data.note || null } });
+  return { direction: parsed.data.direction, purpose: assignmentId ? "TEAM_FEE" : parsed.data.purpose, amountPaise: amountPaise(parsed.data.amount), mode: parsed.data.mode, reference: parsed.data.reference || null, paidOn: validDate(parsed.data.paidOn), vendorBookingId: bookingId, assignmentId, note: parsed.data.note || null };
+}
+
+export async function createPayment(actor: { id: string }, eventId: string, fd: FormData) {
+  const result = await getPrisma().payment.create({ data: { ...(await paymentData(eventId, fd)), eventId, recordedById: actor.id } });
   await audit(actor, "payment.recorded", "Payment", result.id, { eventId, direction: result.direction, amountPaise: result.amountPaise, fields: ["direction", "purpose", "amountPaise", "mode", "paidOn"] });
   await logActivity("NOTE", `${result.direction === "IN" ? "Client receipt" : "Vendor payment"} recorded: ₹${(result.amountPaise / 100).toFixed(2)}.`, { eventId }, actor.id);
   return result;
 }
 
-export async function createExpense(actor: { id: string }, eventId: string, fd: FormData) {
+async function expenseData(eventId: string, fd: FormData) {
   const eventExists = await getPrisma().event.findUnique({ where: { id: eventId }, select: { id: true } });
   if (!eventExists) throw new Error("That event does not exist.");
   const parsed = z.object({ category: z.string().trim().min(2).max(80), amount: amountSchema, spentOn: z.string(), vendorBookingId: z.string().max(100), note: z.string().trim().max(500) }).safeParse({
@@ -169,10 +192,73 @@ export async function createExpense(actor: { id: string }, eventId: string, fd: 
     const booking = await getPrisma().vendorBooking.findUnique({ where: { id: bookingId }, select: { eventId: true } });
     if (!booking || booking.eventId !== eventId) throw new Error("That vendor booking does not belong to this event.");
   }
-  const result = await getPrisma().expense.create({ data: { eventId, category: parsed.data.category, amountPaise: amountPaise(parsed.data.amount), spentOn: validDate(parsed.data.spentOn), vendorBookingId: bookingId, note: parsed.data.note || null, recordedById: actor.id } });
+  return { category: parsed.data.category, amountPaise: amountPaise(parsed.data.amount), spentOn: validDate(parsed.data.spentOn), vendorBookingId: bookingId, note: parsed.data.note || null };
+}
+
+export async function createExpense(actor: { id: string }, eventId: string, fd: FormData) {
+  const result = await getPrisma().expense.create({ data: { ...(await expenseData(eventId, fd)), eventId, recordedById: actor.id } });
   await audit(actor, "expense.recorded", "Expense", result.id, { eventId, amountPaise: result.amountPaise, fields: ["category", "amountPaise", "spentOn"] });
   await logActivity("NOTE", `Expense recorded: ${result.category}, ₹${(result.amountPaise / 100).toFixed(2)}.`, { eventId }, actor.id);
   return result;
+}
+
+export async function updateVendorBooking(actor: { id: string; role: StaffRole }, eventId: string, bookingId: string, fd: FormData) {
+  await bookingOnEvent(eventId, bookingId);
+  const parsed = z.object({ service: z.string().trim().min(2, "Describe the service.").max(160), amount: z.string().max(30), notes: z.string().trim().max(1000) }).safeParse({ service: String(fd.get("service") ?? ""), amount: String(fd.get("amount") ?? ""), notes: String(fd.get("notes") ?? "") });
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Check the vendor booking.");
+  // STAFF cannot see agreed amounts, so their edits never touch them.
+  const amount = actor.role === "STAFF" ? {} : { agreedAmountPaise: parsed.data.amount ? amountPaise(parsed.data.amount) : null };
+  await getPrisma().vendorBooking.update({ where: { id: bookingId }, data: { service: parsed.data.service, notes: parsed.data.notes || null, ...amount } });
+  await audit(actor, "vendor_booking.updated", "VendorBooking", bookingId, { eventId, fields: ["service", "notes", ...Object.keys(amount)] });
+}
+
+export async function deleteVendorBooking(actor: { id: string }, eventId: string, bookingId: string) {
+  const booking = await bookingOnEvent(eventId, bookingId);
+  const blocked = linkedMoneyError("booking", booking._count);
+  if (blocked) throw new Error(blocked);
+  await getPrisma().vendorBooking.delete({ where: { id: bookingId } });
+  await audit(actor, "vendor_booking.deleted", "VendorBooking", bookingId, { eventId, vendorId: booking.vendorId, service: booking.service });
+  await logActivity("NOTE", `Vendor booking removed: ${booking.vendor.name}, ${booking.service}.`, { eventId, vendorId: booking.vendorId }, actor.id);
+}
+
+async function paymentOnEvent(eventId: string, id: string) {
+  const payment = await getPrisma().payment.findUnique({ where: { id } });
+  if (!payment || payment.eventId !== eventId) throw new Error("That payment does not belong to this event.");
+  return payment;
+}
+
+export async function updatePayment(actor: { id: string }, eventId: string, id: string, fd: FormData) {
+  const old = await paymentOnEvent(eventId, id);
+  const result = await getPrisma().payment.update({ where: { id }, data: await paymentData(eventId, fd) });
+  await audit(actor, "payment.updated", "Payment", id, { eventId, from: old.amountPaise, to: result.amountPaise, fields: ["direction", "purpose", "amountPaise", "mode", "paidOn"] });
+  await logActivity("NOTE", `Payment corrected: ₹${(old.amountPaise / 100).toFixed(2)} to ₹${(result.amountPaise / 100).toFixed(2)}.`, { eventId }, actor.id);
+}
+
+export async function deletePayment(actor: { id: string }, eventId: string, id: string) {
+  const old = await paymentOnEvent(eventId, id);
+  await getPrisma().payment.delete({ where: { id } });
+  await audit(actor, "payment.deleted", "Payment", id, { eventId, direction: old.direction, amountPaise: old.amountPaise, paidOn: old.paidOn.toISOString() });
+  await logActivity("NOTE", `Payment removed: ₹${(old.amountPaise / 100).toFixed(2)}.`, { eventId }, actor.id);
+}
+
+async function expenseOnEvent(eventId: string, id: string) {
+  const expense = await getPrisma().expense.findUnique({ where: { id } });
+  if (!expense || expense.eventId !== eventId) throw new Error("That expense does not belong to this event.");
+  return expense;
+}
+
+export async function updateExpense(actor: { id: string }, eventId: string, id: string, fd: FormData) {
+  const old = await expenseOnEvent(eventId, id);
+  const result = await getPrisma().expense.update({ where: { id }, data: await expenseData(eventId, fd) });
+  await audit(actor, "expense.updated", "Expense", id, { eventId, from: old.amountPaise, to: result.amountPaise, fields: ["category", "amountPaise", "spentOn"] });
+  await logActivity("NOTE", `Expense corrected: ${result.category}, ₹${(result.amountPaise / 100).toFixed(2)}.`, { eventId }, actor.id);
+}
+
+export async function deleteExpense(actor: { id: string }, eventId: string, id: string) {
+  const old = await expenseOnEvent(eventId, id);
+  await getPrisma().expense.delete({ where: { id } });
+  await audit(actor, "expense.deleted", "Expense", id, { eventId, category: old.category, amountPaise: old.amountPaise, spentOn: old.spentOn.toISOString() });
+  await logActivity("NOTE", `Expense removed: ${old.category}, ₹${(old.amountPaise / 100).toFixed(2)}.`, { eventId }, actor.id);
 }
 
 export async function eventFinancials(eventId: string) {

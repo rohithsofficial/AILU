@@ -8,6 +8,8 @@ export const PUBLIC_RATE_LIMITS = {
   partnerIp: { route: "partners-ip", limit: 3, windowMs: 24 * 60 * 60 * 1000 },
   dreamIp: { route: "dreams-ip", limit: 3, windowMs: 24 * 60 * 60 * 1000 },
   dreamContact: { route: "dreams-contact", limit: 2, windowMs: 24 * 60 * 60 * 1000 },
+  staffLoginIp: { route: "staff-login-ip", limit: 30, windowMs: 15 * 60 * 1000 },
+  staffLoginEmail: { route: "staff-login-email", limit: 8, windowMs: 15 * 60 * 1000 },
 } as const;
 
 export function hashRateLimitKey(identifier: string, route: string, salt = process.env.RATE_LIMIT_SALT ?? "") {

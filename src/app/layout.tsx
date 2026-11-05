@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
-import SiteChrome from "@/components/SiteChrome";
 import { BRAND } from "@/lib/brand";
 import { publicSiteUrl, ROOT_DESCRIPTION } from "@/lib/public-metadata";
 import { SITE_CONTENT } from "@/content/site";
@@ -30,9 +29,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${poppins.variable} ${inter.variable}`}>
       <body>
-        <noscript><style>{"#ailu-intro{display:none!important}body{overflow:auto!important}"}</style></noscript>
+        <noscript><style>{"#ailu-intro{display:none!important}body{overflow:auto!important}div.ailu>*{visibility:visible!important}"}</style></noscript>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\\u003c") }} />
-        <SiteChrome>{children}</SiteChrome>
+        {children}
       </body>
     </html>
   );

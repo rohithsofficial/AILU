@@ -1,0 +1,22 @@
+/* Site-owned overrides for the generated ailu-world.css (do not edit that file by hand).
+   Loaded after it. "div.ailu" outranks the generated ".ailu" rules.
+   Brand: yellow #F5C400, black #111111, warm white #FFFDF7; Poppins headings, Inter body (next/font variables). */
+div.ailu {
+  --bg: #111111;
+  --surface: color-mix(in srgb, #FFFDF7 5%, #111111);
+  --yellow: #F5C400;
+  --white: #FFFDF7;
+  --text: color-mix(in srgb, #FFFDF7 86%, #111111);
+  --muted: color-mix(in srgb, #FFFDF7 62%, #111111);
+  --line: rgb(255 253 247 / 13%);
+  --head: var(--font-poppins), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --body: var(--font-inter), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --accent: var(--font-poppins), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+}
+html:has(div.ailu), body:has(div.ailu) { background: #111111; }
+
+/* Until the engine has started, the markup is plain page content. Keep it hidden so it never flashes. */
+div.ailu:not(.world-ready) > * { visibility: hidden; }
+
+/* globals.css styles h1–h3 for the Normal World; inside the world the generated CSS only resets h1 and h2. */
+div.ailu h3 { font-family: var(--head); }
