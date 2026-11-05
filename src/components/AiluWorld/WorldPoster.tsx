@@ -6,7 +6,7 @@ import { BRAND } from "@/lib/brand";
 // world-brand.css hides it once the world is ready.
 export default function WorldPoster({ tagline }: { tagline: string }) {
   return <div className="world-poster" aria-hidden="true">
-    <div className="relative aspect-[4/3] w-[min(72vw,320px)]"><Image src={BRAND.hand} alt="" fill sizes="320px" className="object-contain" priority /></div>
+    <div className="relative aspect-[4/3] w-[min(56vw,240px)]"><Image src={BRAND.hand} alt="" fill sizes="240px" className="object-contain" priority /></div>
     <p>{tagline}</p>
     <span>Opening the AILU world…</span>
   </div>;
