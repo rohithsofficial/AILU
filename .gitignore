@@ -5,6 +5,6 @@ node_modules
 next-env.d.ts
 *.tsbuildinfo
 *.patch
-*.json
+google_cloud_auth_api.json
 references
 ZIP FILES
