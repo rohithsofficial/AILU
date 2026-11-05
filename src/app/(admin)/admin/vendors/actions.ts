@@ -39,6 +39,16 @@ export async function archiveVendorAction(fd: FormData) {
   redirect("/admin/vendors");
 }
 
+export async function deleteVendorAction(fd: FormData) {
+  const id = String(fd.get("id") ?? "");
+  try {
+    const staff = await requireRole(["OWNER"]);
+    await vendors.deleteVendor(staff, id);
+    revalidatePath("/admin/vendors");
+  } catch (error) { fail(`/admin/vendors/${id}`, error); }
+  redirect(`/admin/vendors?msg=${encodeURIComponent("Vendor deleted.")}`);
+}
+
 export async function addVendorNoteAction(fd: FormData) {
   const id = String(fd.get("id") ?? "");
   try {
