@@ -5,6 +5,7 @@ import "./ailu-world.css";
 import "./world-brand.css";
 import { startAilu } from "./engine";
 import { HIDDEN_PLACES, WORLD_MARKUP } from "./worldMarkup";
+import { withLightRenderer } from "./worldRenderer";
 import { SITE_CONTENT } from "@/content/site";
 
 // The engine builds a hotspot and a dock button for every place. Remove the ones the site has switched off.
@@ -45,7 +46,7 @@ export default function AiluWorld() {
     };
 
     // three.js loads only in the browser; without it the page falls back to the scroll film.
-    import("three").then(start, () => start(undefined));
+    import("three").then((THREE) => start(withLightRenderer(THREE)), () => start(undefined));
 
     // The engine moves around with location.hash, which creates history entries without Next's state.
     // Next ignores those on Back, so the URL would change to /#place while the Normal World stayed on screen.

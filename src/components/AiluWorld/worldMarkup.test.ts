@@ -36,7 +36,12 @@ describe("AILU World markup", () => {
   });
 
   it("sends in-world action links to real pages", () => {
-    expect(WORLD_MARKUP).not.toMatch(/href="#(jobs|apply|dreams|share|enquire|policies)"/);
+    expect(WORLD_MARKUP).not.toMatch(/href="#(apply|share|enquire|policies)"/);
     expect(BODY_HTML).toMatch(/href="#enquire"/);
+  });
+
+  it("keeps the Join and Dreams menu items inside the world", () => {
+    expect(WORLD_MARKUP).toContain('<a href="#jobs" data-v="jobs">');
+    expect(WORLD_MARKUP).toContain('<a href="#dreams" data-v="dreams">');
   });
 });
