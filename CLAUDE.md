@@ -1,11 +1,11 @@
 # AILU: project guide for Claude Code
 
-Read this and AGENTS.md at the start of every session and follow both. If they disagree, AGENTS.md (business rules) wins; ask Rani.
+Read this and AGENTS.md at the start of every session and follow both. If they disagree, AGENTS.md (business rules) wins; ask Rohith.
 
 ## What this project is
 Website, CRM and CMS for AILU, an event management company in Udupi, Karnataka.
 Tagline: "Creating Moments. Delivering Smiles."
-Owner: Rani (freelance developer/designer, works mostly alone). Explain things in simple English, short sentences.
+Owner: Rohith (freelance developer/designer, works mostly alone). Explain things in simple English, short sentences.
 
 ## Stack
 Next.js (App Router) + React + TypeScript + Tailwind + Framer Motion + three.js / React Three Fiber.
@@ -33,15 +33,15 @@ The hand-and-heart logo is the main symbol.
 - Real forms, the CRM and legal pages live in the Normal World. Links inside the AILU World that need an action open the real page (see the ROUTES table in AiluWorld.tsx).
 
 ## Rules (never break these)
-- Do NOT edit components/AiluWorld/body.ts, engine.ts or ailu-world.css by hand. They are generated. If a change inside the world is needed, list it for Rani instead.
+- Do NOT edit components/AiluWorld/body.ts, engine.ts or ailu-world.css by hand. They are generated. If a change inside the world is needed, list it for Rohith instead.
 - Prisma 7 setup is final: prisma.config.ts loads .env.local and uses DIRECT_URL, schema has no datasource URLs. Do not change it. No Prisma 8.
 - Never open, print, edit or commit .env.local or any secret.
-- Do not create or run database migrations, and do not reset the database, unless Rani asks.
+- Do not create or run database migrations, and do not reset the database, unless Rohith asks.
 - No fake prices, reviews, rewards or availability anywhere on the site.
 - Dreams are private: never publish a person's dream or story.
 - No new dependency without asking first.
 - No destructive git commands (reset --hard, push --force, branch delete, clean -f).
-- Work on a feature branch, small commits, clear commit messages. Tell Rani which branch you are on.
+- Work on a feature branch, small commits, clear commit messages. Tell Rohith which branch you are on.
 - Do not touch the CRM branch work (A0 to A4) unless the task is about it.
 
 ## Always before saying "done"
@@ -53,10 +53,10 @@ The hand-and-heart logo is the main symbol.
 - Understand the code first, then change it. Read before you edit.
 - Fix root causes, not symptoms. Keep changes small and focused.
 - Prefer existing patterns in the repo over inventing new ones.
-- Ask only when a decision is Rani's to make; otherwise choose a sensible default and say what you chose.
+- Ask only when a decision is Rohith's to make; otherwise choose a sensible default and say what you chose.
 - Give a short summary at the end: files changed, what was verified, what is left.
 
-## Build order decided by Rani
+## Build order decided by Rohith
 1. Finish the CRM (A0 to A4). A3 (team and partner commissions) waits on the partner reward policy.
 2. Then the main public website (two worlds).
 3. Then the CMS.
@@ -69,7 +69,7 @@ The hand-and-heart logo is the main symbol.
 - No form inside the world collects data. The rewards/points preview is removed. World copy changes are in src/content/site.ts (SITE_CONTENT.world).
 - World site changes live outside the generated files: worldMarkup.ts (markup patches, tested by worldMarkup.test.ts), AiluWorld.tsx (hides Rewards, releases WebGL, keeps the title, fixes Back), world-brand.css (brand fonts and colours).
 - Menu: Join and Dreams open their world rooms; only their form cards link to real pages. Speed: worldRenderer.ts lowers pixel density and drops quality on slow devices.
-- Open: components/AiluWorld/CHANGES_FOR_GENERATOR.md lists the edits Rani must make when regenerating body.ts, engine.ts and ailu-world.css. Until then the Google Fonts @import, unprefixed keyframes, off-brand 3D colours and canvas fonts remain, /#rewards still opens the rewards 3D room, and the rewards scene is still in the 3D world.
+- Open: components/AiluWorld/CHANGES_FOR_GENERATOR.md lists the edits Rohith must make when regenerating body.ts, engine.ts and ailu-world.css. Until then the Google Fonts @import, unprefixed keyframes, off-brand 3D colours and canvas fonts remain, /#rewards still opens the rewards 3D room, and the rewards scene is still in the 3D world.
 - Phone fixes (2026-11-05): 3D hero and journey scenes run only at 1024px and wider. World phone rules are in world-brand.css. Skip intro fades out, with no hand flight. Intro buttons are Enter AILU World and Explore Website, and their names are in the CMS Intro section. Phone turning goes through phoneTurn.ts. A first visit starts the 3D engine only from the intro (src/lib/worldStart.ts); WorldPoster shows until it is ready. scripts/strip-world-font-import.cjs removes the blocking font import at build time. Checked at 320, 360, 390, 768 and 1440px in the browser pane, not yet on a real phone.
 - three stays at 0.160.0 because the world port requires it.
 - CRM login is email and password (src/lib/password.ts, scrypt, no new dependency). Google is off unless AUTH_GOOGLE_ENABLED=true. The passwordHash migration is applied on Neon. First owner password: npm run staff:password -- <email>.
