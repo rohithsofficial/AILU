@@ -17,6 +17,7 @@ export const PAGE_TEXT = {
     joinText: "Join the team or become an external sales partner. Different paths, one shared love of bringing people together.",
     joinLink: "Find your way in",
     scrollHint: "Keep wandering",
+    swipeHint: "Swipe or scroll",
     enquiryLink: "Start an enquiry"
   },
   home: {

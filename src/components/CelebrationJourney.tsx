@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { canUse3D } from "@/lib/device";
+import { swipeStep } from "@/lib/swipe";
 import { useContent } from "@/components/ContentProvider";
 
 const CelebrationWorldScene = dynamic(() => import("@/components/CelebrationWorldScene"), { ssr: false });
@@ -29,6 +30,7 @@ export default function CelebrationJourney() {
   const { journey: t, celebrations } = useContent();
   const chapters = t.chapters.map((chapter) => ({ ...chapter, category: celebrations.items.find((category) => category.slug === chapter.slug) }));
   const journey = useRef<HTMLElement>(null);
+  const touchStart = useRef<{ x: number; y: number; at: number } | null>(null);
   const [active, setActive] = useState(0);
   const [showWorld, setShowWorld] = useState(false);
   const reduceMotion = useReducedMotion();
@@ -51,6 +53,16 @@ export default function CelebrationJourney() {
     window.scrollTo({ top: target, behavior: reduceMotion ? "auto" : "smooth" });
   }
 
+  function onTouchEnd(event: React.TouchEvent) {
+    const start = touchStart.current;
+    const touch = event.changedTouches[0];
+    touchStart.current = null;
+    if (!start || !touch) return;
+    const step = swipeStep(touch.clientX - start.x, touch.clientY - start.y, performance.now() - start.at);
+    const next = active + step;
+    if (step && next >= 0 && next < chapters.length) goToChapter(next);
+  }
+
   useMotionValueEvent(scrollYProgress, "change", (progress) => {
     const next = Math.min(chapters.length - 1, Math.floor(progress * chapters.length));
     setActive((current) => {
@@ -63,7 +75,7 @@ export default function CelebrationJourney() {
 
   return (
     <section id="celebration-world" ref={journey} className="relative h-[360svh]" aria-label="Explore celebrations and ways to join AILU">
-      <div className={`sticky top-16 flex h-[calc(100svh-4rem)] min-h-[min(560px,calc(100svh-4rem))] overflow-hidden transition-colors duration-700 ${scene.surface}`}>
+      <div onTouchStart={(event) => { const touch = event.touches[0]; touchStart.current = event.touches.length === 1 ? { x: touch.clientX, y: touch.clientY, at: performance.now() } : null; }} onTouchEnd={onTouchEnd} className={`sticky top-16 flex h-[calc(100svh-4rem)] min-h-[min(560px,calc(100svh-4rem))] touch-pan-y overflow-hidden transition-colors duration-700 ${scene.surface}`}>
         <div aria-hidden className="pointer-events-none absolute inset-0 opacity-80" style={{ backgroundImage: scene.pattern, backgroundSize: active === 2 ? "28px 28px" : undefined }} />
         {showWorld && <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 z-0 w-full opacity-55 sm:w-[82%] sm:opacity-70">
           <CelebrationWorldScene chapter={active} />
@@ -101,7 +113,7 @@ export default function CelebrationJourney() {
             </motion.div>
           </AnimatePresence>
         </div>
-        <div aria-hidden className="absolute bottom-7 left-7 z-20 text-[9px] font-semibold uppercase tracking-[.3em] text-ailu-cream/50 sm:left-12 lg:left-24">{t.scrollHint} <span className="ml-2 text-ailu-yellow">↓</span></div>
+        <div aria-hidden className="absolute bottom-7 left-7 z-20 text-[10px] font-semibold uppercase tracking-[.3em] text-ailu-cream/60 sm:left-12 lg:left-24 lg:text-[9px] lg:text-ailu-cream/50"><span className="lg:hidden">{t.swipeHint}</span><span className="hidden lg:inline">{t.scrollHint}</span> <span className="ml-2 text-ailu-yellow">↓</span></div>
         <Link href="/events#enquire" className="absolute bottom-6 right-7 z-20 inline-flex min-h-11 items-center gap-2 border-b border-white/30 text-xs font-semibold sm:right-12 lg:right-24">{t.enquiryLink} <span aria-hidden className="text-ailu-yellow">↗</span></Link>
       </div>
     </section>
