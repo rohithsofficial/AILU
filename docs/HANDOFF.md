@@ -3,7 +3,7 @@
 This file lets work continue on any computer. Claude reads it at the start of a session and updates it at the end.
 Never put passwords, keys or connection strings here. This file goes to GitHub.
 
-Last updated: 2026-11-06
+Last updated: 2026-11-07
 
 ## Owner
 Rohith. Freelance developer. Often sends voice-typed messages, so read for the meaning. Use simple English and short sentences.
@@ -24,6 +24,13 @@ Rohith. Freelance developer. Often sends voice-typed messages, so read for the m
 - CMS with SEO and a photo library.
 - Speed work. Local Lighthouse, first visit, phone: 88.
 - Project files tidied into `docs/` and `_local/`.
+
+## Visitor feedback round
+Rohith is sharing feedback from a friend, one point at a time. For each point: fix it, then check for the same problem across the whole site. The goal is an easy, clear site for visitors.
+
+| # | Feedback | Status |
+|---|---|---|
+| 1 | Tapping small dots is hard, add left and right swipe | Done on branch `fix/swipe-navigation`: home story swipe, quick flick in world rooms, hints on both |
 
 ## Next steps
 1. Try one publish in the CMS on the live site. It was tested only on a local server.

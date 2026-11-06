@@ -82,4 +82,5 @@ Rohith works on more than one computer. Claude memory stays on one computer, so 
 - CRM records: tasks, payments, expenses, vendor bookings, team assignments, draft quotations and timeline notes have edit and delete (src/app/(admin)/admin/records/actions.ts). Clients and events stay archive and restore. An owner can delete a vendor only if it has no event bookings; otherwise archive it. Rules are in src/lib/recordRules.ts.
 - CRM login and records merged to main on 2026-11-05 (PR #7). Live at /admin/login. The public site stays hidden by COMING_SOON.
 - CMS: /admin/cms. Default wording is in src/content (defaults.ts, pageText.ts, legalText.ts). Public pages read getContent() in src/server/cms.ts, or useContent() in client components. Editor screens are built from the shape of CMS_DEFAULTS, so a new key appears in the CMS automatically. Rules are in src/lib/cms.ts. Guide: docs/CMS_GUIDE.md. Photo upload needs a Vercel Blob store (BLOB_READ_WRITE_TOKEN).
+- Swipe: src/lib/swipe.ts holds the rules. The home story uses an easy swipe, and world rooms use a quick flick (roomSwipe.ts), so a slow drag still looks around.
 - Audit: docs/AUDIT.md (2026-11-04).
