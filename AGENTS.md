@@ -4,8 +4,8 @@ This file is for an AI coding agent (OpenCode). Read all of it before changing a
 Place it at the repo root as `AGENTS.md` (OpenCode loads that name automatically).
 
 Repo: https://github.com/rohithsofficial/AILU (branch `main`)
-Owner/developer: Rani (freelance developer, EmYou Media), building this for the AILU team.
-Note: Rani often sends dictated (voice-to-text) messages with typos. Interpret the intent, and keep replies short and practical.
+Owner/developer: Rohith (freelance developer, EmYou Media), building this for the AILU team.
+Note: Rohith often sends dictated (voice-to-text) messages with typos. Interpret the intent, and keep replies short and practical.
 
 ---
 
@@ -32,7 +32,7 @@ The original long brief also had loyalty points, an AI character ("Meet AILU"), 
 
 ## 2. Non-negotiable rules
 
-**Prisma / database (Rani fixed these by hand. Do not undo them):**
+**Prisma / database (Rohith fixed these by hand. Do not undo them):**
 - Prisma is **7.x** (CLI 7.10.1). **Never upgrade to Prisma 8.** Use the normal `prisma migrate` workflow.
 - `prisma.config.ts` loads `.env.local` with dotenv and sets `datasource.url` from `DIRECT_URL`. `prisma/schema.prisma` datasource has **no url / directUrl**. Do not put them back.
 - Runtime client is built in `src/lib/db.ts` with the **`@prisma/adapter-pg` driver adapter** and the pooled `DATABASE_URL` (Prisma 7 has no built-in engine).
@@ -81,11 +81,11 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 ## 5. What has been built (chronological)
 
 1. **Phase 1 starter:** brand tokens, home, events list and per-category detail pages (no prices), contact footer, enquiry form with server validation and spam trap, IDs like `AILU-EVT-000001` created in a DB transaction from an auto-increment `seq`.
-2. **Firebase replaced by Neon + Prisma** (Prisma 7 fixes by Rani, see rules above).
+2. **Firebase replaced by Neon + Prisma** (Prisma 7 fixes by Rohith, see rules above).
 3. **Vision update:** intro reordered (hand first); `/join`, `/dreams`, `/donate` pages; "Cultural & regional celebrations" category; real logo and hand assets added.
 4. **Premium redesign:** dark navbar with large logo, new hero, ticker, reveals, dark page headers.
 5. **Intro "hand flies to the logo":** hand in the middle, welcome lines, optional "tell us about you" (name, city, who you are), two buttons. On either button **or "Skip intro"** the hand flies to the logo in the navbar, then the logo wipes in left to right.
-6. **Coming-soon mode** (Rani added, then hardened): `COMING_SOON=true` redirects everyone to `/coming-soon`; `/?preview=<PREVIEW_SECRET>` sets an httpOnly cookie to bypass. `/api/*` returns 503 while hidden. `X-Robots-Tag: noindex` on the page. `SiteChrome` hides intro, navbar and footer on `/coming-soon`.
+6. **Coming-soon mode** (Rohith added, then hardened): `COMING_SOON=true` redirects everyone to `/coming-soon`; `/?preview=<PREVIEW_SECRET>` sets an httpOnly cookie to bypass. `/api/*` returns 503 while hidden. `X-Robots-Tag: noindex` on the page. `SiteChrome` hides intro, navbar and footer on `/coming-soon`.
 7. **Scroll logo:** on scroll the "I" and "L" fold away and the hand slides left beside the "A" (first and last parts remain). Reverses at the top.
 8. **Join forms + referrals:** `/join/team` (applications, IDs `AILU-APP-000001`) and `/join/partner` (registration, IDs `AILU-SP-000001`, status starts `PENDING`); optional partner ID on the event enquiry form, recorded as `referredBySpId` (ignored if the partner is rejected/suspended or the phone matches the partner's own).
 9. **CRM foundation (A0):** Google OAuth allowlist with first-owner bootstrap only while `StaffUser` is empty, active staff and current roles rechecked from the database, owner-only staff management and paginated audit log, responsive standalone admin shell.
@@ -181,7 +181,7 @@ Commands: `npm install` · `npx prisma generate` · `npx prisma migrate status` 
 6. **Dream launch readiness:** lawyer review; decide retention and closed-record policy, grievance contact, guardian verification, which staff may handle minors' dreams, and emergency response. Test adult/guardian submissions and OWNER deletion before setting `DREAMS_FORM_OPEN=true`.
 7. **Later:** CMS, reports, loyalty points only after a business decision, "Meet AILU" character/chat, notifications, and customer payments.
 
-## 10. Open decisions (ask Rani, do not guess)
+## 10. Open decisions (ask Rohith, do not guess)
 
 - Phone OTP approach (Firebase vs SMS provider).
 - Whether to keep loyalty points at all, or only the monetary referral reward.

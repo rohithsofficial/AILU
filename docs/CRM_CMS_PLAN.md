@@ -499,7 +499,7 @@ Later: client self-service portal and phone OTP, online payments (Razorpay) for 
 3. Keep commission terms manual until AILU confirms reward rules. A4 does not change the schema.
 4. Keep the public site working at all times; do not start A5 without authorization.
 
-## 11. Decisions to confirm with Rani (recommended default in bold)
+## 11. Decisions to confirm with Rohith (recommended default in bold)
 
 1. Staff sign-in: **Google sign-in with allowlist**, or email + password + 2FA?
 2. Staff roles: **OWNER / MANAGER / STAFF / ACCOUNTS as in section 3**, or simpler?
