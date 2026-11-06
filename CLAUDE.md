@@ -1,6 +1,6 @@
 # AILU: project guide for Claude Code
 
-Read this and AGENTS.md at the start of every session and follow both. If they disagree, AGENTS.md (business rules) wins; ask Rohith.
+Read this, AGENTS.md and docs/HANDOFF.md at the start of every session and follow them. If they disagree, AGENTS.md (business rules) wins; ask Rohith.
 
 ## What this project is
 Website, CRM and CMS for AILU, an event management company in Udupi, Karnataka.
@@ -9,7 +9,7 @@ Owner: Rohith (freelance developer/designer, works mostly alone). Explain things
 
 ## Stack
 Next.js (App Router) + React + TypeScript + Tailwind + Framer Motion + three.js / React Three Fiber.
-Neon Postgres + Prisma 7. Auth with next-auth (staff sign in with Google). Hosted on Vercel.
+Neon Postgres + Prisma 7. Auth with next-auth (staff sign in with email and password). Hosted on Vercel.
 Brand: yellow #F5C400, black #111111, warm white #FFFDF7. Poppins for headings, Inter for body.
 The hand-and-heart logo is the main symbol.
 
@@ -43,6 +43,12 @@ The hand-and-heart logo is the main symbol.
 - No destructive git commands (reset --hard, push --force, branch delete, clean -f).
 - Work on a feature branch, small commits, clear commit messages. Tell Rohith which branch you are on.
 - Do not touch the CRM branch work (A0 to A4) unless the task is about it.
+
+## Working across computers
+Rohith works on more than one computer. Claude memory stays on one computer, so anything that must be remembered goes in this repo.
+- At the end of each task, update docs/HANDOFF.md: what changed, next steps and decisions. Update Current state below when it changes.
+- Commit and push those updates with the task, so the next computer gets them with git pull.
+- Never put secrets in these files.
 
 ## Always before saying "done"
 1. npm run lint, npx tsc --noEmit, tests, npm run build all pass.
