@@ -17,15 +17,33 @@ export function buildContent(published: Record<string, unknown>): SiteContent {
   return fillTokens(merged, merged.settings);
 }
 
-/** What visitors see. If the database cannot be reached, the site falls back to the default wording. */
-export const getContent = cache(async (): Promise<SiteContent> => {
-  if (!dbConfigured()) return buildContent({});
+// A slow or blocked database must never hold up a page. After a failure, pages use the last good content
+// and skip the database for a short time, instead of every visitor waiting for it again.
+const DB_WAIT_MS = 4000;
+const RETRY_AFTER_MS = 30000;
+// Kept on globalThis because each route has its own copy of this module.
+const health = ((globalThis as unknown as { cmsHealth?: { lastGood: Record<string, unknown>; skipUntil: number } }).cmsHealth ??= { lastGood: {}, skipUntil: 0 });
+
+async function readWithLimit() {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const limit = new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error("The database took too long.")), DB_WAIT_MS); });
   try {
-    return buildContent(await readPublished());
-  } catch (error) {
-    console.error("CMS content could not be loaded; using defaults.", (error as Error).message);
-    return buildContent({});
+    return await Promise.race([readPublished(), limit]);
+  } finally {
+    clearTimeout(timer);
   }
+}
+
+/** What visitors see. If the database cannot be reached, the site falls back to the last good content. */
+export const getContent = cache(async (): Promise<SiteContent> => {
+  if (!dbConfigured() || Date.now() < health.skipUntil) return buildContent(health.lastGood);
+  try {
+    health.lastGood = await readWithLimit();
+  } catch (error) {
+    health.skipUntil = Date.now() + RETRY_AFTER_MS;
+    console.error("CMS content could not be loaded; using the last good content.", (error as Error).message);
+  }
+  return buildContent(health.lastGood);
 });
 
 /** The parts that browser components need, so visitors do not download the whole site's text on each page. */
