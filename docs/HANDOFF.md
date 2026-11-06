@@ -30,15 +30,16 @@ Rohith is sharing feedback from a friend, one point at a time. For each point: f
 
 | # | Feedback | Status |
 |---|---|---|
-| 1 | Tapping small dots is hard, add left and right swipe | Done on branch `fix/swipe-navigation`: home story swipe, quick flick in world rooms, hints on both |
-| 2 | Explore menu options seem to do nothing | Done on the same branch: a slow database can no longer hold up a page, and every link shows a loading screen at once |
+| 1 | Tapping small dots is hard, add left and right swipe | Done, on `main`: home story swipe, quick flick in world rooms, hints on both. Not tested on a real phone |
+| 2 | Explore menu options seem to do nothing | Done, on `main`: a slow database can no longer hold up a page, and website pages show a loading screen. Rohith still needs to confirm the menu |
 
 ## Next steps
-1. Try one publish in the CMS on the live site. It was tested only on a local server.
-2. Add real content, social links and permitted photos in the CMS.
-3. Add the Google verification code in CMS, under SEO for every page.
-4. Have a lawyer review the legal pages.
-5. Launch: set `COMING_SOON=false` in Vercel, then run Lighthouse again.
+1. Continue the feedback round: Rohith sends the next point.
+2. Try one publish in the CMS on the live site. It was tested only on a local server.
+3. Add real content, social links and permitted photos in the CMS.
+4. Add the Google verification code in CMS, under SEO for every page.
+5. Have a lawyer review the legal pages.
+6. Launch: set `COMING_SOON=false` in Vercel, then run Lighthouse again.
 
 ## Waiting on a decision
 - Partner reward policy. The reward screens exist, but do not use them for real rewards yet.
