@@ -31,6 +31,7 @@ Rohith is sharing feedback from a friend, one point at a time. For each point: f
 | # | Feedback | Status |
 |---|---|---|
 | 1 | Tapping small dots is hard, add left and right swipe | Done on branch `fix/swipe-navigation`: home story swipe, quick flick in world rooms, hints on both |
+| 2 | Explore menu options seem to do nothing | Done on the same branch: a slow database can no longer hold up a page, and every link shows a loading screen at once |
 
 ## Next steps
 1. Try one publish in the CMS on the live site. It was tested only on a local server.
@@ -48,6 +49,7 @@ Rohith is sharing feedback from a friend, one point at a time. For each point: f
 - `localhost:3000` on the office PC may be the Western Terrain Coffee Roasters project, not AILU. Check before testing.
 - `.env.local` points to the live database. Test risky changes on a temporary Neon branch.
 - `next start` can keep running after its task stops. Check the port before trusting a local test.
+- Some networks block the Neon database port 5432. Then localhost pages use default wording and CRM login fails, while the live site is fine. Test with `Test-NetConnection` or use another network.
 - Some Vercel connector calls fail with 403. The `vercel` command line works when signed in.
 - Test names like "Rani" in `*.test.ts` files are sample customers only.
 
