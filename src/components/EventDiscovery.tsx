@@ -1,5 +1,6 @@
 "use client";
 
+// Events page: the list of event types, with a preview of the one you point at.
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";

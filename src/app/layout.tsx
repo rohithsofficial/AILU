@@ -1,3 +1,4 @@
+// Root layout for every page: brand fonts, default SEO, organisation structured data, and the CMS content for client components.
 import type { Metadata } from "next";
 import ContentProvider from "@/components/ContentProvider";
 import { clientContent, getContent } from "@/server/cms";

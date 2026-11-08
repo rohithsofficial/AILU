@@ -1,3 +1,4 @@
+// CRM: form to add a client by hand. Phone numbers must be unique, so a client is never added twice.
 import Link from "next/link";
 import { requireRolePage } from "@/lib/authz";
 import ClientForm from "@/components/admin/ClientForm";

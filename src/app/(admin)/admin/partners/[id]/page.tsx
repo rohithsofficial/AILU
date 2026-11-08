@@ -1,3 +1,4 @@
+// CRM: one sales partner: status, referred enquiries and events, and reward proposals.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireRolePage, can } from "@/lib/authz";

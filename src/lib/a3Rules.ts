@@ -1,3 +1,4 @@
+// Business rules for partner rewards, partner status, application conversion and team assignments. Tested in a3Rules.test.ts.
 export type CommissionEligibility = {
   partnerId: string;
   eventExists: boolean;

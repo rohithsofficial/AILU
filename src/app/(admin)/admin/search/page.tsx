@@ -1,3 +1,4 @@
+// CRM: full results for the search box in the top bar. Results are limited by role (src/server/search).
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
 import { globalSearch } from "@/server/search/global-search";

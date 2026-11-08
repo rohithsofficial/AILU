@@ -1,3 +1,4 @@
+// CMS: the photo library. Uploads go to Vercel Blob through /api/admin/cms/upload.
 import Link from "next/link";
 import MediaLibraryUpload from "@/components/admin/MediaLibraryUpload";
 import { ConfirmButton } from "@/components/admin/RecordControls";

@@ -1,4 +1,6 @@
 "use client";
+
+// CRM side menu. Items are hidden by role, but every page checks the role again on the server.
 import Link from "next/link";
 import { useState } from "react";
 import type { StaffRole } from "@prisma/client";

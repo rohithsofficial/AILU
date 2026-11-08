@@ -1,3 +1,4 @@
+// Normal World: placeholder for future customer accounts. Kept out of Google (noindex).
 import { getContent } from "@/server/cms";
 import PageHero from "@/components/PageHero";
 import Link from "next/link";

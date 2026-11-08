@@ -1,3 +1,4 @@
+// CMS: the editor for one section. The form is built from the shape of CMS_DEFAULTS (src/content/defaults.ts).
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CmsEditor from "@/components/admin/CmsEditor";

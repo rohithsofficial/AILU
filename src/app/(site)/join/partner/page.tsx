@@ -1,3 +1,4 @@
+// Normal World: sales partner registration form. Registering does not guarantee earnings.
 import PageHero from "@/components/PageHero";
 import PartnerForm from "@/components/forms/PartnerForm";
 import { metadataForPath } from "@/lib/public-metadata";

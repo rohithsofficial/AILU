@@ -1,3 +1,5 @@
+// POST /api/applications: saves a team application from /join/team.
+// Checks: form rules, spam trap, rate limit (3 a day per connection) and one application per phone in 30 days.
 import { NextResponse } from "next/server";
 import { dbConfigured, getPrisma } from "@/lib/db";
 import { applicationSchema, normalizePhone } from "@/lib/validation";

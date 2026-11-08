@@ -1,5 +1,6 @@
 "use client";
 
+// The optional 3D scene behind the home story (desktop only, loaded lazily).
 import { Canvas } from "@react-three/fiber";
 
 function Person({ position, tone = "#FFFDF7", scale = 1 }: { position: [number, number, number]; tone?: string; scale?: number }) {

@@ -1,3 +1,4 @@
+// Small money rules for the dashboard (amounts due, due within 7 days, monthly margin). Tested.
 export const DUE_WARNING_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
 

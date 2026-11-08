@@ -1,3 +1,4 @@
+// Normal World: website terms (draft). Wording from the CMS.
 import LegalPage from "@/components/LegalPage";
 import { metadataForPath } from "@/lib/public-metadata";
 import { getContent } from "@/server/cms";

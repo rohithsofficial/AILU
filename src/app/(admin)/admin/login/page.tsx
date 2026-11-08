@@ -1,3 +1,4 @@
+// CRM sign-in page (/admin/login): email and password. Login attempts are rate limited in src/auth.ts.
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth, googleEnabled, signIn } from "@/auth";

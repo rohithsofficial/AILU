@@ -1,3 +1,4 @@
+// POST /api/admin/cms/upload: staff upload a CMS photo (JPG, PNG or WebP, up to 4 MB) to Vercel Blob.
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { currentStaff, can } from "@/lib/authz";

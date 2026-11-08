@@ -1,3 +1,4 @@
+// Shown when a signed-in staff member opens a CRM page their role may not use.
 import Link from "next/link";
 
 export default function NotAllowed() {

@@ -1,3 +1,4 @@
+// Works out an event's money: quoted, received, balance, vendor and team costs, and profit. All in whole paise.
 type PaymentRow = { direction: "IN" | "OUT"; amountPaise: number; vendorBookingId: string | null; assignmentId?: string | null };
 type ExpenseRow = { amountPaise: number; vendorBookingId: string | null };
 type BookingRow = { id: string; agreedAmountPaise: number | null };

@@ -1,3 +1,4 @@
+// CRM: manage staff accounts (add, rename, role, password reset, switch off). Owner only.
 import { requireRolePage } from "@/lib/authz";
 import { getPrisma } from "@/lib/db";
 import { addStaffAction, changeRoleAction, setActiveAction, setStaffPasswordAction, updateStaffNameAction } from "./actions";

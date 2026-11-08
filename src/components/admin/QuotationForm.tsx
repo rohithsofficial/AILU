@@ -1,5 +1,6 @@
 "use client";
 
+// CRM: quotation line items form. The total shown here is a preview; the server always works it out again.
 import { useRef, useState } from "react";
 import { toRupees } from "@/lib/money";
 

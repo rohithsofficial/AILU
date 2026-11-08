@@ -1,4 +1,6 @@
 "use client";
+
+// CMS editor form. It is built from the shape of the default content, so new keys appear automatically.
 import { useState } from "react";
 import { humanise, isFixedKey, isFixedList, isImageKey, listTemplate, type Json } from "@/lib/cms";
 import { ConfirmButton } from "@/components/admin/RecordControls";

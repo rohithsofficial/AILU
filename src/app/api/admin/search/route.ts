@@ -1,3 +1,4 @@
+// GET /api/admin/search?q=...: the CRM top-bar search. Signed-in staff only; results are limited by role.
 import { currentStaff } from "@/lib/authz";
 import { globalSearch } from "@/server/search/global-search";
 

@@ -1,3 +1,5 @@
+// Limits how often a connection or phone may send a form (and how often someone may try to sign in).
+// Keys are stored only as salted hashes, never as raw IP addresses or phone numbers.
 import { createHmac } from "node:crypto";
 import { dbConfigured, getPrisma } from "@/lib/db";
 

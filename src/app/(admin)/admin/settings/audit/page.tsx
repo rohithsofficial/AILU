@@ -1,3 +1,4 @@
+// CRM: the audit log of every change made in the CRM. Owner only.
 import { requireRolePage } from "@/lib/authz";
 import { getPrisma } from "@/lib/db";
 

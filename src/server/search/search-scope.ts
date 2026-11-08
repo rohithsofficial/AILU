@@ -1,3 +1,4 @@
+// Which search groups each role may see, and how a phone number in a search is read.
 import type { StaffRole } from "@prisma/client";
 import { can } from "@/lib/permissions";
 import { normalizePhone } from "@/lib/validation";

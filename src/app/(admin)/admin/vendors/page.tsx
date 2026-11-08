@@ -1,3 +1,4 @@
+// CRM: the vendor directory (decor, sound, catering...).
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES, can } from "@/lib/authz";
 import { listVendors } from "@/server/vendors";

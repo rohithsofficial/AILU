@@ -1,5 +1,6 @@
 "use client";
 
+// Normal World home: the first screen (headline, buttons, and the 3D hand on large screens).
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";

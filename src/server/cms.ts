@@ -1,3 +1,4 @@
+// Database logic for the CMS, and getContent(), which every public page uses to read its wording.
 import { cache } from "react";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { del } from "@vercel/blob";

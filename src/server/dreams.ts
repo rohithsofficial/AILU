@@ -1,3 +1,4 @@
+// Database logic for private dreams. Only owner and manager may read them; every view is audited.
 import { z } from "zod";
 import type { DreamCategory, DreamStatus, StaffRole } from "@prisma/client";
 import { audit } from "@/lib/audit";

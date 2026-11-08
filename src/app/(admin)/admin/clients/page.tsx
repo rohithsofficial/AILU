@@ -1,3 +1,4 @@
+// CRM: list of clients with search (name, company, phone, city, ID) and filters.
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
 import { listClients } from "@/server/clients";

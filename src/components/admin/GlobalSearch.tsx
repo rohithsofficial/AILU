@@ -1,5 +1,6 @@
 "use client";
 
+// CRM search box in the top bar. Calls /api/admin/search as you type.
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";

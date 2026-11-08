@@ -1,3 +1,4 @@
+// CRM top bar: logo, search box and the "My tasks" count.
 import Link from "next/link";
 import Image from "next/image";
 import type { Staff } from "@/lib/authz";

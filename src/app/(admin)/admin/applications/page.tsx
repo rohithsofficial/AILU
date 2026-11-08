@@ -1,3 +1,4 @@
+// CRM: list of team applications from /join/team, with search and filters. Owner, manager and staff.
 import Link from "next/link";
 import { requireRolePage, can } from "@/lib/authz";
 import { listApplications } from "@/server/applications";

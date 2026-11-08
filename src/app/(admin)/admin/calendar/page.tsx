@@ -1,3 +1,4 @@
+// CRM: month calendar of events, with a simple agenda list on phones. STAFF see only their own events.
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
 import { EVENT_STATUSES, EVENT_STATUS_LABELS, type EventStatusValue } from "@/lib/eventStatus";

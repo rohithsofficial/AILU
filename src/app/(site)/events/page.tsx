@@ -1,3 +1,4 @@
+// Normal World: Events page: the event types and the main enquiry form (#enquire).
 import EventDiscovery from "@/components/EventDiscovery";
 import EnquiryForm from "@/components/EnquiryForm";
 import { metadataForPath } from "@/lib/public-metadata";

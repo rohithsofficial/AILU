@@ -1,3 +1,5 @@
+// The AILU World at "/": the 360 degree world and the poster shown while it loads.
+// The intro and the "Explore Website" switch are added by layout.tsx in this folder.
 import type { Metadata } from "next";
 import AiluWorld from "@/components/AiluWorld/AiluWorld";
 import WorldPoster from "@/components/AiluWorld/WorldPoster";

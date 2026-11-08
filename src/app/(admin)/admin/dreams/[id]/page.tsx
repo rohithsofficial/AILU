@@ -1,3 +1,4 @@
+// CRM: one private dream. Owner and manager only. Opening it is recorded in the audit log.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireRolePage, can } from "@/lib/authz";

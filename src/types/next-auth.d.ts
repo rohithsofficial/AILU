@@ -1,3 +1,4 @@
+// Adds the staff id and role to next-auth's session type.
 import type { DefaultSession } from "next-auth";
 import type { StaffRole } from "@prisma/client";
 

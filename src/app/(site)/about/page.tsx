@@ -1,3 +1,4 @@
+// Normal World: About AILU. Wording comes from the CMS (About section).
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";

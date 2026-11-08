@@ -1,3 +1,4 @@
+// CRM: money overview: client balances, vendor and team payments due, and this month's margin. Owner, manager and accounts.
 import Link from "next/link";
 import { requireRolePage } from "@/lib/authz";
 import { formatIN, formatINR } from "@/lib/format";

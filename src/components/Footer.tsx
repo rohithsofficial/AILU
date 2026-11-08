@@ -1,3 +1,4 @@
+// Normal World footer: contact details, links and legal pages.
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";

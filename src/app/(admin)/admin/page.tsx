@@ -1,3 +1,5 @@
+// CRM dashboard (/admin): today's tasks and events, new enquiries, the pipeline, needs attention and money widgets.
+// The data and every role limit come from src/server/dashboard/index.ts.
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES, can } from "@/lib/authz";
 import { EVENT_STATUS_LABELS, type EventStatusValue } from "@/lib/eventStatus";

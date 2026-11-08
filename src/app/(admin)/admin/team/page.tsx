@@ -1,3 +1,4 @@
+// CRM: the team directory (hosts, performers, coordinators...).
 import Link from "next/link";
 import { requireRolePage, can } from "@/lib/authz";
 import { listTeamMembers } from "@/server/team";

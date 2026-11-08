@@ -1,3 +1,4 @@
+// Data for the CRM calendar page. STAFF see only their own events.
 import type { Staff } from "@/lib/authz";
 import type { Prisma } from "@prisma/client";
 import { EVENT_STATUSES, type EventStatusValue } from "@/lib/eventStatus";

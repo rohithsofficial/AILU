@@ -1,3 +1,4 @@
+// Normal World: one event type (wedding, corporate...) with its services, gallery and the enquiry form.
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";

@@ -1,3 +1,4 @@
+// CRM: one website enquiry: assign it, change its status, add tasks, or convert it into a client and an event.
 import NoteControls from "@/components/admin/NoteControls";
 import Link from "next/link";
 import { notFound } from "next/navigation";

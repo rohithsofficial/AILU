@@ -1,3 +1,5 @@
+// POST /api/enquiries: saves an event enquiry from the website (events pages and the /celebrate landing page).
+// Checks: form rules, spam trap, rate limits per connection and per phone, and the partner ID (ignored if not valid).
 import { NextResponse } from "next/server";
 import { dbConfigured, getPrisma } from "@/lib/db";
 import { enquirySchema, normalizePhone } from "@/lib/validation";

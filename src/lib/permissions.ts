@@ -1,3 +1,4 @@
+// Which role may do what in the CRM. One list per role. Checked by src/lib/authz.ts on every page and action.
 import type { StaffRole } from "@prisma/client";
 
 export type StaffAction =

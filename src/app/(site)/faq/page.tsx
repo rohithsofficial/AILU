@@ -1,3 +1,4 @@
+// Normal World: frequently asked questions, plus FAQ structured data for Google.
 import PageHero from "@/components/PageHero";
 import { metadataForPath } from "@/lib/public-metadata";
 import { getContent } from "@/server/cms";

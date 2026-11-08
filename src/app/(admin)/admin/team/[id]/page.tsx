@@ -1,3 +1,4 @@
+// CRM: one team member and their event assignments. Fees are hidden from roles that may not see money.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireRolePage, can } from "@/lib/authz";

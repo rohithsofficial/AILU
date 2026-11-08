@@ -1,3 +1,5 @@
+// CRM: the full "Needs attention" list (late follow-ups, quotations with no answer, events missing a team...).
+// The rules are in src/server/dashboard/attention-rules.ts.
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
 import { formatIN, formatRelative } from "@/lib/format";

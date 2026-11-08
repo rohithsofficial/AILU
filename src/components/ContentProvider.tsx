@@ -1,4 +1,6 @@
 "use client";
+
+// Gives client components the CMS wording (useContent()). Filled once in src/app/layout.tsx.
 import { createContext, useContext } from "react";
 import type { ClientContent } from "@/server/cms";
 

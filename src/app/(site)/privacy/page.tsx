@@ -1,3 +1,4 @@
+// Normal World: privacy notice (draft, to be reviewed by a lawyer). Wording from the CMS.
 import LegalPage from "@/components/LegalPage";
 import { metadataForPath } from "@/lib/public-metadata";
 import { getContent } from "@/server/cms";

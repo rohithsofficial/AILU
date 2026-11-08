@@ -1,3 +1,4 @@
+// CRM: private dream submissions. Owner and manager only. The list shows no dream text, only metadata.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireRolePage, can } from "@/lib/authz";

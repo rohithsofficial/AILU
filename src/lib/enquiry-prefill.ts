@@ -1,3 +1,4 @@
+// Reads ?category= and ?ref= from the address so a shared link can fill in the enquiry form.
 import { getCategory } from "@/lib/events";
 import { isPartnerReferralId } from "@/lib/validation";
 

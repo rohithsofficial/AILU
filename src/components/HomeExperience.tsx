@@ -1,3 +1,5 @@
+// Normal World home: everything under the story: ticker, at a glance, services, people, culture, inspiration,
+// about, how it works, opportunities and FAQ. Wording comes from the CMS (Home section).
 import Image from "next/image";
 import Link from "next/link";
 import { getContent } from "@/server/cms";

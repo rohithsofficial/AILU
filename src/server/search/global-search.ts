@@ -1,3 +1,4 @@
+// The CRM top-bar search across clients, events, enquiries, vendors, partners, applications and team.
 import type { Staff } from "@/lib/authz";
 import { getPrisma } from "@/lib/db";
 import { phoneSearchTerm, allowedSearchGroups, type SearchGroup } from "./search-scope";

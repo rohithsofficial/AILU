@@ -1,3 +1,4 @@
+// CRM: list of events (the pipeline) with search, status, category, owner and date filters.
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
 import { listEvents } from "@/server/events";

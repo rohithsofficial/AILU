@@ -1,5 +1,7 @@
 "use client";
 
+// The AILU World wrapper. Starts the generated 3D engine (engine.ts) and adds the site's own fixes around it:
+// phone turning (phoneTurn.ts), room flicks (roomSwipe.ts), level view (levelView.ts) and named steps (worldSteps.ts).
 import { useEffect, useRef } from "react";
 import "./ailu-world.css";
 import "./world-brand.css";

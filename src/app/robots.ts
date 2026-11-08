@@ -1,3 +1,5 @@
+// robots.txt: lets search engines in, keeps them out of /admin, /api, /coming-soon and /my-ailu,
+// and blocks the whole site while COMING_SOON=true.
 import type { MetadataRoute } from "next";
 import { publicSiteUrl } from "@/lib/public-metadata";
 

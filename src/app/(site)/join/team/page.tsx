@@ -1,3 +1,4 @@
+// Normal World: team application form. Applying does not guarantee work.
 import PageHero from "@/components/PageHero";
 import ApplicationForm from "@/components/forms/ApplicationForm";
 import { metadataForPath } from "@/lib/public-metadata";

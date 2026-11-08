@@ -1,3 +1,4 @@
+// Rules for private dreams: categories, status steps, sensitive-number check and duplicate check. Tested in dreams.test.ts.
 export const DREAM_CATEGORIES = [
   "MY_DREAM",
   "FAMILY",

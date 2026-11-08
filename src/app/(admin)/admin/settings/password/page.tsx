@@ -1,3 +1,4 @@
+// CRM: change my own password. Changing it signs you out everywhere.
 import { currentStaff } from "@/lib/authz";
 import { PASSWORD_MIN_LENGTH } from "@/lib/password";
 import { redirect } from "next/navigation";

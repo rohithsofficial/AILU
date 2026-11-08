@@ -1,3 +1,4 @@
+// CRM: partner reward (commission) proposals: approve, reject and mark paid. Owner, manager and accounts.
 import Link from "next/link";
 import { requireRolePage, can } from "@/lib/authz";
 import { getPrisma } from "@/lib/db";

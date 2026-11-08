@@ -1,3 +1,4 @@
+// The "Needs attention" rules and their time limits. Pure functions, tested in attention-rules.test.ts.
 export const ATTENTION_THRESHOLDS = {
   enquiryHours: 24,
   sentQuotationDays: 5,

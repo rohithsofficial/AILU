@@ -1,3 +1,4 @@
+// Normal World: Join AILU: choose the team application or the sales partner programme.
 import Link from "next/link";
 import { metadataForPath } from "@/lib/public-metadata";
 import { getContent } from "@/server/cms";

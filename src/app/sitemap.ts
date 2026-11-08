@@ -1,3 +1,4 @@
+// sitemap.xml for Google. Empty while COMING_SOON=true. Pages hidden in the CMS SEO screen are left out.
 import type { MetadataRoute } from "next";
 import { EVENT_CATEGORIES } from "@/lib/events";
 import { getContent } from "@/server/cms";

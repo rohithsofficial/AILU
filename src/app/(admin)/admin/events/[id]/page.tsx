@@ -1,3 +1,5 @@
+// CRM: one event: status, details, quotations, vendors, team, payments, expenses, partner reward, tasks and timeline.
+// Each part checks the role again on the server, so hidden buttons are never the only protection.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireRolePage, STAFF_ROLES, canWriteCRM, canEditEvent, can } from "@/lib/authz";

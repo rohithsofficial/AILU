@@ -1,3 +1,5 @@
+// POST /api/dreams: saves a private dream. Closed unless DREAMS_FORM_OPEN=true.
+// Never log the request, the dream text or contact details.
 import { NextResponse } from "next/server";
 import { createDreamSubmission, hasRecentDuplicateDream } from "@/server/dreams";
 import { dbConfigured } from "@/lib/db";

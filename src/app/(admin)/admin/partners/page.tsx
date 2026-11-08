@@ -1,3 +1,4 @@
+// CRM: list of sales partners who registered on /join/partner.
 import Link from "next/link";
 import { requireRolePage, can } from "@/lib/authz";
 import { listPartners } from "@/server/partners";

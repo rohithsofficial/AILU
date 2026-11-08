@@ -1,3 +1,4 @@
+// Fixed brand facts: name, tagline, logo, phone, WhatsApp and email. Editable wording lives in the CMS instead.
 export const BRAND = {
   name: "AILU",
   tagline: "Creating Moments. Delivering Smiles.",

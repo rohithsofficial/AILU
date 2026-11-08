@@ -1,3 +1,4 @@
+// CRM: one vendor: details, notes and bookings. Only owner and accounts see UPI IDs.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireRolePage, STAFF_ROLES, can } from "@/lib/authz";

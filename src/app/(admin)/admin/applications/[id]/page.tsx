@@ -1,3 +1,4 @@
+// CRM: one team application. Owner and manager can change its status, add notes or convert it into a team member.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireRolePage, can } from "@/lib/authz";

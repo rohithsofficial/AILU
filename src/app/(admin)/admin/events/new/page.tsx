@@ -1,3 +1,4 @@
+// CRM: form to create an event by hand, for an existing client or a new one.
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
 import { EVENT_CATEGORIES } from "@/lib/events";

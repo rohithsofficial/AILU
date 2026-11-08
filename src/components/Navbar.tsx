@@ -1,5 +1,6 @@
 "use client";
 
+// Normal World top bar: logo, main links, the "Enter AILU World" switch and the Explore menu.
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";

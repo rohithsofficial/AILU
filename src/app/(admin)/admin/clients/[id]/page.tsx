@@ -1,3 +1,4 @@
+// CRM: one client: details, contacts, events, enquiries, tasks and the timeline of notes and calls.
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireRolePage, STAFF_ROLES, canWriteCRM, canEditClient } from "@/lib/authz";

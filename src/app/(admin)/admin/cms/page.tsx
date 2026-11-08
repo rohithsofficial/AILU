@@ -1,3 +1,4 @@
+// CMS home (/admin/cms): every section of website wording, with draft and published state. Guide: docs/CMS_GUIDE.md.
 import Link from "next/link";
 import { requireRolePage } from "@/lib/authz";
 import { formatIN } from "@/lib/format";

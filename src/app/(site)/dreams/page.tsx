@@ -1,3 +1,4 @@
+// Normal World: private dream support. The form shows only when DREAMS_FORM_OPEN=true; dreams are never published.
 import { BRAND } from "@/lib/brand";
 import PageHero from "@/components/PageHero";
 import DreamForm from "@/components/forms/DreamForm";

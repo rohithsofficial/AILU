@@ -1,3 +1,4 @@
+// Normal World: Contact page (phone, WhatsApp, email). Wording from the CMS.
 import Link from "next/link";
 import EnquiryForm from "@/components/EnquiryForm";
 import { BRAND } from "@/lib/brand";

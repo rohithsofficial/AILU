@@ -1,3 +1,4 @@
+// Normal World: Donation Box, information only. Donations stay switched off until AILU has a legal and payment setup.
 import PageHero from "@/components/PageHero";
 import { metadataForPath } from "@/lib/public-metadata";
 import { getContent } from "@/server/cms";
