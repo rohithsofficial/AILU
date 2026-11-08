@@ -52,7 +52,7 @@ Rohith works on more than one computer. Claude memory stays on one computer, so 
 - Never put secrets in these files.
 
 ## Always before saying "done"
-1. npm run lint, npx tsc --noEmit, tests, npm run build all pass.
+1. npm run lint, npx eslint src/server --ext .ts, npx tsc --noEmit, tests, npm run build all pass.
 2. Check the changed pages at 390px (phone) and 1440px (desktop): no horizontal scroll, no overlapping fixed elements.
 3. Mention anything you could not verify. Do not claim something works if you did not run it.
 
@@ -87,3 +87,4 @@ Rohith works on more than one computer. Claude memory stays on one computer, so 
 - Slow database: getContent() in src/server/cms.ts waits 4 seconds at most, skips the database for 30 seconds after a failure and uses the last good content. src/app/(site)/loading.tsx shows while a page loads. Swipe and this fix merged to main on 2026-11-06.
 - Audit: docs/AUDIT.md (2026-11-04).
 - 2026-11-08 (branch claude/new-session-x8qhdu): world drag is level (levelView.ts) and rooms have named steps (worldSteps.ts, checked against engine.ts by its test). Landing page /celebrate in src/app/(landing) with an A/B test: src/lib/experiments.ts, middleware allow(), wording in src/content/landing.ts, results at /admin/experiments. Docs: AB_TESTING.md, LANDING_PAGE.md, IMPROVEMENT_IDEAS.md, REPORT_2026-11-08.md. npm audit advisories wait on a Next 15 / zod 4 upgrade decision.
+- Code review 2026-11-08 (same branch): docs/CODE_REVIEW_2026-11-08.md and docs/CODE_MAP.md. Use the shared helpers: src/lib/actionMessage.ts (CRM action errors), src/lib/dates.ts (India dates; date-only fields are midnight UTC), src/lib/search.ts (phoneFilter, pageNumber). The lint script skips src/server; also run npx eslint src/server --ext .ts.

@@ -44,8 +44,17 @@ Full report: `docs/REPORT_2026-11-08.md`.
 - Ideas and questions for Rohith: `docs/IMPROVEMENT_IDEAS.md`.
 - Not verified here (no database on this computer): a real landing enquiry saving its A/B note, and the results screen while signed in.
 
+## Code review on 2026-11-08 (same branch)
+Full report: `docs/CODE_REVIEW_2026-11-08.md`. Code map: `docs/CODE_MAP.md`.
+- Fixed: an empty "Expected guests" box blocked every enquiry; CRM name search returned every record (7 lists);
+  unreadable form errors and buttons; tasks due today shown as overdue; inbox crash on odd page or status in the address;
+  login crash on a damaged hash; partner double-submit message; WebGL context leak; Escape on the intro.
+- Structure: shared helpers `src/lib/actionMessage.ts`, `src/lib/dates.ts`, `src/lib/search.ts` replace copied code.
+- Every source file now starts with a comment saying what it is for.
+- 150 tests pass. Lint, typecheck and build pass.
+
 ## Next steps
-1. Review and merge `claude/new-session-x8qhdu`. Then send one test enquiry from `/celebrate?v=b` and check CRM → A/B test.
+1. Review and merge `claude/new-session-x8qhdu`. Then send one test enquiry from `/celebrate?v=b` (leave Expected guests empty) and check CRM → A/B test. Try a name search in CRM → Inbox and Clients.
 2. Try the world on a real phone: drag up and down, tap the step chips.
 3. Answer the questions at the end of `docs/IMPROVEMENT_IDEAS.md`.
 4. Continue the feedback round: Rohith sends the next point.
@@ -56,6 +65,7 @@ Full report: `docs/REPORT_2026-11-08.md`.
 9. Launch: set `COMING_SOON=false` in Vercel, then run Lighthouse again.
 
 ## Waiting on a decision
+- Should an Accepted quotation be final? Today it can go back to Draft and be deleted.
 - Security upgrade to Next 15 / zod 4 (`npm audit` advisories).
 - How to count landing page visits: Vercel Web Analytics or a small table (migration).
 - Partner reward policy. The reward screens exist, but do not use them for real rewards yet.
