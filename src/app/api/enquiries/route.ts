@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbConfigured, getPrisma } from "@/lib/db";
 import { enquirySchema, normalizePhone } from "@/lib/validation";
+import { experimentNote } from "@/lib/experiments";
 import { checkPublicRateLimit, clientIpFrom, PUBLIC_RATE_LIMITS } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -14,7 +15,7 @@ export async function POST(req: Request) {
 
   if (!dbConfigured()) return NextResponse.json({ error: "Enquiries are not switched on yet. Please call or WhatsApp us.", fields: undefined }, { status: 503 });
 
-  const { website, email, eventDate, budget, services, details, referralId, consent, phone, ...rest } = parsed.data; void website; void consent;
+  const { website, email, eventDate, budget, services, details, referralId, consent, phone, landing, ...rest } = parsed.data; void website; void consent;
   const phoneN = normalizePhone(phone);
   try {
     if (!process.env.RATE_LIMIT_SALT) return NextResponse.json({ error: "Enquiries are temporarily unavailable. Please call or WhatsApp us." }, { status: 503 });
@@ -38,6 +39,8 @@ export async function POST(req: Request) {
       });
       const code = `AILU-EVT-${String(row.seq).padStart(6, "0")}`;
       await tx.eventEnquiry.update({ where: { seq: row.seq }, data: { id: code } });
+      // A/B test: the version of the landing page this visitor saw, shown in the enquiry's history in the CRM.
+      if (landing) await tx.activity.create({ data: { kind: "NOTE", body: experimentNote(landing), enquiryId: code } });
       return code;
     });
     return NextResponse.json({ id });

@@ -1,3 +1,4 @@
+import { LANDING_TEST } from "@/lib/experiments";
 import { z } from "zod";
 import { EVENT_CATEGORIES } from "./events";
 import { ROLES } from "./roles";
@@ -36,6 +37,7 @@ export const enquirySchema = z.object({
   referralId: z.union([z.literal(""), z.string().trim().regex(/^AILU-SP-\d{6}$/i, "Check the partner ID")]).optional(),
   consent: z.literal(true, { errorMap: () => ({ message: "Please agree before sending your enquiry" }) }),
   website: z.string().max(0).optional(), // honeypot
+  landing: z.enum(LANDING_TEST.variants).optional(), // A/B test version, only sent by the landing page
 });
 export type EnquiryInput = z.infer<typeof enquirySchema>;
 

@@ -5,6 +5,8 @@
 :root { --yellow: #F5C400; --black: #111111; --cream: #FFFDF7; }
 html { scroll-behavior: smooth; }
 body { background: var(--cream); color: var(--black); font-family: var(--font-inter), system-ui, sans-serif; }
+/* Landing page (/celebrate): dark behind the page, so a phone's bounce scroll never flashes cream. */
+html:has([data-landing-variant]), body:has([data-landing-variant]) { background: #111111; }
 h1, h2, h3 { font-family: var(--font-poppins), system-ui, sans-serif; }
 :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 .skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 100; transform: translateY(-180%); border-radius: .5rem; background: var(--yellow); color: var(--black); padding: .75rem 1rem; font-weight: 700; }

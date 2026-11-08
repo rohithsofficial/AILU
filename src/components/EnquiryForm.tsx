@@ -5,11 +5,13 @@ import { useContent } from "@/components/ContentProvider";
 import { enquiryPrefill } from "@/lib/enquiry-prefill";
 import { todayInIndia } from "@/lib/validation";
 import { BRAND } from "@/lib/brand";
+import type { Variant } from "@/lib/experiments";
 
 type State = { status: "idle" | "sending" | "done" | "error"; message?: string; id?: string; fields?: Record<string, string[]> };
 const input = "mt-1 min-h-11 w-full rounded-sm border border-white/20 bg-ailu-black px-3 py-3 text-ailu-cream placeholder:text-ailu-cream/40";
 
-export default function EnquiryForm({ defaultCategory }: { defaultCategory?: string }) {
+// `landing` and `submitLabel` are used only by the landing page and its A/B test (docs/AB_TESTING.md).
+export default function EnquiryForm({ defaultCategory, landing, submitLabel = "Send enquiry" }: { defaultCategory?: string; landing?: Variant; submitLabel?: string }) {
   const EVENT_CATEGORIES = useContent().celebrations.items;
   const [state, setState] = useState<State>({ status: "idle" });
   const [category, setCategory] = useState(defaultCategory ?? EVENT_CATEGORIES[0].slug);
@@ -32,6 +34,7 @@ export default function EnquiryForm({ defaultCategory }: { defaultCategory?: str
     data.consent = data.consent === "on";
     data.category = category;
     data.referralId = referralId;
+    if (landing) data.landing = landing;
     try {
       const res = await fetch("/api/enquiries", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
       const json = await res.json();
@@ -71,7 +74,7 @@ export default function EnquiryForm({ defaultCategory }: { defaultCategory?: str
       <span>By sending this, you agree AILU may contact you about your event. See our <Link href="/privacy" className="font-semibold underline">Privacy Policy</Link>.</span></label>
     {error("consent", "Please agree before sending your enquiry")}
     {state.status === "error" && <div ref={feedbackRef} id="form-feedback" tabIndex={-1} role="alert" className="text-red-800 focus-visible:outline sm:col-span-2">{state.message}</div>}
-    <button disabled={state.status === "sending"} className="min-h-11 rounded-full bg-ailu-yellow px-7 py-3 font-semibold text-ailu-black disabled:opacity-60 sm:col-span-2 sm:justify-self-start">{state.status === "sending" ? "Sending..." : "Send enquiry"}</button>
+    <button disabled={state.status === "sending"} className="min-h-11 rounded-full bg-ailu-yellow px-7 py-3 font-semibold text-ailu-black disabled:opacity-60 sm:col-span-2 sm:justify-self-start">{state.status === "sending" ? "Sending..." : submitLabel}</button>
     <p className="text-sm text-ailu-cream/55 sm:col-span-2">No payment is taken to enquire. Please don&apos;t include identity documents or financial details.</p>
   </form>;
 }
