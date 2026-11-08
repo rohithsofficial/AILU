@@ -27,8 +27,13 @@ export async function verifyPassword(password: string, stored: string) {
   const [scheme, n, r, p, salt, hash] = stored.split("$");
   if (scheme !== "scrypt" || !salt || !hash) return false;
   const expected = Buffer.from(hash, "base64");
-  const actual = await derive(password, Buffer.from(salt, "base64"), Number(n), Number(r), Number(p), expected.length);
-  return timingSafeEqual(actual, expected);
+  if (!expected.length) return false;
+  try {
+    const actual = await derive(password, Buffer.from(salt, "base64"), Number(n), Number(r), Number(p), expected.length);
+    return timingSafeEqual(actual, expected);
+  } catch {
+    return false; // a damaged stored hash (bad numbers) must read as "wrong password", not crash the login
+  }
 }
 
 // Compared when the email is unknown, so a wrong email takes as long as a wrong password.

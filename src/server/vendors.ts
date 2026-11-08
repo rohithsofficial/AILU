@@ -1,5 +1,7 @@
+// Database logic for vendors, vendor bookings, payments, expenses and the event money summary.
 import { z } from "zod";
 import { getPrisma } from "@/lib/db";
+import { phoneFilter } from "@/lib/search";
 import { audit } from "@/lib/audit";
 import { logActivity } from "@/server/activity";
 import { parseINRToPaise, MAX_PAISE } from "@/lib/money";
@@ -44,7 +46,7 @@ export async function listVendors(params: { q?: string; category?: string; statu
       { name: { contains: q, mode: "insensitive" } },
       { category: { contains: q, mode: "insensitive" } },
       { city: { contains: q, mode: "insensitive" } },
-      { phone: { contains: q.replace(/\D/g, "") } },
+      ...phoneFilter(q),
     ];
   }
   return getPrisma().vendor.findMany({ where, orderBy: [{ status: "asc" }, { name: "asc" }], take: 300 });

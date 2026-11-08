@@ -1,13 +1,14 @@
 "use server";
+
+// Form actions for team applications. Each one checks the role first, then calls src/server/applications.ts.
+import { actionMessage } from "@/lib/actionMessage";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/authz";
 import * as applications from "@/server/applications";
 
 function fail(id: string, error: unknown): never {
-  const digest = (error as { digest?: string })?.digest ?? "";
-  if (digest.startsWith("NEXT_REDIRECT")) throw error;
-  redirect(`${id ? `/admin/applications/${id}` : "/admin/applications"}?msg=${encodeURIComponent(String((error as Error)?.message ?? "Something went wrong."))}`);
+  redirect(`${id ? `/admin/applications/${id}` : "/admin/applications"}?msg=${encodeURIComponent(actionMessage(error))}`);
 }
 
 export async function updateApplicationAction(fd: FormData) {

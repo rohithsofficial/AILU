@@ -1,5 +1,8 @@
+// Database logic for the CRM inbox of website enquiries.
 import type { Prisma } from "@prisma/client";
 import { getPrisma } from "@/lib/db";
+import { pageNumber, phoneFilter } from "@/lib/search";
+import { ENQUIRY_STATUSES, type EnquiryStatusValue } from "@/lib/enquiryStatus";
 import { audit } from "@/lib/audit";
 import { logActivity } from "@/server/activity";
 
@@ -12,28 +15,30 @@ export async function listEnquiries(params: { q?: string; status?: string; spam?
   if (params.owner === "unassigned") where.ownerId = null;
   if (params.conversion === "unconverted") where.eventId = null;
   else if (params.conversion === "converted") where.eventId = { not: null };
-  if (params.status) where.status = params.status as Prisma.EnumEnquiryStatusFilter;
+  // Only known statuses reach the database; anything else in the address bar is ignored.
+  if (ENQUIRY_STATUSES.includes(params.status as EnquiryStatusValue)) where.status = params.status as EnquiryStatusValue;
   if (params.q?.trim()) {
     const q = params.q.trim();
     where.OR = [
       { name: { contains: q, mode: "insensitive" } },
-      { phone: { contains: q.replace(/\D/g, "") } },
+      ...phoneFilter(q),
       { id: { contains: q, mode: "insensitive" } },
       { location: { contains: q, mode: "insensitive" } },
     ];
   }
   const PAGE = 25;
+  const page = pageNumber(params.page ?? 1);
   const [total, rows] = await Promise.all([
     db.eventEnquiry.count({ where }),
     db.eventEnquiry.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      skip: ((params.page ?? 1) - 1) * PAGE,
+      skip: (page - 1) * PAGE,
       take: PAGE,
       include: { event: { select: { id: true, title: true, status: true } } },
     }),
   ]);
-  return { rows, total, pages: Math.max(1, Math.ceil(total / PAGE)), page: params.page ?? 1 };
+  return { rows, total, pages: Math.max(1, Math.ceil(total / PAGE)), page };
 }
 
 export async function getEnquiry(id: string) {
@@ -66,11 +71,10 @@ export async function setEnquiryOwner(actor: { id: string }, enquiryId: string, 
 
 export async function setEnquiryStatus(actor: { id: string }, enquiryId: string, status: string) {
   const db = getPrisma();
-  const allowed = ["SUBMITTED", "UNDER_REVIEW", "QUOTATION_PREPARED", "AWAITING_CUSTOMER", "PAYMENT_PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"];
-  if (!allowed.includes(status)) throw new Error("That status does not exist.");
+  if (!ENQUIRY_STATUSES.includes(status as EnquiryStatusValue)) throw new Error("That status does not exist.");
   const existing = await db.eventEnquiry.findUnique({ where: { id: enquiryId } });
   if (!existing) throw new Error("That enquiry does not exist.");
-  const updated = await db.eventEnquiry.update({ where: { id: enquiryId }, data: { status: status as "SUBMITTED" } });
+  const updated = await db.eventEnquiry.update({ where: { id: enquiryId }, data: { status: status as EnquiryStatusValue } });
   await audit({ id: actor.id }, "enquiry.status_changed", "EventEnquiry", enquiryId, { from: existing.status, to: status });
   await logActivity("STATUS", `Enquiry status changed: ${existing.status} → ${status}`, { clientId: existing.clientId, eventId: existing.eventId, enquiryId }, actor.id);
   return updated;

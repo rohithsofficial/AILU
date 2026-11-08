@@ -1,4 +1,7 @@
 "use server";
+
+// Form actions for staff accounts. Owner only. The last active owner can never be demoted or switched off.
+import { actionMessage } from "@/lib/actionMessage";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -29,12 +32,6 @@ function backWith(msg: string) {
   redirect(`/admin/settings/staff?msg=${encodeURIComponent(msg)}`);
 }
 
-// redirect() throws a NEXT_REDIRECT error; re-throw it untouched and only surface real failures.
-function realMessage(e: unknown): string {
-  const digest = (e as { digest?: string })?.digest ?? "";
-  if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT")) throw e;
-  return String((e as Error)?.message ?? "Something went wrong.");
-}
 
 export async function addStaffAction(formData: FormData) {
   try {
@@ -52,7 +49,7 @@ export async function addStaffAction(formData: FormData) {
     revalidatePath("/admin/settings/staff");
     backWith(`${parsed.data.email} can now sign in. Share the password privately and ask them to change it.`);
   } catch (e) {
-    backWith(realMessage(e));
+    backWith(actionMessage(e));
   }
 }
 
@@ -66,7 +63,7 @@ export async function updateStaffNameAction(formData: FormData) {
     revalidatePath("/admin/settings/staff");
     backWith(`Name saved for ${target.email}.`);
   } catch (e) {
-    backWith(realMessage(e));
+    backWith(actionMessage(e));
   }
 }
 
@@ -84,7 +81,7 @@ export async function setStaffPasswordAction(formData: FormData) {
     if (target.id === actor.id) redirect("/admin/login?changed=1");
     backWith(`New password set for ${target.email}. Share it privately.`);
   } catch (e) {
-    backWith(realMessage(e));
+    backWith(actionMessage(e));
   }
 }
 
@@ -104,7 +101,7 @@ export async function changeRoleAction(formData: FormData) {
     revalidatePath("/admin/settings/staff");
     backWith(`${target.email} is now ${parsed.data.role}.`);
   } catch (e) {
-    backWith(realMessage(e));
+    backWith(actionMessage(e));
   }
 }
 
@@ -127,6 +124,6 @@ export async function setActiveAction(formData: FormData) {
     revalidatePath("/admin/settings/staff");
     backWith(active ? `${target.email} can sign in again.` : `${target.email} no longer has admin access.`);
   } catch (e) {
-    backWith(realMessage(e));
+    backWith(actionMessage(e));
   }
 }

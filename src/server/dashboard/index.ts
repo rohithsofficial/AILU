@@ -1,18 +1,15 @@
 import type { Staff } from "@/lib/authz";
 import { can } from "@/lib/permissions";
+// The CRM dashboard (/admin), Needs attention and the finance widgets. Every query is limited by the
+// staff member's role: STAFF see only their own events and tasks, and no money unless they may read finance.
 import { getPrisma } from "@/lib/db";
+import { addDays, indiaDayStart } from "@/lib/dates";
 import { EVENT_STATUSES } from "@/lib/eventStatus";
 import { calculateEventFinancials } from "@/lib/eventFinance";
 import { ATTENTION_THRESHOLDS, buildAttentionItems, type AttentionItem } from "./attention-rules";
 import { isDueWithinDays, marginForCompletedEvents, outstandingPaise, summarizeDue } from "./money-rules";
 
 const day = 24 * 60 * 60 * 1000;
-const indiaDayStart = (date: Date) => {
-  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
-  const fields = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-  return new Date(`${fields.year}-${fields.month}-${fields.day}T00:00:00.000Z`);
-};
-const addDays = (date: Date, days: number) => new Date(date.getTime() + days * day);
 const eventScope = (staff: Staff) => ({ archivedAt: null, ...(staff.role === "STAFF" ? { ownerId: staff.id } : {}) });
 const taskScope = (staff: Staff) => staff.role === "STAFF" ? { assigneeId: staff.id } : {};
 
@@ -94,6 +91,8 @@ async function needsAttention(staff: Staff, now: Date, limit: number) {
     can(staff.role, "dream.read") ? db.dream.findMany({ where: { status: "SUBMITTED", createdAt: { lt: dreamReviewBefore } }, select: { id: true, status: true, createdAt: true }, take: 1000 }) : Promise.resolve([]),
   ]);
   const balances = clientMoney.map((event) => ({ id: event.id, title: event.title, startDate: event.startDate!, balanceDuePaise: outstandingPaise(event.quotations[0]?.totalPaise ?? null, event.payments.reduce((sum, payment) => sum + payment.amountPaise, 0)) }));
+  // When did each event become EXECUTED? Read from its STATUS timeline line ("Status changed: PLANNING → EXECUTED"),
+  // written by setEventStatus in src/server/events.ts. If that wording changes, change this search too.
   const executionActivities = executed.length ? await db.activity.findMany({ where: { kind: "STATUS", eventId: { in: executed.map((event) => event.id) }, body: { contains: "→ EXECUTED" } }, orderBy: { at: "desc" }, select: { eventId: true, at: true } }) : [];
   const executedAtByEvent = new Map<string, Date>();
   for (const activity of executionActivities) if (activity.eventId && !executedAtByEvent.has(activity.eventId)) executedAtByEvent.set(activity.eventId, activity.at);

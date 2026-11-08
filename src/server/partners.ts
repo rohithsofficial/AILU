@@ -1,6 +1,8 @@
+// Database logic for sales partners and partner rewards (commissions).
 import { Prisma, type PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import { getPrisma } from "@/lib/db";
+import { phoneFilter } from "@/lib/search";
 import { audit } from "@/lib/audit";
 import { parseINRToPaise, MAX_PAISE } from "@/lib/money";
 import { commissionEligibilityIssues, canTransitionCommission, partnerStatusError } from "@/lib/a3Rules";
@@ -17,7 +19,7 @@ export async function listPartners(params: { q?: string; status?: string; page?:
     const q = params.q.trim();
     where.OR = [
       { id: { contains: q, mode: "insensitive" } }, { name: { contains: q, mode: "insensitive" } },
-      { phone: { contains: q.replace(/\D/g, "") } }, { city: { contains: q, mode: "insensitive" } },
+      ...phoneFilter(q), { city: { contains: q, mode: "insensitive" } },
     ];
   }
   const page = Math.max(1, Math.min(10000, Math.floor(params.page ?? 1) || 1));

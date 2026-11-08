@@ -1,13 +1,14 @@
 "use server";
+
+// Form actions for sales partners and partner rewards (propose, approve or reject, mark paid).
+import { actionMessage } from "@/lib/actionMessage";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/authz";
 import * as partners from "@/server/partners";
 
 function fail(path: string, error: unknown): never {
-  const digest = (error as { digest?: string })?.digest ?? "";
-  if (digest.startsWith("NEXT_REDIRECT")) throw error;
-  redirect(`${path}?msg=${encodeURIComponent(String((error as Error)?.message ?? "Something went wrong."))}`);
+  redirect(`${path}?msg=${encodeURIComponent(actionMessage(error))}`);
 }
 
 export async function updatePartnerAction(fd: FormData) {

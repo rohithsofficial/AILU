@@ -1,5 +1,8 @@
-import { LANDING_TEST } from "@/lib/experiments";
+// Rules for the public forms (enquiry, team application, partner, private dream). The API routes in
+// src/app/api/* check every submission with these schemas on the server, whatever the browser sent.
 import { z } from "zod";
+import { todayInIndia } from "@/lib/dates";
+import { LANDING_TEST } from "@/lib/experiments";
 import { EVENT_CATEGORIES } from "./events";
 import { ROLES } from "./roles";
 import { containsSensitiveDreamPattern, DREAM_CATEGORIES } from "./dreams";
@@ -14,11 +17,8 @@ const optionalText = (max: number) => z.string().trim().max(max).optional();
 // "98765 43210", "+91 98765 43210" and "9876543210" all become "+919876543210"
 export const normalizePhone = (p: string) => `+91${p.replace(/\D/g, "").slice(-10)}`;
 export const isPartnerReferralId = (value: string) => /^AILU-SP-\d{6}$/i.test(value.trim());
-export function todayInIndia(now = new Date()) {
-  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now);
-  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
-  return `${values.year}-${values.month}-${values.day}`;
-}
+// todayInIndia lives in lib/dates.ts; it is re-exported here because forms and tests import it from this file.
+export { todayInIndia } from "@/lib/dates";
 
 export const enquirySchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -30,7 +30,8 @@ export const enquirySchema = z.object({
     return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === v;
   }, "Enter a valid event date").refine((v) => v >= todayInIndia(), "Choose today or a future date")]).optional(),
   location: z.string().trim().min(2).max(120),
-  guests: z.coerce.number().int().min(1).max(100000).optional(),
+  // An empty "Expected guests" box arrives as "". It means "not given", so it must not become 0 and fail min(1).
+  guests: z.preprocess((value) => (value === "" || value === null ? undefined : value), z.coerce.number().int().min(1).max(100000).optional()),
   budget: optionalText(60),
   services: optionalText(300),
   details: optionalText(1500),

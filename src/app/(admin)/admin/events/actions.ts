@@ -1,4 +1,8 @@
 "use server";
+
+// Form actions for events, quotations and event tasks.
+// Each one checks the role, then canEditEvent (STAFF only change events assigned to them), then calls src/server.
+import { actionMessage } from "@/lib/actionMessage";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireRole, canWriteCRM, canEditEvent } from "@/lib/authz";
@@ -12,11 +16,6 @@ function back(id: string, msg: string): never {
 function backList(msg: string): never {
   redirect(`/admin/events?msg=${encodeURIComponent(msg)}`);
 }
-function realMessage(e: unknown): string {
-  const digest = (e as { digest?: string })?.digest ?? "";
-  if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT")) throw e;
-  return String((e as Error)?.message ?? "Something went wrong.");
-}
 
 export async function createEventAction(fd: FormData) {
   let id = "";
@@ -28,7 +27,7 @@ export async function createEventAction(fd: FormData) {
     const event = await events.createEvent(staff, fd);
     id = event.id;
   } catch (e) {
-    backList(realMessage(e));
+    backList(actionMessage(e));
   }
   revalidatePath("/admin/events");
   redirect(`/admin/events/${id}?msg=${encodeURIComponent("Event created.")}`);
@@ -44,7 +43,7 @@ export async function updateEventAction(fd: FormData) {
     if (staff.role === "STAFF" && String(fd.get("ownerId") ?? "").trim() !== (event.ownerId ?? "")) throw new Error("Only a manager can reassign an event.");
     await events.updateEvent(staff, id, fd);
   } catch (e) {
-    back(id, realMessage(e));
+    back(id, actionMessage(e));
   }
   revalidatePath(`/admin/events/${id}`);
   back(id, "Event updated.");
@@ -59,7 +58,7 @@ export async function setEventStatusAction(fd: FormData) {
     if (!event || !canEditEvent(staff, event)) throw new Error("You cannot change this event's status.");
     await events.setEventStatus(staff, id, String(fd.get("status") ?? ""), String(fd.get("lostReason") ?? ""));
   } catch (e) {
-    back(id, realMessage(e));
+    back(id, actionMessage(e));
   }
   revalidatePath(`/admin/events/${id}`);
   back(id, "Status updated.");
@@ -73,7 +72,7 @@ export async function archiveEventAction(fd: FormData) {
     const staff = await requireRole(["OWNER"]);
     await events.setEventArchived(staff, id, archived === "yes");
   } catch (e) {
-    back(id, realMessage(e));
+    back(id, actionMessage(e));
   }
   revalidatePath(`/admin/events/${id}`);
   back(id, archived === "yes" ? "Event archived." : "Event restored.");
@@ -88,7 +87,7 @@ export async function createQuotationAction(fd: FormData) {
     if (!event || !canEditEvent(staff, event)) throw new Error("You cannot add quotations to this event.");
     await quotations.createQuotation(staff, id, fd);
   } catch (e) {
-    back(id, realMessage(e));
+    back(id, actionMessage(e));
   }
   revalidatePath(`/admin/events/${id}`);
   back(id, "Quotation created.");
@@ -105,7 +104,7 @@ export async function updateQuotationAction(fd: FormData) {
     if (!event || !canEditEvent(staff, event)) throw new Error("You cannot edit this quotation.");
     await quotations.updateQuotation(staff, id, quotationId, fd);
   } catch (e) {
-    back(id, realMessage(e));
+    back(id, actionMessage(e));
   }
   revalidatePath(`/admin/events/${id}`);
   back(id, "Draft quotation updated.");
@@ -123,7 +122,7 @@ export async function setQuotationStatusAction(fd: FormData) {
     if (!event || !canEditEvent(staff, event)) throw new Error("You cannot change this quotation.");
     await quotations.setQuotationStatus(staff, quotationId, String(fd.get("status") ?? ""));
   } catch (e) {
-    back(id, realMessage(e));
+    back(id, actionMessage(e));
   }
   revalidatePath(`/admin/events/${id}`);
   back(id, "Quotation status updated.");
@@ -140,7 +139,7 @@ export async function addTaskAction(fd: FormData) {
     }
     await (await import("@/server/tasks")).createTask(staff, fd);
   } catch (e) {
-    back(id, realMessage(e));
+    back(id, actionMessage(e));
   }
   revalidatePath(`/admin/events/${id}`);
   back(id, "Follow-up task added.");
@@ -162,7 +161,7 @@ export async function toggleTaskAction(fd: FormData) {
     }
     await (await import("@/server/tasks")).toggleTaskDone(staff, input.data.id, input.data.done === "yes");
   } catch (e) {
-    back(id, realMessage(e));
+    back(id, actionMessage(e));
   }
   revalidatePath(`/admin/events/${id}`);
   back(id, "Task updated.");

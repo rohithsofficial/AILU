@@ -1,4 +1,8 @@
 "use server";
+
+// Form actions for clients: create, edit, archive, contacts, timeline notes and tasks.
+// Each one checks the role and that the client is assigned to this staff member before changing anything.
+import { actionMessage } from "@/lib/actionMessage";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireRole, canWriteCRM, canEditClient, type Staff } from "@/lib/authz";
@@ -11,11 +15,6 @@ import { indianPhoneSchema, normalizePhone } from "@/lib/validation";
 
 function back(msg: string, clientId?: string): never {
   redirect(clientId ? `/admin/clients/${clientId}?msg=${encodeURIComponent(msg)}` : `/admin/clients?msg=${encodeURIComponent(msg)}`);
-}
-function realMessage(e: unknown): string {
-  const digest = (e as { digest?: string })?.digest ?? "";
-  if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT")) throw e;
-  return String((e as Error)?.message ?? "Something went wrong.");
 }
 
 async function assertClientEditable(staff: Staff, clientId: string) {
@@ -33,7 +32,7 @@ export async function createClientAction(fd: FormData) {
     const client = await clients.createClient(staff, fd);
     id = client.id;
   } catch (e) {
-    back(realMessage(e));
+    back(actionMessage(e));
   }
   revalidatePath("/admin/clients");
   redirect(`/admin/clients/${id}?msg=${encodeURIComponent("Client created.")}`);
@@ -47,7 +46,7 @@ export async function updateClientAction(fd: FormData) {
     await assertClientEditable(staff, id);
     await clients.updateClient(staff, id, fd);
   } catch (e) {
-    back(realMessage(e), id);
+    back(actionMessage(e), id);
   }
   revalidatePath(`/admin/clients/${id}`);
   back("Client updated.", id);
@@ -61,7 +60,7 @@ export async function archiveClientAction(fd: FormData) {
     const staff = await requireRole(["OWNER"]);
     await clients.setClientArchived(staff, id, archived === "yes");
   } catch (e) {
-    back(realMessage(e), id);
+    back(actionMessage(e), id);
   }
   revalidatePath(`/admin/clients/${id}`);
   back(archived === "yes" ? "Client archived." : "Client restored.", id);
@@ -87,7 +86,7 @@ export async function addClientContactAction(fd: FormData) {
     });
     await (await import("@/lib/audit")).audit({ id: staff.id }, "client.contact_added", "Client", id);
   } catch (e) {
-    back(realMessage(e), id);
+    back(actionMessage(e), id);
   }
   revalidatePath(`/admin/clients/${id}`);
   back("Contact added.", id);
@@ -112,7 +111,7 @@ export async function updateClientContactAction(fd: FormData) {
     if (!existing) throw new Error("That contact does not exist.");
     await db.clientContact.update({ where: { id: existing.id }, data: { name: parsed.data.name, role: parsed.data.role || null, phone: parsed.data.phone ? normalizePhone(parsed.data.phone) : null, email: parsed.data.email || null } });
     await audit(staff, "client.contact_updated", "Client", clientId, { fields: ["name", "role", "phone", "email"] });
-  } catch (e) { back(realMessage(e), clientId); }
+  } catch (e) { back(actionMessage(e), clientId); }
   revalidatePath(`/admin/clients/${clientId}`);
   back("Contact updated.", clientId);
 }
@@ -128,7 +127,7 @@ export async function removeClientContactAction(fd: FormData) {
     if (!existing) throw new Error("That contact does not exist.");
     await db.clientContact.delete({ where: { id } });
     await audit(staff, "client.contact_removed", "Client", clientId);
-  } catch (e) { back(realMessage(e), clientId); }
+  } catch (e) { back(actionMessage(e), clientId); }
   revalidatePath(`/admin/clients/${clientId}`);
   back("Contact removed.", clientId);
 }
@@ -147,7 +146,7 @@ export async function logClientActivityAction(fd: FormData) {
     await logActivity(parsed.data.kind, parsed.data.body, { clientId }, staff.id);
     await audit(staff, "client.activity_added", "Client", clientId, { kind: parsed.data.kind });
   } catch (e) {
-    back(realMessage(e), clientId);
+    back(actionMessage(e), clientId);
   }
   revalidatePath(`/admin/clients/${clientId}`);
   back("Timeline updated.", clientId);
@@ -160,7 +159,7 @@ export async function addClientTaskAction(fd: FormData) {
     await assertClientEditable(staff, clientId);
     await createTask(staff, fd);
   } catch (e) {
-    back(realMessage(e), clientId);
+    back(actionMessage(e), clientId);
   }
   revalidatePath(`/admin/clients/${clientId}`);
   revalidatePath("/admin/tasks");

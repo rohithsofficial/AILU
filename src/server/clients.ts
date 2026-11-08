@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { getPrisma } from "@/lib/db";
+import { phoneFilter } from "@/lib/search";
 import { indianPhoneSchema, normalizePhone } from "@/lib/validation";
 import { audit } from "@/lib/audit";
 import { z } from "zod";
@@ -20,7 +21,7 @@ export async function listClients(params: { q?: string; type?: string; tag?: str
     where.OR = [
       { name: { contains: q, mode: "insensitive" } },
       { companyName: { contains: q, mode: "insensitive" } },
-      { phone: { contains: q.replace(/\D/g, "") } },
+      ...phoneFilter(q),
       { city: { contains: q, mode: "insensitive" } },
       { id: { contains: q, mode: "insensitive" } },
     ];

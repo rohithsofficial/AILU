@@ -1,3 +1,4 @@
+// POST /api/partners: saves a sales partner registration from /join/partner. One registration per phone.
 import { NextResponse } from "next/server";
 import { dbConfigured, getPrisma } from "@/lib/db";
 import { normalizePhone, partnerSchema } from "@/lib/validation";
@@ -34,6 +35,8 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ id });
   } catch (e) {
+    // Two registrations with the same phone at the same moment: the database's unique phone rule stops the second.
+    if ((e as { code?: string })?.code === "P2002") return NextResponse.json({ error: "This number is already registered as a partner. Our team will be in touch." }, { status: 409 });
     console.error("partner save failed", e);
     return NextResponse.json({ error: "Something went wrong saving your registration. Please WhatsApp us." }, { status: 500 });
   }

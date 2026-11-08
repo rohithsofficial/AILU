@@ -1,4 +1,6 @@
 "use server";
+
+// Form action: a staff member changes their own password, then signs in again.
 import { redirect } from "next/navigation";
 import { getPrisma } from "@/lib/db";
 import { audit } from "@/lib/audit";

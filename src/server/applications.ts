@@ -1,5 +1,7 @@
+// Database logic for team applications: list, update and convert into a team member.
 import type { Prisma } from "@prisma/client";
 import { getPrisma } from "@/lib/db";
+import { phoneFilter } from "@/lib/search";
 import { audit } from "@/lib/audit";
 import { normalizePhone } from "@/lib/validation";
 import { canConvertApplication, teamMemberConversionMode } from "@/lib/a3Rules";
@@ -19,7 +21,7 @@ export async function listApplications(params: { q?: string; status?: string; ro
     where.OR = [
       { id: { contains: q, mode: "insensitive" } },
       { name: { contains: q, mode: "insensitive" } },
-      { phone: { contains: q.replace(/\D/g, "") } },
+      ...phoneFilter(q),
       { city: { contains: q, mode: "insensitive" } },
     ];
   }
@@ -75,7 +77,8 @@ export async function convertApplicationToTeamMember(actor: { id: string }, id: 
       member = await tx.teamMember.update({ where: { id: member.id }, data: { applicationId: application.id, roles: [...new Set([...member.roles, application.role])] } });
     }
 
-    const status = application.status === "SELECTED" ? application.status : "SELECTED";
+    // Converting always means the person was selected.
+    const status = "SELECTED" as const;
     const changedStatus = application.status !== status;
     await tx.application.update({ where: { id }, data: {
       teamMemberId: member.id, status,

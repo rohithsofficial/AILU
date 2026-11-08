@@ -1,4 +1,6 @@
 "use client";
+
+// The intro on "/" (once per browser session): hand, welcome, then "Enter AILU World" or "Explore Website".
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -35,6 +37,13 @@ export default function Intro() {
   }, []);
 
   useEffect(() => { document.body.style.overflow = phase === "done" ? "" : "hidden"; return () => { document.body.style.overflow = ""; }; }, [phase]);
+  // Escape does the same as "Skip intro", as people expect from a full-screen dialog.
+  useEffect(() => {
+    if (phase !== "playing") return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") skipRef.current?.click(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [phase]);
   useEffect(() => {
     if (phase === "playing") skipRef.current?.focus();
     if (phase === "done") document.getElementById("main-content")?.focus();

@@ -1,14 +1,14 @@
 "use server";
+
+// Form actions for the CMS: save a draft, publish, undo, restore the original wording, and edit or delete photos.
+// Staff may save drafts; only roles with cms.publish may publish.
+import { actionMessage } from "@/lib/actionMessage";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { can, requireRole } from "@/lib/authz";
 import { deleteMedia, discardDraft, publishSection, restoreDefault, saveDraft, undoPublish, updateMediaAlt } from "@/server/cms";
 
-const message = (error: unknown) => {
-  const digest = (error as { digest?: string })?.digest ?? "";
-  if (digest.startsWith("NEXT_REDIRECT")) throw error;
-  return (error as Error)?.message || "Something went wrong.";
-};
+const message = (error: unknown) => actionMessage(error);
 const back = (path: string, text: string): never => redirect(`${path}?msg=${encodeURIComponent(text)}`);
 
 export async function cmsSectionAction(fd: FormData) {

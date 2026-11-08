@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getPrisma } from "@/lib/db";
+import { addDays, indiaDayStart } from "@/lib/dates";
 import { audit } from "@/lib/audit";
 import { logActivity } from "@/server/activity";
 import type { StaffRole } from "@prisma/client";
@@ -8,13 +9,14 @@ export async function listTasks(actor: { id: string; role: StaffRole }, view: st
   const db = getPrisma();
   const now = new Date();
   const scope = actor.role === "STAFF" ? { assigneeId: actor.id } : {};
-  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now).map((part) => [part.type, part.value]));
-  const tomorrow = new Date(`${parts.year}-${parts.month}-${parts.day}T00:00:00.000Z`);
-  tomorrow.setTime(tomorrow.getTime() + 24 * 60 * 60 * 1000);
+  // Due dates are date-only (midnight UTC of the day). "Due" is up to the end of today in India,
+  // and "Overdue" is before today, so a task due today is never shown as overdue.
+  const today = indiaDayStart(now);
+  const tomorrow = addDays(today, 1);
   const where = view === "due"
     ? { ...scope, doneAt: null, dueAt: { lt: tomorrow } }
     : view === "overdue"
-    ? { ...scope, doneAt: null, dueAt: { lt: now } }
+    ? { ...scope, doneAt: null, dueAt: { lt: today } }
     : view === "my"
       ? { assigneeId: actor.id, doneAt: null }
       : scope;

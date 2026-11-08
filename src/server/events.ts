@@ -1,5 +1,7 @@
+// Database logic for events: list, create, edit, status changes, and converting a website enquiry into a client and an event.
 import type { EventEnquiry, Prisma } from "@prisma/client";
 import { getPrisma } from "@/lib/db";
+import { phoneFilter } from "@/lib/search";
 import { parseINRToPaise } from "@/lib/money";
 import { audit } from "@/lib/audit";
 import { logActivity } from "@/server/activity";
@@ -49,7 +51,7 @@ export async function listEvents(params: { q?: string; status?: string; category
       { title: { contains: q, mode: "insensitive" } },
       { id: { contains: q, mode: "insensitive" } },
       { client: { name: { contains: q, mode: "insensitive" } } },
-      { client: { phone: { contains: q.replace(/\D/g, "") } } },
+      ...phoneFilter(q).map((phone) => ({ client: phone })),
       { venueCity: { contains: q, mode: "insensitive" } },
     ];
   }

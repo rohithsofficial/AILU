@@ -1,5 +1,7 @@
 "use server";
 
+// Form actions for private dreams (review and permanent delete).
+// Only a short list of known messages is ever shown, so no private detail can leak into the address bar.
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/authz";

@@ -1,7 +1,9 @@
+// Database logic for team members and their event assignments.
 import type { Prisma } from "@prisma/client";
 import { linkedMoneyError } from "@/lib/recordRules";
 import type { StaffRole } from "@prisma/client";
 import { getPrisma } from "@/lib/db";
+import { phoneFilter } from "@/lib/search";
 import { audit } from "@/lib/audit";
 import { logActivity } from "@/server/activity";
 import { indianPhoneSchema, normalizePhone } from "@/lib/validation";
@@ -23,7 +25,7 @@ export async function listTeamMembers(params: { q?: string; role?: string; activ
     const q = params.q.trim();
     where.OR = [
       { id: { contains: q, mode: "insensitive" } }, { name: { contains: q, mode: "insensitive" } },
-      { phone: { contains: q.replace(/\D/g, "") } }, { city: { contains: q, mode: "insensitive" } },
+      ...phoneFilter(q), { city: { contains: q, mode: "insensitive" } },
       { roles: { has: q.toUpperCase() } },
     ];
   }

@@ -1,3 +1,4 @@
+// CRM: the inbox of website enquiries, with search and filters. STAFF see their own and unassigned enquiries.
 import Link from "next/link";
 import { requireRolePage, STAFF_ROLES } from "@/lib/authz";
 import { listEnquiries } from "@/server/inbox";
@@ -8,8 +9,8 @@ export const dynamic = "force-dynamic";
 
 export default async function InboxPage({ searchParams }: { searchParams: { q?: string; status?: string; spam?: string; conversion?: string; owner?: string; page?: string } }) {
   const staff = await requireRolePage(["OWNER", "MANAGER", "STAFF"]);
-  const page = Number(searchParams.page ?? "1") || 1;
-  const { rows, total, pages } = await listEnquiries({ q: searchParams.q, status: searchParams.status, spam: searchParams.spam, conversion: searchParams.conversion, owner: searchParams.owner, staffId: staff.role === "STAFF" ? staff.id : undefined, page });
+  // listEnquiries makes the page number safe (whole, 1 or more), so the links below use its value.
+  const { rows, total, pages, page } = await listEnquiries({ q: searchParams.q, status: searchParams.status, spam: searchParams.spam, conversion: searchParams.conversion, owner: searchParams.owner, staffId: staff.role === "STAFF" ? staff.id : undefined, page: Number(searchParams.page ?? 1) });
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -73,7 +74,7 @@ export default async function InboxPage({ searchParams }: { searchParams: { q?: 
       )}
 
       <p className="mt-3 text-xs text-ailu-cream/50">
-        {total} total{pages > 1 ? " · page " + page + " of " + pages : ""}{pages > 1 && (searchParams.q || searchParams.status || searchParams.spam) ? "" : ""}
+        {total} total{pages > 1 ? " · page " + page + " of " + pages : ""}
         {pages > 1 && (
           <>
             {" · "}

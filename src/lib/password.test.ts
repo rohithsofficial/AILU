@@ -23,3 +23,10 @@ describe("staff passwords", () => {
     expect(passwordProblem("long enough now")).toBeNull();
   });
 });
+
+describe("damaged password hash", () => {
+  it("reads as a wrong password instead of crashing the login", async () => {
+    await expect(verifyPassword("anything-long", "scrypt$abc$8$1$AAAA$AAAA")).resolves.toBe(false);
+    await expect(verifyPassword("anything-long", "scrypt$32768$8$1$AAAA$")).resolves.toBe(false);
+  });
+});

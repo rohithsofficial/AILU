@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 
 export type SubmitState = { status: "idle" | "sending" | "done" | "error"; message?: string; id?: string; fields?: Record<string, string[]> };
-export const inputCls = "mt-1 w-full rounded-sm border border-white/20 bg-ailu-black px-3 py-3 text-ailu-cream placeholder:text-ailu-cream/40";
+// aria-invalid is set on a field the server rejected; the red border is what "Please check the highlighted fields" points to.
+export const inputCls = "mt-1 min-h-11 w-full rounded-sm border border-white/20 bg-ailu-black px-3 py-3 text-ailu-cream placeholder:text-ailu-cream/40 aria-[invalid=true]:border-red-300";
 
 // Posts a form to an API route as JSON. `build` turns the raw FormData into the payload.
 export function useFormSubmit(endpoint: string, build: (fd: FormData) => Record<string, unknown>) {

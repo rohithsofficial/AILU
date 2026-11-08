@@ -5,8 +5,8 @@ export const formatIN = (d: Date | string) =>
 export const formatINTime = (d: Date | string) =>
   new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" }).format(typeof d === "string" ? new Date(d) : d);
 
-export const formatINR = (paise: number) =>
-  new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: paise % 100 === 0 ? 0 : 2 }).format(paise / 100);
+// One rupee formatter for the whole project; it lives with the other money rules.
+export { formatINR } from "@/lib/money";
 
 export const formatRelative = (date: Date | string, now = new Date()) => {
   const value = typeof date === "string" ? new Date(date) : date;

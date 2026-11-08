@@ -1,4 +1,7 @@
 "use server";
+
+// Edit and delete actions shared by many CRM screens (tasks, payments, expenses, bookings, assignments, notes).
+import { actionMessage } from "@/lib/actionMessage";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { canEditEvent, requireRole, requireStaff } from "@/lib/authz";
@@ -19,9 +22,7 @@ async function run(fd: FormData, done: string, work: () => Promise<unknown>): Pr
     await work();
     revalidatePath(path.split("?")[0]);
   } catch (error) {
-    const digest = (error as { digest?: string })?.digest ?? "";
-    if (digest.startsWith("NEXT_REDIRECT")) throw error;
-    message = (error as Error)?.message ?? "Something went wrong.";
+    message = actionMessage(error);
   }
   redirect(`${path}${join}msg=${encodeURIComponent(message)}${hash ? `#${hash}` : ""}`);
 }

@@ -1,11 +1,12 @@
 "use client";
 
+// Public private-dream form (/dreams, only when open). Posts to /api/dreams. Under 18 needs a parent or guardian.
 import { useState } from "react";
 import Link from "next/link";
 import { DREAM_CATEGORIES, DREAM_CATEGORY_LABELS } from "@/lib/dreams";
 import { inputCls, useFormSubmit } from "./useFormSubmit";
 
-const fieldError = (name: string, message?: string) => message ? <span id={`dream-${name}-error`} className="text-sm font-medium text-red-800">{message}</span> : null;
+const fieldError = (name: string, message?: string) => message ? <span id={`dream-${name}-error`} className="text-sm font-medium text-red-300">{message}</span> : null;
 
 export default function DreamForm() {
   const [isMinor, setIsMinor] = useState(false);
@@ -54,7 +55,7 @@ export default function DreamForm() {
     <input name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
     <label className="flex min-h-11 items-start gap-2 text-sm sm:col-span-2"><input type="checkbox" name="consentToContact" className="mt-1 h-5 w-5" aria-invalid={Boolean(err("consentToContact"))} aria-describedby={err("consentToContact") ? "dream-consent-error" : undefined} /><span>I agree that AILU may contact me privately about this dream, and I have read the <Link href="/privacy" className="font-semibold underline">Privacy Policy</Link>.{isMinor ? " I am the parent or guardian and am giving this consent for the request." : ""}</span></label>
     {fieldError("consentToContact", err("consentToContact"))}
-    {state.status === "error" && <p id="public-form-feedback" tabIndex={-1} role="alert" className="text-red-800 focus-visible:outline sm:col-span-2">{state.message}</p>}
-    <button disabled={state.status === "sending"} className="min-h-12 rounded-full bg-ailu-yellow px-7 py-3 font-semibold disabled:opacity-60 sm:col-span-2 sm:justify-self-start">{state.status === "sending" ? "Sending privately..." : "Share privately with AILU"}</button>
+    {state.status === "error" && <p id="public-form-feedback" tabIndex={-1} role="alert" className="text-red-300 focus-visible:outline sm:col-span-2">{state.message}</p>}
+    <button disabled={state.status === "sending"} className="min-h-12 rounded-full bg-ailu-yellow px-7 py-3 font-semibold text-ailu-black disabled:opacity-60 sm:col-span-2 sm:justify-self-start">{state.status === "sending" ? "Sending privately..." : "Share privately with AILU"}</button>
   </form>;
 }
