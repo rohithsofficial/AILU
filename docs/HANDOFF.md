@@ -3,7 +3,7 @@
 This file lets work continue on any computer. Claude reads it at the start of a session and updates it at the end.
 Never put passwords, keys or connection strings here. This file goes to GitHub.
 
-Last updated: 2026-11-06
+Last updated: 2026-11-08
 
 ## Owner
 Rohith. Freelance developer. Often sends voice-typed messages, so read for the meaning. Use simple English and short sentences.
@@ -32,16 +32,32 @@ Rohith is sharing feedback from a friend, one point at a time. For each point: f
 |---|---|---|
 | 1 | Tapping small dots is hard, add left and right swipe | Done, on `main`: home story swipe, quick flick in world rooms, hints on both. Not tested on a real phone |
 | 2 | Explore menu options seem to do nothing | Done, on `main`: a slow database can no longer hold up a page, and website pages show a loading screen. Rohith still needs to confirm the menu |
+| 3 | In the world, moving up or down shows a blank page | Done on `claude/new-session-x8qhdu`: `levelView.ts` keeps the view level, drag turns left and right only |
+| 4 | Each world step should show what it is | Done on `claude/new-session-x8qhdu`: step bar with room name, "Step 2 of 5", named chips and "Next: ..." (`worldSteps.ts`) |
+
+## Work on 2026-11-08 (branch `claude/new-session-x8qhdu`, not merged yet)
+Full report: `docs/REPORT_2026-11-08.md`.
+- Health check: lint, typecheck, 139 tests and build pass. `npm audit` has 1 critical and 4 high advisories (Next 14, zod 3, @vercel/blob). Upgrade waits for Rohith.
+- World: level view and named steps (feedback 3 and 4 above).
+- New landing page `/celebrate` (`docs/LANDING_PAGE.md`) with an A/B test on its hero (`docs/AB_TESTING.md`). Results: CRM → A/B test. No migration, no new package.
+- `/privacy` no longer scrolls sideways on phones.
+- Ideas and questions for Rohith: `docs/IMPROVEMENT_IDEAS.md`.
+- Not verified here (no database on this computer): a real landing enquiry saving its A/B note, and the results screen while signed in.
 
 ## Next steps
-1. Continue the feedback round: Rohith sends the next point.
-2. Try one publish in the CMS on the live site. It was tested only on a local server.
-3. Add real content, social links and permitted photos in the CMS.
-4. Add the Google verification code in CMS, under SEO for every page.
-5. Have a lawyer review the legal pages.
-6. Launch: set `COMING_SOON=false` in Vercel, then run Lighthouse again.
+1. Review and merge `claude/new-session-x8qhdu`. Then send one test enquiry from `/celebrate?v=b` and check CRM → A/B test.
+2. Try the world on a real phone: drag up and down, tap the step chips.
+3. Answer the questions at the end of `docs/IMPROVEMENT_IDEAS.md`.
+4. Continue the feedback round: Rohith sends the next point.
+5. Try one publish in the CMS on the live site. It was tested only on a local server.
+6. Add real content, social links and permitted photos in the CMS.
+7. Add the Google verification code in CMS, under SEO for every page.
+8. Have a lawyer review the legal pages.
+9. Launch: set `COMING_SOON=false` in Vercel, then run Lighthouse again.
 
 ## Waiting on a decision
+- Security upgrade to Next 15 / zod 4 (`npm audit` advisories).
+- How to count landing page visits: Vercel Web Analytics or a small table (migration).
 - Partner reward policy. The reward screens exist, but do not use them for real rewards yet.
 - Regenerating the world files: see `src/components/AiluWorld/CHANGES_FOR_GENERATOR.md`.
 - Entering the world is still heavy on slow phones. The real fix needs engine changes.

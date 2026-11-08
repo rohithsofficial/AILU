@@ -14,6 +14,7 @@ Brand: yellow #F5C400, black #111111, warm white #FFFDF7. Poppins for headings, 
 The hand-and-heart logo is the main symbol.
 
 ## Folder map (everything lives under src/: src/app, src/components, src/lib, src/server, src/content; middleware.ts and auth.ts are in src/)
+- app/(landing)/ campaign landing pages with a small header (celebrate)
 - app/ public pages: about, contact, donate, dreams, events and events/[slug], faq, join (partner, team), my-ailu, privacy, terms, referral-policy, coming-soon, plus app/api/* (enquiries, dreams, applications, partners, admin/search, auth)
 - app/(admin)/admin/* the CRM: inbox, clients, events, quotations, tasks, vendors, finance, team, partners, commissions, dreams, applications, calendar, attention, settings
 - components/ site components (Hero, CelebrationJourney, HomeExperience, Navbar, Footer, SiteChrome, FloatingWhatsApp, Intro ...), components/admin/*, components/forms/*, components/AiluWorld/*
@@ -85,3 +86,4 @@ Rohith works on more than one computer. Claude memory stays on one computer, so 
 - Swipe: src/lib/swipe.ts holds the rules. The home story uses an easy swipe, and world rooms use a quick flick (roomSwipe.ts), so a slow drag still looks around.
 - Slow database: getContent() in src/server/cms.ts waits 4 seconds at most, skips the database for 30 seconds after a failure and uses the last good content. src/app/(site)/loading.tsx shows while a page loads. Swipe and this fix merged to main on 2026-11-06.
 - Audit: docs/AUDIT.md (2026-11-04).
+- 2026-11-08 (branch claude/new-session-x8qhdu): world drag is level (levelView.ts) and rooms have named steps (worldSteps.ts, checked against engine.ts by its test). Landing page /celebrate in src/app/(landing) with an A/B test: src/lib/experiments.ts, middleware allow(), wording in src/content/landing.ts, results at /admin/experiments. Docs: AB_TESTING.md, LANDING_PAGE.md, IMPROVEMENT_IDEAS.md, REPORT_2026-11-08.md. npm audit advisories wait on a Next 15 / zod 4 upgrade decision.

@@ -27,6 +27,9 @@ Already handled by `worldMarkup.ts`; once the source has them, the matching patc
 9. Speed: `buildWorld()` runs as one long task at start (513ms on a fast PC). Split it so the intro stays smooth on phones.
 10. Speed: `low` only starts below about 28 frames a second (`slow>.036`). Raise that limit, and in `low` mode also cut particles, beams and crowd. `worldRenderer.ts` can only lower pixel density.
 
+11. Drag: `pointermove` changes `pitch` with the vertical drag, so the view tilts to the empty sky or floor (looks like a blank page). Make drag change `yaw` only, and keep `pitch` for room stops. Until then `levelView.ts` hides the vertical movement from the engine; once the engine does this, `levelView.ts` can be deleted.
+12. Steps: `showStop` shows only the title and "2 of 5". The site adds a step bar with short names from outside (`worldSteps.ts`, which watches `#subTitle`). If you regenerate, either keep the stop titles the same, or update `ROOMS` in `worldSteps.ts`; `worldSteps.test.ts` fails and names any stop that changed. Better: give each `stop()` a short `label` and build the step bar in the engine.
+
 ## CSS (`ailu-world.css`)
 
 `world-brand.css` overrides the variables, but these need the source:
