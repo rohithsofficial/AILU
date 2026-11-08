@@ -8,6 +8,8 @@ import { HIDDEN_PLACES } from "./worldMarkup";
 import { withLightRenderer } from "./worldRenderer";
 import { steadyPhoneTurn } from "./phoneTurn";
 import { roomSwipe } from "./roomSwipe";
+import { levelView } from "./levelView";
+import { worldSteps } from "./worldSteps";
 import { ENTER_WORLD_EVENT, INTRO_SEEN_KEY, INTRO_STEPS_MS, whenIdle } from "@/lib/worldStart";
 import { SITE_CONTENT } from "@/content/site";
 
@@ -40,6 +42,8 @@ export default function AiluWorld({ markup }: { markup: string }) {
     let cancelled = false;
     const stopPhoneTurn = steadyPhoneTurn(root);
     const stopRoomSwipe = roomSwipe(root);
+    const stopLevelView = levelView(root); // after roomSwipe, so a room flick still sees the real release
+    const stopWorldSteps = worldSteps(root);
     const start = (THREE?: typeof import("three")) => {
       if (cancelled) return;
       root.classList.add("world-starting"); // the engine measures the page, so it must be in the layout
@@ -87,6 +91,8 @@ export default function AiluWorld({ markup }: { markup: string }) {
       window.removeEventListener(ENTER_WORLD_EVENT, boot);
       stopPhoneTurn();
       stopRoomSwipe();
+      stopLevelView();
+      stopWorldSteps();
       window.removeEventListener("hashchange", keepNextState);
       window.removeEventListener("hashchange", keepTitle);
       window.removeEventListener("popstate", keepTitle);

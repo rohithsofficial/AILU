@@ -101,3 +101,30 @@ div.ailu.world-ready + .world-poster { display: none; }
 @media (pointer: coarse) {
   div.ailu.has-world.is-inside #subCard::after { content: "Swipe left or right to move"; font-size: .74rem; color: var(--muted); }
 }
+
+/* Room step bar (worldSteps.ts): the room's name, the step number, and one numbered chip per stop. */
+div.ailu #stepBar { display: grid; gap: 6px; min-width: 0; }
+div.ailu #stepBar .step-room { margin: 0; font: 600 .72rem/1.2 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--yellow); }
+div.ailu #stepBar .step-room span { color: var(--muted); letter-spacing: .04em; }
+div.ailu #stepBar .step-chips {
+  display: flex; gap: 6px; margin: 0; padding: 0 0 2px; list-style: none;
+  overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; scroll-snap-type: x proximity;
+}
+div.ailu #stepBar .step-chips::-webkit-scrollbar { display: none; }
+div.ailu #stepBar li { flex: none; scroll-snap-align: center; }
+div.ailu #stepBar .step-chip {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 12px 4px 4px;
+  border: 1px solid var(--line); border-radius: 999px; background: rgb(255 253 247 / 6%);
+  font: 500 .82rem/1 var(--body); color: var(--text); white-space: nowrap; cursor: pointer;
+}
+div.ailu #stepBar .step-chip b {
+  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: rgb(255 253 247 / 12%); font: 700 .78rem/1 var(--head); color: var(--white);
+}
+div.ailu #stepBar .step-chip.done b { background: rgb(245 196 0 / 28%); color: var(--yellow); }
+div.ailu #stepBar .step-chip[aria-current="step"] { border-color: var(--yellow); background: rgb(245 196 0 / 14%); color: var(--white); }
+div.ailu #stepBar .step-chip[aria-current="step"] b { background: var(--yellow); color: #111111; }
+div.ailu #stepBar .step-chip:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+/* The bar already says "Step 2 of 5", so the engine's own counter is not needed. */
+div.ailu #subCard.has-steps #stopCount { display: none; }
+div.ailu #subCard.has-steps > .eyebrow { display: none; }
