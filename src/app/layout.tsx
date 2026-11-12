@@ -11,12 +11,12 @@ const poppins = Poppins({ subsets: ["latin"], weight: ["500", "600", "700", "800
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 // Poppins and Inter have no Indian scripts. These are used only on translated pages (globals.css, .i18n-script).
 // preload is off, so a browser downloads one only when a page actually shows that script.
-const indic = { display: "swap", preload: false } as const;
-const kannada = Noto_Sans_Kannada({ subsets: ["kannada"], variable: "--font-noto-kn", ...indic });
-const devanagari = Noto_Sans_Devanagari({ subsets: ["devanagari"], variable: "--font-noto-hi", ...indic });
-const malayalam = Noto_Sans_Malayalam({ subsets: ["malayalam"], variable: "--font-noto-ml", ...indic });
-const tamil = Noto_Sans_Tamil({ subsets: ["tamil"], variable: "--font-noto-ta", ...indic });
-const telugu = Noto_Sans_Telugu({ subsets: ["telugu"], variable: "--font-noto-te", ...indic });
+// (next/font needs the options written out in full for each font.)
+const kannada = Noto_Sans_Kannada({ subsets: ["kannada"], variable: "--font-noto-kn", display: "swap", preload: false });
+const devanagari = Noto_Sans_Devanagari({ subsets: ["devanagari"], variable: "--font-noto-hi", display: "swap", preload: false });
+const malayalam = Noto_Sans_Malayalam({ subsets: ["malayalam"], variable: "--font-noto-ml", display: "swap", preload: false });
+const tamil = Noto_Sans_Tamil({ subsets: ["tamil"], variable: "--font-noto-ta", display: "swap", preload: false });
+const telugu = Noto_Sans_Telugu({ subsets: ["telugu"], variable: "--font-noto-te", display: "swap", preload: false });
 const fontVariables = [poppins, inter, kannada, devanagari, malayalam, tamil, telugu].map((font) => font.variable).join(" ");
 
 export async function generateMetadata(): Promise<Metadata> {

@@ -32,7 +32,7 @@ export default async function LandingLayout({ children, params }: { children: Re
           </Link>
           <nav aria-label={LANDING.quickActions} className="flex items-center gap-1.5 sm:gap-2">
             <LanguageSwitcher />
-            <Link href={SITE_CONTENT.switch.toWorld.href} className="inline-flex min-h-11 items-center whitespace-nowrap rounded-full border border-ailu-cream/25 px-3 text-xs font-semibold text-ailu-cream hover:border-ailu-yellow hover:text-ailu-yellow sm:px-4 sm:text-sm">
+            <Link href={SITE_CONTENT.switch.toWorld.href} data-world-switch className="inline-flex min-h-11 items-center whitespace-nowrap rounded-full border border-ailu-cream/25 px-3 text-xs font-semibold text-ailu-cream hover:border-ailu-yellow hover:text-ailu-yellow sm:px-4 sm:text-sm">
               {worldLabel}
             </Link>
             <a href={tel} className="inline-flex min-h-11 items-center whitespace-nowrap rounded-full bg-ailu-yellow px-3 text-xs font-bold sm:px-4 sm:text-sm text-ailu-black hover:bg-ailu-cream">

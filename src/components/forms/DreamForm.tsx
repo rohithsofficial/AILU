@@ -21,8 +21,8 @@ export default function DreamForm() {
     const english = serverErr(field);
     if (!english || locale === "en") return english;
     if (/identity, card or financial/.test(english)) return text.errors.sensitive;
-    if (/phone/i.test(field)) return text.errors.phone;
-    if (/email/i.test(field)) return text.errors.email;
+    if (/phone/i.test(field)) return text.errors.mobile;
+    if (/email/i.test(field)) return text.errors.emailAddress;
     if (/consent/i.test(field)) return text.errors.consentContact;
     return text.errors.required;
   };
@@ -54,7 +54,7 @@ export default function DreamForm() {
     </> : <>
       <label className="block">{t.adultName}<input name="displayName" required maxLength={80} autoComplete="name" className={inputCls} aria-invalid={Boolean(err("displayName"))} aria-describedby={err("displayName") ? "dream-displayName-error" : undefined} />{fieldError("displayName", err("displayName"))}</label>
       <label className="block">{t.adultPhone}<input name="contactPhone" type="tel" inputMode="tel" autoComplete="tel" className={inputCls} aria-invalid={Boolean(err("contactPhone"))} aria-describedby={err("contactPhone") ? "dream-contactPhone-error" : undefined} />{fieldError("contactPhone", err("contactPhone"))}</label>
-      <label className="block sm:col-span-2">{text.fields.email}<input name="contactEmail" type="email" autoComplete="email" className={inputCls} aria-invalid={Boolean(err("contactEmail"))} aria-describedby={err("contactEmail") ? "dream-contactEmail-error" : undefined} />{fieldError("contactEmail", err("contactEmail"))}</label>
+      <label className="block sm:col-span-2">{text.fields.emailOptional}<input name="contactEmail" type="email" autoComplete="email" className={inputCls} aria-invalid={Boolean(err("contactEmail"))} aria-describedby={err("contactEmail") ? "dream-contactEmail-error" : undefined} />{fieldError("contactEmail", err("contactEmail"))}</label>
     </>}
 
     <label className="block">{text.fields.city}<input name="city" required maxLength={80} autoComplete="address-level2" className={inputCls} aria-invalid={Boolean(err("city"))} aria-describedby={err("city") ? "dream-city-error" : undefined} />{fieldError("city", err("city"))}</label>

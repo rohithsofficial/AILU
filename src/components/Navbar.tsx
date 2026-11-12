@@ -95,7 +95,7 @@ export default function Navbar() {
           </div>
           <div className="flex shrink-0 items-center gap-1.5 min-[400px]:gap-2">
           <LanguageSwitcher />
-          <Link href={TO_WORLD.href} className="inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full bg-ailu-yellow px-3 text-xs font-bold text-ailu-black transition-colors hover:bg-ailu-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ailu-yellow sm:px-4 sm:text-sm">
+          <Link href={TO_WORLD.href} data-world-switch className="inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full bg-ailu-yellow px-3 text-xs font-bold text-ailu-black transition-colors hover:bg-ailu-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ailu-yellow sm:px-4 sm:text-sm">
             {intro.worldButton} <span aria-hidden className="hidden min-[400px]:inline">◉</span>
           </Link>
           <button

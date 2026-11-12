@@ -83,8 +83,9 @@ export function languageAlternates(path: string) {
 }
 
 // Fixed parts that stay the same in every language: links, images, ids and contact details.
-const SHARED_KEY = /(href|whatsapp|image|src|slug|path|kind|scene|phone|email|enabled|googleVerificationCode|hideFromGoogle)$/i;
-export const isSharedKey = (key: string) => SHARED_KEY.test(key);
+const SHARED_SUFFIX = /(href|whatsapp|image|src)$/i;
+const SHARED_EXACT = new Set(["slug", "path", "kind", "scene", "phone", "email", "enabled", "googleVerificationCode", "hideFromGoogle"]);
+export const isSharedKey = (key: string) => SHARED_EXACT.has(key) || SHARED_SUFFIX.test(key);
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
 

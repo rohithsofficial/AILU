@@ -46,7 +46,7 @@ export default function LanguageSwitcher({ variant = "menu", className = "" }: {
     </nav>;
   }
 
-  return <div ref={box} className={`relative ${className}`}>
+  return <div ref={box} data-lang-switch className={`relative ${className}`}>
     <button type="button" aria-expanded={open} aria-controls={listId} aria-label={`${t.choose}. ${LANGUAGES[current].native}`} onClick={() => setOpen((value) => !value)}
       className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border border-white/25 px-2.5 text-sm font-semibold text-ailu-cream transition-colors hover:border-ailu-yellow hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow sm:px-3">
       <svg aria-hidden viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z" /></svg>

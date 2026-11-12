@@ -15,6 +15,12 @@ Other buttons:
 
 Write `{phone}` or `{email}` in any text to use the values from Contact details.
 
+## Languages
+Pick a language at the top of the CMS (English, ಕನ್ನಡ, हिन्दी, മലയാളം, தமிழ், తెలుగు).
+In another language you change text only; each field shows the English line under it.
+Links, photos and list order are shared with English. Translations are drafts until a native speaker checks them.
+Full guide: `docs/LANGUAGES.md`.
+
 ## Who can do what
 | Role | Save drafts | Publish | Publish legal, Dreams and Donation Box |
 |---|---|---|---|
@@ -47,7 +53,7 @@ A photo used on the website cannot be deleted until it is removed from the page.
 ## What stays in code
 - Layout, brand colours, logo and animation
 - The 3D scenes inside AILU World
-- Form fields, such as the enquiry form labels
+- Which fields a form has (their labels, errors and buttons are in "Buttons, forms and messages")
 - The seven celebration web addresses. Their names and wording can change, but adding a new celebration needs code, because the CRM uses the same list.
 
 ## Rules

@@ -12,7 +12,7 @@ export default function DraftLanguageNote() {
   const t = useContent().ui.language;
   const { path } = splitLocale(usePathname() ?? "/");
   if (LANGUAGES[locale].checked) return null;
-  return <p className="border-b border-ailu-yellow/30 bg-ailu-yellow/10 px-4 py-2 text-center text-xs text-ailu-cream/85 sm:text-sm">
+  return <p className="border-b border-ailu-yellow/30 bg-ailu-black px-4 py-2 text-center text-xs text-ailu-cream/85 sm:text-sm">
     {t.draftNote} <a href={localePath("en", path)} lang="en" hrefLang="en" className="font-semibold text-ailu-yellow underline underline-offset-2">{t.readInEnglish}</a>
   </p>;
 }

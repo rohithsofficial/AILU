@@ -11,7 +11,7 @@ import { CMS_DEFAULTS } from "@/content/defaults";
 import { LANDING, LANDING_VARIANTS } from "@/content/landing";
 import { TRANSLATIONS } from "@/content/translations";
 import { buildContent, parseSectionId } from "@/server/cms";
-import { LOCALES } from "@/lib/i18n";
+import { LOCALES, isSharedKey, type Locale } from "@/lib/i18n";
 
 type Walker = (english: unknown, translated: unknown, path: string) => void;
 const walk: Walker = (english, translated, path) => {
@@ -85,5 +85,41 @@ describe("parseSectionId", () => {
     expect(parseSectionId("hero")).toEqual({ key: "hero", locale: "en" });
     expect(parseSectionId("hero:kn")).toEqual({ key: "hero", locale: "kn" });
     expect(parseSectionId("hero:xx")).toEqual({ key: "hero", locale: "en" });
+  });
+});
+
+describe("every translated line reaches the page", () => {
+  // Catches a translation that is silently dropped, for example because its key looks like a link or contact detail.
+  const check = (built: unknown, translated: unknown, key: string, path: string, misses: string[]) => {
+    if (typeof translated === "string") {
+      if (translated.trim() && !isSharedKey(key) && built !== translated.trim()) misses.push(path);
+      return;
+    }
+    if (Array.isArray(translated)) translated.forEach((item, index) => check((built as unknown[])?.[index], item, key, `${path}[${index}]`, misses));
+    else if (translated && typeof translated === "object") for (const [k, v] of Object.entries(translated)) check((built as Record<string, unknown>)?.[k], v, k, `${path}.${k}`, misses);
+  };
+  for (const [locale, translation] of Object.entries(TRANSLATIONS)) {
+    it(`${locale}: nothing is dropped`, () => {
+      const built = buildContent({}, locale as Locale);
+      const misses: string[] = [];
+      // {phone} and {email} are filled in after the translation is laid on, so compare against filled text.
+      check(built, JSON.parse(JSON.stringify(translation?.content ?? {}).replaceAll("{phone}", built.settings.phone).replaceAll("{email}", built.settings.email)), "", locale, misses);
+      expect(misses).toEqual([]);
+    });
+  }
+});
+
+describe("translatable text keys", () => {
+  it("the Buttons, forms and messages section has no text named like a link or contact detail", () => {
+    const shared: string[] = [];
+    const walk = (value: unknown, path: string) => {
+      if (Array.isArray(value)) value.forEach((item, index) => walk(item, `${path}[${index}]`));
+      else if (value && typeof value === "object") for (const [k, v] of Object.entries(value)) {
+        if (typeof v === "string" && isSharedKey(k) && k !== "slug") shared.push(`${path}.${k}`);
+        walk(v, `${path}.${k}`);
+      }
+    };
+    walk(CMS_DEFAULTS.ui, "ui");
+    expect(shared).toEqual([]);
   });
 });

@@ -38,14 +38,14 @@ export const UI_TEXT = {
     fields: {
       name: "Your name",
       fullName: "Full name",
-      phone: "Mobile number",
-      email: "Email (optional)",
+      mobile: "Mobile number",
+      emailOptional: "Email (optional)",
       city: "City",
     },
     errors: {
       name: "Enter your name",
-      phone: "Enter a valid mobile number",
-      email: "Enter a valid email",
+      mobile: "Enter a valid mobile number",
+      emailAddress: "Enter a valid email",
       city: "Enter your city",
       location: "Enter the event location",
       eventDate: "Choose today or a future date",

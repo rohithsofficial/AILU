@@ -22,6 +22,17 @@ h1, h2, h3 { font-family: var(--font-poppins), system-ui, sans-serif; }
 .i18n-script * { letter-spacing: normal !important; }
 .i18n-script :is(h1, h2, h3, .font-display) { line-height: 1.3 !important; overflow-wrap: break-word; }
 .i18n-script :is(p, li, label, summary, legend, a, button) { line-height: 1.6; }
+.i18n-script :is(h1, h2) { overflow-wrap: anywhere; }
+@media (max-width: 639px) {
+  /* Words in Indian scripts are long, so big phone headings and the top bar need room to wrap. */
+  .i18n-script h1 { font-size: min(2.5rem, 10.5vw) !important; }
+  .i18n-script [data-world-switch] { white-space: normal; max-width: 7.5rem; text-align: center; font-size: 11px; line-height: 1.15 !important; }
+}
+/* Very small phones: with the language button in the top bar, the world button may wrap onto two lines.
+   Without the language button (no checked translation yet) nothing changes. */
+@media (max-width: 399px) {
+  header:has([data-lang-switch]) [data-world-switch] { white-space: normal; max-width: 6.25rem; text-align: center; line-height: 1.15; }
+}
 :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 .skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 100; transform: translateY(-180%); border-radius: .5rem; background: var(--yellow); color: var(--black); padding: .75rem 1rem; font-weight: 700; }
 .skip-link:focus { transform: translateY(0); }
