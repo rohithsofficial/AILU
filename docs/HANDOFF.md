@@ -68,6 +68,17 @@ Rohith chose: address prefixes with our own code (no new package), AI drafts hid
 - Not checked: CMS language editing signed in (no database on this computer), a real phone, the live site.
 - World text: nothing needs to change in the generated world files. "Explore Website" in the world opens the English site.
 
+## Easier CMS on 2026-11-12 (branch `feat/cms-easy-editing`, from `feat/languages`, not merged)
+Rohith asked for the CMS to work like the Western Terrain Coffee Roasters CMS: page by page, clean, with preview and easy photos.
+Rohith chose to build on `feat/languages`, so merge `feat/languages` first, then this branch.
+- CMS home: quick links (Business details, Photo library, SEO, Activity, Staff accounts), a "Waiting to be published" list, status badges and "View page ↗" on every section.
+- Editor: one box per part of a section, length counters, "+ Add ..." and ↑ ↓ for lists, an "Unsaved changes" note and a warning before leaving, confirm before Publish.
+- Photo picker (`components/admin/MediaPicker.tsx`): thumbnail, Change photo, search the library or upload with a description, in one window.
+- Save and preview: Next.js draft mode (`/api/admin/cms/preview`), staff only. `getContent()` reads drafts only in preview. A yellow bar on the site offers Back to editor and Exit preview. Public pages stay static.
+- Activity page `/admin/cms/activity` from the audit log. Staff accounts reuse `/admin/settings/staff`.
+- No new package, no migration. Each section now has a `path` in `CMS_SECTIONS` (tested).
+- Checked: lint, server lint, typecheck, 186 tests, build; preview without sign-in goes to login.
+
 ## Next steps
 0. Languages: have a native speaker read `/kn/classic` and the other Kannada pages (and a lawyer the Kannada legal pages). Then set `kn` to `checked: true`, merge `feat/languages`, and test CMS editing in Kannada on the live site.
 1. Send one test enquiry from `/celebrate?v=b` (leave Expected guests empty) and check CRM → A/B test, Note: that test enquiry counts as one version B result (results come from the saved notes), so subtract it, or change `LANDING_TEST.id` before real traffic starts. Try a name search in CRM → Inbox and Clients.

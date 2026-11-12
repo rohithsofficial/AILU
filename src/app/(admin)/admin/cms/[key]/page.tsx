@@ -9,7 +9,7 @@ import { getSection, listMedia, UNTRANSLATED_SECTIONS } from "@/server/cms";
 import type { Json } from "@/lib/cms";
 import { cmsSectionAction } from "../actions";
 import CmsLanguagePicker from "@/components/admin/CmsLanguagePicker";
-import { LANGUAGES, toLocale } from "@/lib/i18n";
+import { LANGUAGES, localePath, toLocale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +24,10 @@ export default async function CmsSectionPage({ params, searchParams }: { params:
   const canPublish = can(staff.role, "cms.publish") && (!section.info.ownerPublish || staff.role === "OWNER");
   return <div className="mx-auto max-w-4xl">
     <Link href={locale === "en" ? "/admin/cms" : `/admin/cms?lang=${locale}`} className="text-sm text-ailu-cream/60 hover:underline">← Website CMS</Link>
-    <h1 className="mt-2 font-display text-2xl font-bold">{section.info.label}{locale !== "en" ? ` · ${LANGUAGES[locale].english}` : ""}</h1>
+    <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+      <h1 className="font-display text-2xl font-bold">{section.info.label}{locale !== "en" ? ` · ${LANGUAGES[locale].english}` : ""}</h1>
+      {info.path ? <a href={localePath(locale, info.path)} target="_blank" rel="noopener" className="rounded-lg border border-white/20 px-3 py-1.5 text-sm text-ailu-cream/80 hover:border-ailu-yellow">View live page ↗</a> : null}
+    </div>
     {translatable ? <CmsLanguagePicker locale={locale} basePath={`/admin/cms/${params.key}`} /> : <p className="mt-2 text-xs text-ailu-cream/50">The AILU World stays in English, so this section has no other languages.</p>}
     <p className="mt-1 text-sm text-ailu-cream/60">{section.info.help}</p>
     <p className="mt-1 text-xs text-ailu-cream/45">{section.publishedAt ? `Last published ${formatIN(section.publishedAt)}` : "Using the original wording"}{section.hasDraft ? " · You have an unpublished draft" : ""}</p>
@@ -40,6 +43,7 @@ export default async function CmsSectionPage({ params, searchParams }: { params:
       canPublish={canPublish}
       canUndo={section.canUndo}
       hasDraft={section.hasDraft}
+      canPreview={Boolean(info.path)}
     />
   </div>;
 }

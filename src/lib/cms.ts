@@ -108,3 +108,38 @@ export function seoIssues(pages: { path: string; title: string; description: str
   }
   return issues;
 }
+
+/**
+ * A soft length limit for a text field, so editors see when a line is getting long.
+ * SEO titles and descriptions follow Google's limits; headings and buttons are kept short for phones.
+ * Returns 0 when there is no limit. Going over is a warning, not an error.
+ */
+export function fieldLimit(section: string, name: string) {
+  if (section === "seo" || name.startsWith("seo")) return /title/i.test(name) ? 60 : /description/i.test(name) ? 160 : 0;
+  if (/(title|heading|label|button|cta|eyebrow|name)$/i.test(name)) return 90;
+  return 0;
+}
+
+/** Only an address on this website can be previewed: "/about" is fine, "//evil.com" or "https://…" is not. */
+export function safePreviewPath(path: unknown, fallback = "/classic") {
+  if (typeof path !== "string" || !path.startsWith("/") || path.startsWith("//") || path.includes("\\") || /[\r\n]/.test(path)) return fallback;
+  return path;
+}
+
+/** Only a CMS editor address may be the "Back to the editor" link. */
+export const safeEditorPath = (path: unknown) => (typeof path === "string" && /^\/admin\/cms(\/[\w-]+)?(\?lang=[a-z]{2})?$/.test(path) ? path : "/admin/cms");
+
+/** Readable words for the activity list. */
+export const CMS_ACTIONS: Record<string, string> = {
+  "cms.draft_saved": "Saved a draft",
+  "cms.published": "Published",
+  "cms.draft_discarded": "Discarded a draft",
+  "cms.publish_undone": "Undid the last publish",
+  "cms.restored_default": "Restored the original wording",
+  "cms.media_added": "Uploaded a photo",
+  "cms.media_updated": "Changed a photo description",
+  "cms.media_deleted": "Deleted a photo",
+};
+
+/** Cookie that remembers which CMS editor opened a preview, for the "Back to the editor" link. */
+export const CMS_BACK_COOKIE = "ailu_cms_back";

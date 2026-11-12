@@ -2,11 +2,24 @@
 
 Open **Website CMS** in the staff menu at `/admin/cms`.
 
+## The CMS home
+- **Quick links** at the top: Business details, Photo library, SEO, Activity and (owner) Staff accounts.
+- **Waiting to be published** lists every section with a saved draft.
+- Each section shows its status: **Unpublished changes**, **Live** or **Original wording**, and a **View page ↗** link.
+
 ## How editing works
-1. Open a section, such as Contact details or FAQs.
-2. Change the text.
+1. Open a section, such as Contact details or FAQs. Each part of it sits in its own box.
+2. Change the text. A counter shows the length; headings and buttons over 90 characters, and SEO lines over Google's limits, turn red.
 3. Click **Save draft** to keep working. Visitors do not see drafts.
-4. Click **Publish** when it is ready. The website updates straight away.
+4. Click **Save and preview** to see the real page with your draft. A yellow bar at the bottom says you are in preview, with **Back to editor** and **Exit preview**. Visitors still see the live wording.
+5. Click **Publish** when it is ready. It asks once to confirm, then the website updates straight away.
+
+If you try to leave with changes that are not saved, the browser warns you first.
+
+## Photos in a section
+A photo field shows the chosen photo. **Change photo** opens a window:
+- **Photo library:** search by description and click a photo to use it.
+- **Upload new:** choose a file, describe it, and click **Upload and use this photo**.
 
 Other buttons:
 - **Discard draft:** removes unpublished changes.
