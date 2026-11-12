@@ -76,6 +76,19 @@ Rohith chose: address prefixes with our own code (no new package), AI drafts hid
 Points 5 to 8 in the feedback table. Merge order: `feat/languages`, then `feat/cms-easy-editing`, then this branch.
 - Checked: lint, server lint, typecheck, tests, build; 12 pages at 390px for gaps and sideways scroll; `/classic` at 320px and 1440px; Kannada, Tamil (390px) and Malayalam (320px) home. Not checked: a real phone.
 
+## Easier CMS on 2026-11-12 (branch `feat/cms-easy-editing`, from `feat/languages`, not merged)
+Rohith asked for the CMS to work like the Western Terrain Coffee Roasters CMS: page by page, clean, with preview and easy photos.
+Rohith chose to build on `feat/languages`, so merge `feat/languages` first, then this branch.
+- CMS home: quick links (Business details, Photo library, SEO, Activity, Staff accounts), a "Waiting to be published" list, status badges and "View page ↗" on every section.
+- Editor: one box per part of a section, length counters, "+ Add ..." and ↑ ↓ for lists, an "Unsaved changes" note and a warning before leaving, confirm before Publish.
+- Photo picker (`components/admin/MediaPicker.tsx`): thumbnail, Change photo, search the library or upload with a description, in one window.
+- Save and preview: Next.js draft mode (`/api/admin/cms/preview`), staff only. `getContent()` reads drafts only in preview. A yellow bar on the site offers Back to editor and Exit preview. Public pages stay static.
+- Activity page `/admin/cms/activity` from the audit log. Staff accounts reuse `/admin/settings/staff`.
+- No new package, no migration. Each section now has a `path` in `CMS_SECTIONS` (tested).
+- Fixed while testing: Save and preview now opens with a full page load (`OpenPreview.tsx`), because a form redirect did not keep the preview cookie; the preview bar sits above the WhatsApp button on phones; after Discard, Undo or Restore the form shows the saved wording, not old typing (this was also wrong before); labels like "atAGlance" read "At a glance".
+- Checked: lint, server lint, typecheck, 187 tests, build (public pages still static). Signed in on localhost with the live database at 390px and 1440px: CMS home, editor boxes and counters, Unsaved changes, photo picker window, Save and preview (draft shown, bar shown, no overlap on `/classic` and `/`), Back to editor, Exit preview, Activity, Discard draft. Test drafts were discarded.
+- Not checked: uploading a photo (would go to the real photo store), Publish (would change the live site), a translated section, a real phone.
+
 ## Next steps
 0. Languages: have a native speaker check each language (start with Kannada at `/kn/classic`), and a lawyer the translated legal pages. Mark each checked language `checked: true` in `src/lib/i18n.ts`, merge `feat/languages` with Rohith's OK, and test CMS editing in one language on the live site.
 1. Send one test enquiry from `/celebrate?v=b` (leave Expected guests empty) and check CRM → A/B test, Note: that test enquiry counts as one version B result (results come from the saved notes), so subtract it, or change `LANDING_TEST.id` before real traffic starts. Try a name search in CRM → Inbox and Clients.

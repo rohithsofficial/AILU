@@ -1,6 +1,7 @@
 // Root layout for every page: brand fonts, default SEO, organisation structured data, and the CMS content for client components.
 import type { Metadata } from "next";
 import ContentProvider from "@/components/ContentProvider";
+import PreviewBanner from "@/components/PreviewBanner";
 import { clientContent, getContent } from "@/server/cms";
 import { Inter, Noto_Sans_Devanagari, Noto_Sans_Kannada, Noto_Sans_Malayalam, Noto_Sans_Tamil, Noto_Sans_Telugu, Poppins } from "next/font/google";
 import "./globals.css";
@@ -50,6 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <noscript><style>{"#ailu-intro{display:none!important}body{overflow:auto!important}div.ailu{display:block!important}div.ailu>*{visibility:visible!important}.world-poster{display:none!important}"}</style></noscript>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, "\\u003c") }} />
         <ContentProvider value={clientContent(content)}>{children}</ContentProvider>
+        <PreviewBanner />
       </body>
     </html>
   );

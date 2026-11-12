@@ -1,5 +1,6 @@
 // Database logic for the CMS, and getContent(), which every public page uses to read its wording.
 import { cache } from "react";
+import { draftMode } from "next/headers";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { del } from "@vercel/blob";
 import { Prisma } from "@prisma/client";
@@ -60,8 +61,30 @@ async function readWithLimit() {
   }
 }
 
+/** True when a signed-in staff member opened "Preview" in the CMS (Next.js draft mode, set by /api/admin/cms/preview). */
+export function previewing() {
+  try {
+    return draftMode().isEnabled;
+  } catch {
+    return false; // outside a request, for example while building
+  }
+}
+
+/** For preview only: every section's draft, or its live wording where there is no draft. Never cached. */
+async function readDrafts() {
+  const rows = await getPrisma().cmsSection.findMany({ select: { key: true, draft: true, published: true } });
+  return Object.fromEntries(rows.map((row) => [row.key, row.draft ?? row.published]));
+}
+
 /** What visitors see, in their language. If the database cannot be reached, the site falls back to the last good content. */
 export const getContent = cache(async (locale: Locale = DEFAULT_LOCALE): Promise<SiteContent> => {
+  if (previewing() && dbConfigured()) {
+    try {
+      return buildContent(await readDrafts(), locale);
+    } catch (error) {
+      console.error("CMS drafts could not be loaded for preview.", (error as Error).message);
+    }
+  }
   if (!dbConfigured() || Date.now() < health.skipUntil) return buildContent(health.lastGood, locale);
   try {
     health.lastGood = await readWithLimit();

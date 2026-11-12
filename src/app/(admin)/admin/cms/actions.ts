@@ -18,11 +18,18 @@ export async function cmsSectionAction(fd: FormData) {
   const section = parseSectionId(key);
   const path = `/admin/cms/${section.key}${section.locale === "en" ? "" : `?lang=${section.locale}`}`;
   let done = "Draft saved. Visitors do not see it yet.";
+  let preview = "";
   try {
     const staff = await requireRole(["OWNER", "MANAGER", "STAFF"]);
     const value = () => JSON.parse(String(fd.get("value") ?? "null")) as unknown;
     const publisher = () => { if (!can(staff.role, "cms.publish")) throw new Error("Your role can save drafts but cannot publish."); };
     if (intent === "save") await saveDraft(staff, key, value());
+    else if (intent === "preview") {
+      // Save the draft, then the editor page opens the preview with a full page load (OpenPreview),
+      // because the preview cookie must be set by a real browser visit, not inside this form request.
+      await saveDraft(staff, key, value());
+      preview = `${path}${path.includes("?") ? "&" : "?"}preview=1`;
+    }
     else if (intent === "discard") { await discardDraft(staff, key); done = "Draft removed."; }
     else if (intent === "publish") {
       publisher();
@@ -32,7 +39,8 @@ export async function cmsSectionAction(fd: FormData) {
     else if (intent === "restore") { publisher(); await restoreDefault(staff, key); done = "Back to the original wording."; }
     revalidatePath("/admin/cms");
     revalidatePath(`/admin/cms/${section.key}`);
-  } catch (error) { done = message(error); }
+  } catch (error) { done = message(error); preview = ""; }
+  if (preview) redirect(preview);
   back(path, done);
 }
 
