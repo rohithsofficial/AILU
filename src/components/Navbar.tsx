@@ -10,6 +10,7 @@ import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent }
 import { BRAND } from "@/lib/brand";
 import { splitLocale } from "@/lib/i18n";
 import NavLogo from "./NavLogo";
+import World360Icon from "./World360Icon";
 import { SITE_CONTENT } from "@/content/site";
 
 import { useContent } from "@/components/ContentProvider";
@@ -96,7 +97,7 @@ export default function Navbar() {
           <div className="flex shrink-0 items-center gap-1.5 min-[400px]:gap-2">
           <LanguageSwitcher />
           <Link href={TO_WORLD.href} data-world-switch className="inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full bg-ailu-yellow px-3 text-xs font-bold text-ailu-black transition-colors hover:bg-ailu-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ailu-yellow sm:px-4 sm:text-sm">
-            {intro.worldButton} <span aria-hidden className="hidden min-[400px]:inline">◉</span>
+            <World360Icon className="hidden h-4 w-4 shrink-0 min-[360px]:block" />{intro.worldButton}
           </Link>
           <button
             ref={triggerRef}
@@ -107,7 +108,9 @@ export default function Navbar() {
             onClick={() => setOpen((value) => !value)}
             className="group inline-flex min-h-12 items-center gap-2 rounded-full border border-ailu-yellow/50 px-2 py-1.5 min-[400px]:px-3 text-sm font-semibold text-ailu-cream transition-colors hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow sm:gap-3 sm:px-5"
           >
-            <span className="relative block h-7 w-8 overflow-hidden min-[400px]:h-8 min-[400px]:w-10">
+            {/* Three lines on phones, so the button clearly reads as a menu. Desktop shows the word "Explore". */}
+            <svg aria-hidden viewBox="0 0 20 14" className="h-3.5 w-5 shrink-0 text-ailu-yellow sm:hidden"><path d="M1 1h18M1 7h18M1 13h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+            <span className="relative block h-6 w-7 overflow-hidden min-[400px]:h-8 min-[400px]:w-10">
               <Image src={BRAND.hand} alt="" fill sizes="40px" className="object-contain transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110" />
             </span>
             <span className="hidden sm:inline">{open ? ui.nav.close : ui.nav.explore}</span>

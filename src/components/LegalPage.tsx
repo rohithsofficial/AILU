@@ -8,7 +8,7 @@ const withLinks = (text: string) => text.split(/(https?:\/\/[^\s]+[^\s.,])/).map
 export default function LegalPage({ title, intro, lastUpdated, sections, ui, translated = false }: LegalContent & { ui?: { pageMarker: string; lastUpdated: string; language: { legalNote: string } }; translated?: boolean }) {
   return <>
     <PageHero title={title} marker={ui?.pageMarker}>{intro}</PageHero>
-    <article className="mx-auto max-w-4xl px-4 py-12 text-ailu-cream">
+    <article className="mx-auto max-w-4xl px-4 py-8 text-ailu-cream sm:py-12">
       {translated && ui ? <p className="mb-5 rounded-sm border border-ailu-yellow/45 bg-ailu-yellow/10 p-4 text-sm">{ui.language.legalNote}</p> : null}
       <p className="text-sm font-medium text-ailu-cream/50">{ui?.lastUpdated ?? "Last updated:"} {lastUpdated}</p>
       {sections.map((section) => <section key={section.title} className="mt-7 border-t border-white/15 pt-5"><h2 className="font-display text-xl font-semibold">{section.title}</h2>{section.paragraphs.map((paragraph, index) => <p key={index} className="mt-3 text-sm leading-relaxed text-ailu-cream/65">{withLinks(paragraph)}</p>)}</section>)}

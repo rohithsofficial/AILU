@@ -12,7 +12,7 @@ export default async function PartnerPage({ params }: LangParams) {
   return (
     <>
       <PageHero marker={content.ui.pageMarker} title={t.partnerPageTitle}>{t.partnerPageLead}</PageHero>
-      <div className="mx-auto max-w-3xl px-4 py-14">
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:py-14">
         <p className="mb-6 rounded-lg bg-ailu-yellow/50 p-4 text-sm text-black">{t.partnerPageNote}</p>
         <PartnerForm />
       </div>

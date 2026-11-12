@@ -6,6 +6,7 @@ import Link from "@/components/LocaleLink";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { BRAND } from "@/lib/brand";
+import World360Icon from "@/components/World360Icon";
 import { canUse3D } from "@/lib/device";
 import { useContent } from "@/components/ContentProvider";
 
@@ -21,7 +22,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative isolate flex min-h-[min(760px,calc(100svh-4.5rem))] overflow-hidden bg-ailu-black text-ailu-cream">
+    <section className="relative isolate flex overflow-hidden lg:min-h-[min(760px,calc(100svh-4.5rem))] bg-ailu-black text-ailu-cream">
       <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_72%_48%,rgba(245,196,0,.15),transparent_32%),radial-gradient(ellipse_at_50%_110%,rgba(245,196,0,.08),transparent_55%)]" />
       <div className="pointer-events-none absolute inset-y-0 right-[12%] hidden w-px bg-white/[.06] lg:block" />
 
@@ -43,7 +44,7 @@ export default function Hero() {
             <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-2">
               <Link href="/events#enquire" className="group inline-flex min-h-12 items-center gap-3 border-b border-ailu-yellow pb-1 font-semibold text-ailu-yellow transition-colors hover:text-ailu-cream">{t.primaryButton} <span aria-hidden className="transition-transform group-hover:translate-x-1">↗</span></Link>
               <Link href="/join" className="inline-flex min-h-12 items-center text-sm font-medium text-ailu-cream/65 transition-colors hover:text-ailu-yellow">{t.secondaryLink}</Link>
-              <Link href="/" className="inline-flex min-h-12 items-center gap-2 rounded-sm border border-ailu-cream/25 px-4 text-sm font-semibold text-ailu-cream transition-colors hover:border-ailu-yellow hover:text-ailu-yellow"><span aria-hidden>◉</span> {t.worldButton}</Link>
+              <Link href="/" className="inline-flex min-h-12 items-center gap-2 rounded-sm border border-ailu-cream/25 px-4 text-sm font-semibold text-ailu-cream transition-colors hover:border-ailu-yellow hover:text-ailu-yellow"><World360Icon className="h-4 w-4 text-ailu-yellow" />{t.worldButton}</Link>
             </div>
           </div>
         </div>

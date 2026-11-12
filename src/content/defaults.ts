@@ -75,9 +75,9 @@ export const CMS_DEFAULTS = {
       { title: "Contemporary and fusion", detail: "Contemporary dance, hip-hop, DJs and live music." },
     ],
     ideas: [
-      { tag: "Personal celebrations", title: "A little golden gathering", copy: "Warm colour, shared tables and small details shaped around your people." },
-      { tag: "Corporate events", title: "Business, with a bright side", copy: "A clear stage, welcoming spaces and a programme planned around the occasion." },
-      { tag: "Entertainment", title: "An evening with energy", copy: "Music, movement and moments for guests to share together." },
+      { tag: "Personal celebrations", title: "A little golden gathering", copy: "Warm colour, shared tables and small details shaped around your people.", image: "" },
+      { tag: "Corporate events", title: "Business, with a bright side", copy: "A clear stage, welcoming spaces and a programme planned around the occasion.", image: "" },
+      { tag: "Entertainment", title: "An evening with energy", copy: "Music, movement and moments for guests to share together.", image: "" },
     ],
     steps: SITE_CONTENT.process,
   },

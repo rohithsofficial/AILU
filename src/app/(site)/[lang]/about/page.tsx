@@ -15,7 +15,7 @@ export default async function AboutPage({ params }: LangParams) {
     <section className="relative isolate flex min-h-[52svh] overflow-hidden bg-ailu-black text-ailu-cream" aria-labelledby="about-title">
       <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_76%_50%,rgba(245,196,0,.18),transparent_34%),radial-gradient(ellipse_at_0%_100%,rgba(245,196,0,.08),transparent_38%)]" />
       <div aria-hidden className="absolute inset-y-0 right-[16%] w-px bg-ailu-yellow/15" />
-      <div className="relative mx-auto flex w-full max-w-[1500px] items-center px-6 py-16 sm:px-12 lg:px-20">
+      <div className="relative mx-auto flex w-full max-w-[1500px] items-center px-6 py-10 sm:py-16 sm:px-12 lg:px-20">
         <div className="relative z-10 max-w-4xl">
           <p className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[.3em] text-ailu-yellow sm:text-xs"><span aria-hidden className="h-px w-9 bg-ailu-yellow" /> {t.eyebrow}</p>
           <h1 id="about-title" className="mt-6 max-w-[12ch] font-display text-[clamp(2.8rem,6.5vw,5.5rem)] font-semibold leading-[.94] tracking-[-.06em]">{t.title}</h1>
@@ -28,7 +28,7 @@ export default async function AboutPage({ params }: LangParams) {
       </div>
     </section>
 
-    <section className="bg-ailu-black px-6 py-14 text-ailu-cream sm:px-12 sm:py-16" aria-labelledby="story-heading">
+    <section className="bg-ailu-black px-6 py-9 text-ailu-cream sm:px-12 sm:py-16" aria-labelledby="story-heading">
       <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[.65fr_1.35fr] lg:gap-16">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[.25em] text-ailu-yellow">{t.listEyebrow}</p>
@@ -43,7 +43,7 @@ export default async function AboutPage({ params }: LangParams) {
       </div>
     </section>
 
-    <section className="bg-ailu-black px-6 py-14 text-ailu-cream sm:px-12 sm:py-16" aria-labelledby="work-heading">
+    <section className="bg-ailu-black px-6 py-9 text-ailu-cream sm:px-12 sm:py-16" aria-labelledby="work-heading">
       <div className="mx-auto max-w-6xl">
         <p className="text-xs font-bold uppercase tracking-[.25em] text-ailu-yellow">{t.stepsEyebrow}</p>
         <h2 id="work-heading" className="mt-3 max-w-[12ch] font-display text-3xl font-semibold leading-[.98] tracking-[-.05em] sm:text-4xl">{t.stepsTitle}</h2>
@@ -56,7 +56,7 @@ export default async function AboutPage({ params }: LangParams) {
       </div>
     </section>
 
-    <section className="bg-ailu-black px-6 py-12 text-ailu-cream sm:px-12 sm:py-16" aria-labelledby="promises-heading">
+    <section className="bg-ailu-black px-6 py-9 text-ailu-cream sm:px-12 sm:py-16" aria-labelledby="promises-heading">
       <div className="mx-auto grid max-w-6xl gap-7 lg:grid-cols-[.7fr_1.3fr] lg:gap-16">
         <div><p className="text-[10px] font-bold uppercase tracking-[.25em] text-ailu-yellow">{t.promiseEyebrow}</p><h2 id="promises-heading" className="mt-3 max-w-[9ch] font-display text-3xl font-semibold leading-[.98] tracking-[-.05em] sm:text-4xl">{t.promiseTitle}</h2></div>
         <ul className="space-y-3 border-t border-white/15 pt-5 text-sm leading-relaxed text-ailu-cream/65 sm:text-base">

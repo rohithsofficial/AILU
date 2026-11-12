@@ -34,6 +34,10 @@ Rohith is sharing feedback from a friend, one point at a time. For each point: f
 | 2 | Explore menu options seem to do nothing | Done, on `main`: a slow database can no longer hold up a page, and website pages show a loading screen. Rohith still needs to confirm the menu |
 | 3 | In the world, moving up or down shows a blank page | Done, on `main`: `levelView.ts` keeps the view level, drag turns left and right only |
 | 4 | Each world step should show what it is | Done, on `main`: step bar with room name, "Step 2 of 5", named chips and "Next: ..." (`worldSteps.ts`) |
+| 5 | Home idea cards are empty picture boxes | On branch `fix/home-feedback`: compact cards with a faint AILU hand; each card shows a photo once one is chosen in CMS → Home sections → Ideas |
+| 6 | Too much gap between sections | Same branch: phone spacing about 36px above and below each section on all public pages and `/celebrate`; desktop unchanged. Measured at 390px: gaps from 125–160px down to under 100px on most pages |
+| 7 | The "right people" table looks off | Same branch: number and name on one line, no empty boxes |
+| 8 | Few people click Enter AILU World | Same branch, Rohith chose icon + tour card: a turning 360° icon on the button (`World360Icon.tsx`), a "Take the 360° tour" card under the top section (`WorldTourCard.tsx`, wording in CMS Home sections, draft translations), and three lines on the phone menu button |
 
 ## Work on 2026-11-08 (branch `claude/new-session-x8qhdu`, merged to `main` on 2026-11-12)
 Full report: `docs/REPORT_2026-11-08.md`.
@@ -67,6 +71,10 @@ Rohith chose: address prefixes with our own code (no new package), AI drafts hid
 - Checked: lint, server lint, typecheck, 180 tests, build. In the browser: 17 pages × 6 languages at 390px and 320px (no sideways scroll beyond 1px rounding), Kannada and English at 1440px, the switcher, a Kannada enquiry with empty fields (Kannada errors), English errors unchanged, the A/B test on `/celebrate` and `/kn/celebrate`.
 - Not checked: CMS language editing signed in (no database on this computer), a real phone, the live site.
 - World text: nothing needs to change in the generated world files. "Explore Website" in the world opens the English site.
+
+## Home feedback on 2026-11-12 (branch `fix/home-feedback`, from `feat/languages`, not merged)
+Points 5 to 8 in the feedback table. Merge order: `feat/languages`, then `feat/cms-easy-editing`, then this branch.
+- Checked: lint, server lint, typecheck, tests, build; 12 pages at 390px for gaps and sideways scroll; `/classic` at 320px and 1440px; Kannada, Tamil (390px) and Malayalam (320px) home. Not checked: a real phone.
 
 ## Next steps
 0. Languages: have a native speaker check each language (start with Kannada at `/kn/classic`), and a lawyer the translated legal pages. Mark each checked language `checked: true` in `src/lib/i18n.ts`, merge `feat/languages` with Rohith's OK, and test CMS editing in one language on the live site.

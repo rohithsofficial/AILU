@@ -21,6 +21,10 @@ export const PAGE_TEXT = {
     enquiryLink: "Start an enquiry"
   },
   home: {
+    tourEyebrow: "The 360° AILU World",
+    tourTitle: "Look around before you plan.",
+    tourText: "Step inside a celebration world. Drag to look around and tap a room to go in. It works on phones too.",
+    tourButton: "Take the 360° tour",
     bannerText1: "Creating moments",
     bannerText2: "Delivering smiles",
     bannerText3: "The AILU way",

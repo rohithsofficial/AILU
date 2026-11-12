@@ -15,7 +15,7 @@ export default async function ContactPage({ params }: LangParams) {
   const { settings } = content;
   const whatsappHref = `${settings.whatsapp}?text=${encodeURIComponent(settings.whatsappMessage)}`;
   return <>
-    <section className="bg-ailu-black px-6 py-12 text-ailu-cream sm:px-12 sm:py-16" aria-labelledby="contact-title">
+    <section className="bg-ailu-black px-6 py-9 text-ailu-cream sm:px-12 sm:py-16" aria-labelledby="contact-title">
       <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[.3em] text-ailu-yellow sm:text-xs">{t.eyebrow}</p>
@@ -26,7 +26,7 @@ export default async function ContactPage({ params }: LangParams) {
       </div>
     </section>
 
-    <section className="bg-ailu-black px-6 py-10 text-ailu-cream sm:px-12 sm:py-12" aria-label="Ways to contact AILU">
+    <section className="bg-ailu-black px-6 py-8 text-ailu-cream sm:px-12 sm:py-12" aria-label="Ways to contact AILU">
       <div className="mx-auto grid max-w-6xl gap-4 border-y border-white/15 py-5 sm:grid-cols-2 lg:grid-cols-3">
         <a className="group flex min-h-16 flex-col justify-center border-b border-white/10 py-3 sm:border-0" href={`tel:${settings.phone.replace(/\s/g, "")}`}><span className="text-[10px] font-bold uppercase tracking-[.2em] text-ailu-cream/45">{t.callLabel}</span><span className="mt-1 text-lg font-semibold underline decoration-ailu-yellow decoration-2 underline-offset-4 group-hover:text-ailu-yellow">{settings.phone}</span></a>
         <a className="group flex min-h-16 flex-col justify-center border-b border-white/10 py-3 sm:border-0" href={`mailto:${settings.email}`}><span className="text-[10px] font-bold uppercase tracking-[.2em] text-ailu-cream/45">{t.emailLabel}</span><span className="mt-1 break-all text-lg font-semibold underline decoration-ailu-yellow decoration-2 underline-offset-4 group-hover:text-ailu-yellow">{settings.email}</span></a>
@@ -34,7 +34,7 @@ export default async function ContactPage({ params }: LangParams) {
       </div>
     </section>
 
-    <section className="bg-ailu-black px-6 pb-14 text-ailu-cream sm:px-12 sm:pb-16" aria-labelledby="contact-form-heading">
+    <section className="bg-ailu-black px-6 pb-10 text-ailu-cream sm:px-12 sm:pb-16" aria-labelledby="contact-form-heading">
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[.75fr_1.25fr] lg:gap-16">
         <aside>
           <p className="text-[10px] font-bold uppercase tracking-[.22em] text-ailu-yellow">{t.pathsEyebrow}</p>

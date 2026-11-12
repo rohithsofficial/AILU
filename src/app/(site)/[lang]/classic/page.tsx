@@ -1,6 +1,7 @@
 import Hero from "@/components/Hero";
 import CelebrationJourney from "@/components/CelebrationJourney";
 import HomeExperience from "@/components/HomeExperience";
+import WorldTourCard from "@/components/WorldTourCard";
 import { metadataForPath } from "@/lib/public-metadata";
 import { getContent } from "@/server/cms";
 import { toLocale, type LangParams } from "@/lib/i18n";
@@ -11,6 +12,7 @@ export async function generateMetadata({ params }: LangParams) { const locale = 
 export default function ClassicHome({ params }: LangParams) {
   return <>
     <Hero />
+    <WorldTourCard locale={toLocale(params.lang)} />
     <CelebrationJourney />
     <HomeExperience locale={toLocale(params.lang)} />
   </>;

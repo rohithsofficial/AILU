@@ -12,7 +12,7 @@ export default async function TeamPage({ params }: LangParams) {
   return (
     <>
       <PageHero marker={content.ui.pageMarker} title={t.teamPageTitle}>{t.teamPageLead}</PageHero>
-      <div className="mx-auto max-w-3xl px-4 py-14">
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:py-14">
         <p className="mb-6 rounded-lg bg-ailu-yellow/30 p-4 text-sm">{t.teamPageNote}</p>
         <ApplicationForm />
       </div>

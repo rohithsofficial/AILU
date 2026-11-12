@@ -25,7 +25,7 @@ export default function EventDiscovery() {
   const entrance = entrances[active];
 
   return (
-    <section aria-labelledby="discovery-title" className="relative overflow-hidden bg-ailu-black px-6 pb-20 pt-16 text-ailu-cream sm:px-12 sm:pb-28 sm:pt-24">
+    <section aria-labelledby="discovery-title" className="relative overflow-hidden bg-ailu-black px-6 pb-12 pt-10 text-ailu-cream sm:px-12 sm:pb-28 sm:pt-24">
       <span aria-hidden className="pointer-events-none absolute right-[8%] top-[16%] font-display text-7xl text-ailu-yellow/15 sm:text-9xl">✳</span>
       <div className="relative mx-auto max-w-[1400px]">
         <p className="text-[10px] font-semibold uppercase tracking-[.3em] text-ailu-yellow sm:text-xs">{t.eyebrow}</p>
@@ -47,7 +47,7 @@ export default function EventDiscovery() {
           </div>
         </div>
 
-        <div className="mt-14 border-y border-white/20 py-6 sm:mt-20 sm:py-8">
+        <div className="mt-10 border-y border-white/20 py-6 sm:mt-20 sm:py-8">
           <p className="mb-4 text-xs font-bold uppercase tracking-[.2em] text-ailu-yellow">{t.chooseTitle} <span className="mt-1 block font-medium normal-case tracking-normal text-ailu-cream/65 sm:ml-2 sm:mt-0 sm:inline">{t.chooseHint}</span></p>
           <ul className="flex flex-wrap gap-2.5 sm:gap-3">
             {EVENT_CATEGORIES.map((item, index) => <li key={item.slug}>

@@ -67,7 +67,7 @@ export default async function CelebratePage({ params }: LangParams) {
       </section>
 
       {/* Occasions */}
-      <section className="px-4 py-12" aria-labelledby="occasions-title">
+      <section className="px-4 py-9 sm:py-12" aria-labelledby="occasions-title">
         <div className="mx-auto max-w-6xl">
           <h2 id="occasions-title" className="font-display text-2xl font-bold sm:text-3xl">{LANDING.occasionsTitle}</h2>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -84,7 +84,7 @@ export default async function CelebratePage({ params }: LangParams) {
       </section>
 
       {/* How it works */}
-      <section className="px-4 py-12" aria-labelledby="steps-title">
+      <section className="px-4 py-9 sm:py-12" aria-labelledby="steps-title">
         <div className="mx-auto max-w-6xl">
           <h2 id="steps-title" className="font-display text-2xl font-bold sm:text-3xl">{LANDING.stepsTitle}</h2>
           <ol className="mt-6 grid gap-4 md:grid-cols-3">
@@ -100,7 +100,7 @@ export default async function CelebratePage({ params }: LangParams) {
       </section>
 
       {/* Why AILU */}
-      <section className="px-4 py-12" aria-labelledby="why-title">
+      <section className="px-4 py-9 sm:py-12" aria-labelledby="why-title">
         <div className="mx-auto max-w-6xl">
           <h2 id="why-title" className="font-display text-2xl font-bold sm:text-3xl">{LANDING.whyTitle}</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -115,7 +115,7 @@ export default async function CelebratePage({ params }: LangParams) {
       </section>
 
       {/* The goal of the page: the enquiry form */}
-      <section id="enquire" className="scroll-mt-20 px-4 py-12" aria-labelledby="form-title">
+      <section id="enquire" className="scroll-mt-20 px-4 py-9 sm:py-12" aria-labelledby="form-title">
         <div className="mx-auto max-w-3xl">
           <h2 id="form-title" className="font-display text-2xl font-bold sm:text-3xl">{LANDING.formTitle}</h2>
           <p className="mb-6 mt-1 text-ailu-cream/70">{LANDING.formBody}</p>
@@ -124,7 +124,7 @@ export default async function CelebratePage({ params }: LangParams) {
       </section>
 
       {/* Short FAQ */}
-      <section className="px-4 py-12" aria-labelledby="faq-title">
+      <section className="px-4 py-9 sm:py-12" aria-labelledby="faq-title">
         <div className="mx-auto max-w-3xl">
           <h2 id="faq-title" className="font-display text-2xl font-bold sm:text-3xl">{LANDING.faqTitle}</h2>
           <div className="mt-5 divide-y divide-white/10 rounded-2xl border border-white/10">
@@ -138,7 +138,7 @@ export default async function CelebratePage({ params }: LangParams) {
         </div>
       </section>
 
-      <section className="px-4 py-14 text-center">
+      <section className="px-4 py-10 text-center sm:py-14">
         <h2 className="font-display text-2xl font-bold sm:text-3xl">{LANDING.finalTitle}</h2>
         <p className="mt-2 text-ailu-cream/70">{LANDING.finalBody}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
