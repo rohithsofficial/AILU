@@ -28,15 +28,17 @@ The switcher shows draft languages while developing (`npm run dev`), or on a sit
 
 Once any language is checked, English pages also get hreflang links, and the language button appears in the top bar on every page.
 
-## What is translated now (2026-11-12, all drafts)
-- **Kannada:** everything on the Normal World pages, `/celebrate`, forms and errors, menu and footer, legal pages, SEO titles.
-- **Hindi, Malayalam, Tamil, Telugu:** menu, footer, language switcher, forms and errors. Page text shows in English until translated.
+## What is translated now (all drafts)
+All five languages (Kannada, Hindi, Malayalam, Tamil, Telugu) cover everything in the Normal World:
+every page, the celebration types, FAQs, forms and errors, menu and footer, legal pages, SEO titles and `/celebrate`.
+The AILU World stays English. Tamil and Malayalam use a short "AILU World" button label so it fits on phones.
 
 Legal pages in another language show: "This translation is for your convenience. If it differs from the English version, the English version applies." A lawyer should also see the translations.
 
 ## Where the words live
 - English wording: `src/content` (as before). Form labels, errors and menu words are in `src/content/uiText.ts` (CMS section "Buttons, forms and messages").
-- Translations: `src/content/translations/kn.ts` (+ `kn.legal.ts`), `hi.ts`, `ml.ts`, `ta.ts`, `te.ts`.
+- Translations: `src/content/translations/kn.ts` (+ `kn.legal.ts`). Hindi, Malayalam, Tamil and Telugu each have three files:
+  `hi.ts` (menu, footer, forms), `hi.pages.ts` (page text and `/celebrate`) and `hi.legal.ts` (legal pages); the same for `ml`, `ta`, `te`.
   Each file holds only text. Links, photos, ids and contact details always come from English.
   A missing line shows in English, so a page is never blank.
   Lists follow the English order: item 1 translates item 1.

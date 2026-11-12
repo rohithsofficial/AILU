@@ -37,7 +37,7 @@ const translation: Translation = {
         { title: "சட்டம்", links: [{ label: "தனியுரிமை" }, { label: "விதிமுறைகள்" }, { label: "பரிந்துரைக் கொள்கை" }] },
       ],
     },
-    intro: { worldButton: "AILU உலகுக்குள் நுழையுங்கள்", websiteButton: "இணையதளத்தைப் பாருங்கள்" },
+    intro: { worldButton: "AILU உலகம்", websiteButton: "இணையதளத்தைப் பாருங்கள்" },
     ui: {
       language: {
         label: "மொழி",

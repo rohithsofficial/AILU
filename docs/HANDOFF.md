@@ -59,7 +59,7 @@ Reviewed `claude/new-session-x8qhdu`: no new package, no migration, no change to
 ## Languages on 2026-11-12 (branch `feat/languages`, not merged)
 Rohith chose: address prefixes with our own code (no new package), AI drafts hidden until checked, Kannada full and the other four partial, CMS editing per language with no migration. Guide: `docs/LANGUAGES.md`.
 - English addresses and wording are unchanged. `/kn/...`, `/hi/...`, `/ml/...`, `/ta/...`, `/te/...` serve the other languages. The AILU World and the CRM stay English.
-- Kannada: all Normal World pages, `/celebrate`, forms, errors, legal pages, SEO titles. Hindi, Malayalam, Tamil, Telugu: menu, footer, switcher, forms and errors.
+- All five languages (Kannada, Hindi, Malayalam, Tamil, Telugu) now cover every Normal World page, `/celebrate`, forms, errors, legal pages and SEO titles (Hindi, Malayalam, Tamil and Telugu completed later on 2026-11-12).
 - All five are **drafts**: not in the live switcher, `noindex`, with a "draft, read in English" note. Turn one on with `checked: true` in `src/lib/i18n.ts` after a native speaker checks it.
 - Language button in the top bar (phone and desktop), the Explore menu and the footer. It shows on the live site only once a language is checked.
 - New CMS section "Buttons, forms and messages" (form labels, errors, menu words). CMS language picker; translated sections save as rows like `hero:kn`.
@@ -69,7 +69,7 @@ Rohith chose: address prefixes with our own code (no new package), AI drafts hid
 - World text: nothing needs to change in the generated world files. "Explore Website" in the world opens the English site.
 
 ## Next steps
-0. Languages: have a native speaker read `/kn/classic` and the other Kannada pages (and a lawyer the Kannada legal pages). Then set `kn` to `checked: true`, merge `feat/languages`, and test CMS editing in Kannada on the live site.
+0. Languages: have a native speaker check each language (start with Kannada at `/kn/classic`), and a lawyer the translated legal pages. Mark each checked language `checked: true` in `src/lib/i18n.ts`, merge `feat/languages` with Rohith's OK, and test CMS editing in one language on the live site.
 1. Send one test enquiry from `/celebrate?v=b` (leave Expected guests empty) and check CRM → A/B test, Note: that test enquiry counts as one version B result (results come from the saved notes), so subtract it, or change `LANDING_TEST.id` before real traffic starts. Try a name search in CRM → Inbox and Clients.
 2. Try the world on a real phone: drag up and down, tap the step chips.
 3. Answer the questions at the end of `docs/IMPROVEMENT_IDEAS.md`.

@@ -37,7 +37,7 @@ const translation: Translation = {
         { title: "നിയമപരം", links: [{ label: "സ്വകാര്യത" }, { label: "നിബന്ധനകൾ" }, { label: "റഫറൽ നയം" }] },
       ],
     },
-    intro: { worldButton: "AILU ലോകത്തേക്ക് കടക്കൂ", websiteButton: "വെബ്സൈറ്റ് കാണുക" },
+    intro: { worldButton: "AILU ലോകം", websiteButton: "വെബ്സൈറ്റ് കാണുക" },
     ui: {
       language: {
         label: "ഭാഷ",
