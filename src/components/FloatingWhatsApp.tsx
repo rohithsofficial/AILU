@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useContent } from "@/components/ContentProvider";
 
 export default function FloatingWhatsApp() {
-  const { settings } = useContent();
+  const { settings, ui } = useContent();
   const pathname = usePathname();
   const [avoid, setAvoid] = useState(false);
   // The site chrome stays mounted across client navigation, so look for the new page's forms on every route.
@@ -12,7 +12,7 @@ export default function FloatingWhatsApp() {
     setAvoid(false);
     const competingActions = [
       ...document.querySelectorAll("main form"),
-      ...document.querySelectorAll('#celebration-world a[href="/events#enquire"]'),
+      ...document.querySelectorAll('#celebration-world a[href$="/events#enquire"]'),
     ];
     if (!competingActions.length || !("IntersectionObserver" in window)) return;
     const visible = new Set<Element>();
@@ -28,5 +28,5 @@ export default function FloatingWhatsApp() {
   }, [pathname]);
   if (avoid) return null;
   const href = `${settings.whatsapp}?text=${encodeURIComponent(settings.whatsappMessage)}`;
-  return <a className="whatsapp-float" href={href} target="_blank" rel="noopener noreferrer" aria-label="Chat with AILU on WhatsApp">WhatsApp</a>;
+  return <a className="whatsapp-float" href={href} target="_blank" rel="noopener noreferrer" aria-label={ui.whatsapp.label}>{ui.whatsapp.button}</a>;
 }

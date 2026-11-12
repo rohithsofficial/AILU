@@ -7,15 +7,40 @@ import { audit } from "@/lib/audit";
 import { cleanContent, fillTokens, mergeContent } from "@/lib/cms";
 import { dbConfigured, getPrisma } from "@/lib/db";
 import { CMS_DEFAULTS, CMS_SECTIONS, type CmsKey, type SiteContent } from "@/content/defaults";
+import { translationFor } from "@/content/translations";
+import { DEFAULT_LOCALE, isLocale, overlayTranslation, type Locale } from "@/lib/i18n";
 
 const readPublished = unstable_cache(async () => {
   const rows = await getPrisma().cmsSection.findMany({ select: { key: true, published: true } });
   return Object.fromEntries(rows.map((row) => [row.key, row.published]));
 }, ["cms-published"], { tags: ["cms"], revalidate: 300 });
 
-export function buildContent(published: Record<string, unknown>): SiteContent {
-  const merged = Object.fromEntries(Object.entries(CMS_DEFAULTS).map(([key, value]) => [key, mergeContent(value, published[key])])) as SiteContent;
+// A translated section is saved as its own row, keyed like "hero:kn". English rows keep their plain key.
+const rowKey = (key: string, locale: Locale) => (locale === DEFAULT_LOCALE ? key : `${key}:${locale}`);
+
+/** Reads "hero" or "hero:kn" from the CMS screens. */
+export function parseSectionId(id: string): { key: string; locale: Locale } {
+  const [key, locale] = id.split(":");
+  return { key, locale: isLocale(locale) ? locale : DEFAULT_LOCALE };
+}
+
+/**
+ * The wording for one language. English: the code defaults with CMS edits on top.
+ * Another language: that English, then the translation file, then CMS edits made in that language.
+ * Anything not translated stays English.
+ */
+export function buildContent(published: Record<string, unknown>, locale: Locale = DEFAULT_LOCALE): SiteContent {
+  const english = Object.fromEntries(Object.entries(CMS_DEFAULTS).map(([key, value]) => [key, mergeContent(value, published[key])])) as SiteContent;
+  const merged = locale === DEFAULT_LOCALE ? english : translateSections(english, published, locale);
   return fillTokens(merged, merged.settings);
+}
+
+function translateSections(english: SiteContent, published: Record<string, unknown>, locale: Locale): SiteContent {
+  const file = translationFor(locale).content as Record<string, unknown>;
+  return Object.fromEntries(Object.entries(english).map(([key, value]) => {
+    const fromFile = overlayTranslation(value, file[key]);
+    return [key, overlayTranslation(fromFile, published[rowKey(key, locale)])];
+  })) as SiteContent;
 }
 
 // A slow or blocked database must never hold up a page. After a failure, pages use the last good content
@@ -35,46 +60,74 @@ async function readWithLimit() {
   }
 }
 
-/** What visitors see. If the database cannot be reached, the site falls back to the last good content. */
-export const getContent = cache(async (): Promise<SiteContent> => {
-  if (!dbConfigured() || Date.now() < health.skipUntil) return buildContent(health.lastGood);
+/** What visitors see, in their language. If the database cannot be reached, the site falls back to the last good content. */
+export const getContent = cache(async (locale: Locale = DEFAULT_LOCALE): Promise<SiteContent> => {
+  if (!dbConfigured() || Date.now() < health.skipUntil) return buildContent(health.lastGood, locale);
   try {
     health.lastGood = await readWithLimit();
   } catch (error) {
     health.skipUntil = Date.now() + RETRY_AFTER_MS;
     console.error("CMS content could not be loaded; using the last good content.", (error as Error).message);
   }
-  return buildContent(health.lastGood);
+  return buildContent(health.lastGood, locale);
 });
 
 /** The parts that browser components need, so visitors do not download the whole site's text on each page. */
 export function clientContent(content: SiteContent) {
-  const { settings, hero, journey, eventsPage, nav, intro, comingSoon, celebrations } = content;
-  return { settings, hero, journey, eventsPage, nav, intro, comingSoon, celebrations };
+  const { settings, hero, journey, eventsPage, nav, intro, comingSoon, celebrations, ui } = content;
+  return { settings, hero, journey, eventsPage, nav, intro, comingSoon, celebrations, ui };
 }
 export type ClientContent = ReturnType<typeof clientContent>;
 
-function sectionInfo(key: string) {
+// Sections that have no language versions: the AILU World stays English.
+export const UNTRANSLATED_SECTIONS: CmsKey[] = ["world"];
+
+/** Finds a section from an id like "hero" or "hero:kn", and the database row key it is saved under. */
+function sectionInfo(id: string) {
+  const { key, locale } = parseSectionId(id);
   const info = CMS_SECTIONS.find((section) => section.key === key);
-  if (!info) throw new Error("That section does not exist.");
-  return info;
+  if (!info || (locale !== DEFAULT_LOCALE && UNTRANSLATED_SECTIONS.includes(info.key))) throw new Error("That section does not exist.");
+  return { ...info, locale, row: rowKey(info.key, locale) };
 }
 
-export async function listSections() {
+export async function listSections(locale: Locale = DEFAULT_LOCALE) {
   const rows = await getPrisma().cmsSection.findMany({ select: { key: true, draft: true, published: true, publishedAt: true, updatedAt: true } });
   const byKey = new Map(rows.map((row) => [row.key, row]));
-  return CMS_SECTIONS.map((section) => {
-    const row = byKey.get(section.key);
+  return CMS_SECTIONS.filter((section) => locale === DEFAULT_LOCALE || !UNTRANSLATED_SECTIONS.includes(section.key)).map((section) => {
+    const row = byKey.get(rowKey(section.key, locale));
     return { ...section, hasDraft: row?.draft != null, published: row?.published != null, publishedAt: row?.publishedAt ?? null };
   });
 }
 
+/** Where a translation starts from: live English, with the translation file on top. */
+async function translationBase(key: CmsKey, locale: Locale) {
+  const row = await getPrisma().cmsSection.findUnique({ where: { key }, select: { published: true } });
+  const english = mergeContent(CMS_DEFAULTS[key], row?.published);
+  if (locale === DEFAULT_LOCALE) return { english, base: english };
+  const file = translationFor(locale).content as Record<string, unknown>;
+  return { english, base: overlayTranslation(english, file[key]) };
+}
+
+/** Checks edited content. A translation keeps only its text; links, images and switches stay English. */
+async function cleanFor(info: ReturnType<typeof sectionInfo>, input: unknown) {
+  const cleaned = cleanContent(CMS_DEFAULTS[info.key], input);
+  if (info.locale === DEFAULT_LOCALE) return cleaned;
+  const { base } = await translationBase(info.key, info.locale);
+  return overlayTranslation(base, cleaned);
+}
+
 /** The working copy for the editor: the draft if there is one, otherwise what is live. */
-export async function getSection(key: string) {
-  const info = sectionInfo(key);
-  const row = await getPrisma().cmsSection.findUnique({ where: { key } });
-  const defaults = CMS_DEFAULTS[info.key];
-  return { info, defaults, value: mergeContent(defaults, row?.draft ?? row?.published), hasDraft: row?.draft != null, canUndo: row?.previous != null, publishedAt: row?.publishedAt ?? null };
+export async function getSection(id: string) {
+  const info = sectionInfo(id);
+  const row = await getPrisma().cmsSection.findUnique({ where: { key: info.row } });
+  const saved = row?.draft ?? row?.published;
+  const common = { hasDraft: row?.draft != null, canUndo: row?.previous != null, publishedAt: row?.publishedAt ?? null };
+  if (info.locale === DEFAULT_LOCALE) {
+    const defaults = CMS_DEFAULTS[info.key];
+    return { info, defaults, english: null, value: mergeContent(defaults, saved), ...common };
+  }
+  const { english, base } = await translationBase(info.key, info.locale);
+  return { info, defaults: english, english, value: overlayTranslation(base, saved), ...common };
 }
 
 function refreshSite() {
@@ -82,17 +135,19 @@ function refreshSite() {
   revalidatePath("/", "layout");
 }
 
-export async function saveDraft(actor: { id: string }, key: string, input: unknown) {
-  const info = sectionInfo(key);
-  const draft = cleanContent(CMS_DEFAULTS[info.key], input) as Prisma.InputJsonValue;
+export async function saveDraft(actor: { id: string }, id: string, input: unknown) {
+  const info = sectionInfo(id);
+  const key = info.row;
+  const draft = (await cleanFor(info, input)) as Prisma.InputJsonValue;
   await getPrisma().cmsSection.upsert({ where: { key }, create: { key, draft, updatedById: actor.id }, update: { draft, updatedById: actor.id } });
   await audit(actor, "cms.draft_saved", "CmsSection", key);
 }
 
-export async function publishSection(actor: { id: string; role: string }, key: string, input: unknown) {
-  const info = sectionInfo(key);
+export async function publishSection(actor: { id: string; role: string }, id: string, input: unknown) {
+  const info = sectionInfo(id);
+  const key = info.row;
   if (info.ownerPublish && actor.role !== "OWNER") throw new Error("Only the owner can publish this section. Your draft is saved.");
-  const published = cleanContent(CMS_DEFAULTS[info.key], input) as Prisma.InputJsonValue;
+  const published = (await cleanFor(info, input)) as Prisma.InputJsonValue;
   const db = getPrisma();
   const old = await db.cmsSection.findUnique({ where: { key }, select: { published: true } });
   const previous = (old?.published ?? Prisma.DbNull) as Prisma.InputJsonValue | typeof Prisma.DbNull;
@@ -102,15 +157,16 @@ export async function publishSection(actor: { id: string; role: string }, key: s
   refreshSite();
 }
 
-export async function discardDraft(actor: { id: string }, key: string) {
-  sectionInfo(key);
+export async function discardDraft(actor: { id: string }, id: string) {
+  const key = sectionInfo(id).row;
   await getPrisma().cmsSection.updateMany({ where: { key }, data: { draft: Prisma.DbNull, updatedById: actor.id } });
   await audit(actor, "cms.draft_discarded", "CmsSection", key);
 }
 
 /** Puts back the version from before the last publish. */
-export async function undoPublish(actor: { id: string; role: string }, key: string) {
-  const info = sectionInfo(key);
+export async function undoPublish(actor: { id: string; role: string }, id: string) {
+  const info = sectionInfo(id);
+  const key = info.row;
   if (info.ownerPublish && actor.role !== "OWNER") throw new Error("Only the owner can publish this section.");
   const db = getPrisma();
   const row = await db.cmsSection.findUnique({ where: { key }, select: { published: true, previous: true } });
@@ -121,8 +177,9 @@ export async function undoPublish(actor: { id: string; role: string }, key: stri
 }
 
 /** Goes back to the original wording in the code. */
-export async function restoreDefault(actor: { id: string; role: string }, key: string) {
-  const info = sectionInfo(key);
+export async function restoreDefault(actor: { id: string; role: string }, id: string) {
+  const info = sectionInfo(id);
+  const key = info.row;
   if (info.ownerPublish && actor.role !== "OWNER") throw new Error("Only the owner can publish this section.");
   const db = getPrisma();
   const old = await db.cmsSection.findUnique({ where: { key }, select: { published: true } });

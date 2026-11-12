@@ -1,5 +1,6 @@
 // The dark title band at the top of inner Normal World pages.
-export default function PageHero({ title, children, marker = "A moment, made yours" }: { title: string; children?: React.ReactNode; marker?: string }) {
+export default function PageHero({ title, children, marker }: { title: string; children?: React.ReactNode; marker?: string }) {
+  marker ||= "A moment, made yours";
   return (
     <section className="relative isolate overflow-hidden bg-ailu-black text-ailu-cream">
       <div aria-hidden className="absolute inset-y-0 right-[12%] w-px bg-ailu-yellow/10" />

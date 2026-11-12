@@ -1,5 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useContent } from "@/components/ContentProvider";
+import { useLocale } from "@/components/LocaleLink";
+import { serverMessage } from "./formText";
 
 export type SubmitState = { status: "idle" | "sending" | "done" | "error"; message?: string; id?: string; fields?: Record<string, string[]> };
 // aria-invalid is set on a field the server rejected; the red border is what "Please check the highlighted fields" points to.
@@ -7,6 +10,8 @@ export const inputCls = "mt-1 min-h-11 w-full rounded-sm border border-white/20 
 
 // Posts a form to an API route as JSON. `build` turns the raw FormData into the payload.
 export function useFormSubmit(endpoint: string, build: (fd: FormData) => Record<string, unknown>) {
+  const locale = useLocale();
+  const text = useContent().ui.forms;
   const [state, setState] = useState<SubmitState>({ status: "idle" });
   useEffect(() => {
     if (state.status === "done" || state.status === "error") document.getElementById("public-form-feedback")?.focus();
@@ -18,10 +23,12 @@ export function useFormSubmit(endpoint: string, build: (fd: FormData) => Record<
     try {
       const res = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(build(new FormData(e.currentTarget))) });
       const json = await res.json();
-      if (!res.ok) return setState({ status: "error", message: json.error, fields: json.fields });
+      if (!res.ok) return setState({ status: "error", message: serverMessage(locale, res.status, json.error, text.server), fields: json.fields });
       setState({ status: "done", id: json.id });
-    } catch { setState({ status: "error", message: "Could not reach AILU. Check your connection and try again." }); }
+    } catch { setState({ status: "error", message: text.server.network }); }
   }
   const err = (f: string) => state.fields?.[f]?.[0];
-  return { state, onSubmit, err };
+  /** The message under a field: the server's words in English, the CMS wording in other languages. */
+  const fieldMessage = (f: string, translated: string) => (err(f) ? (locale === "en" ? err(f) : translated) : undefined);
+  return { state, onSubmit, err, fieldMessage, text, locale };
 }

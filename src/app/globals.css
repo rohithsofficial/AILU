@@ -8,6 +8,20 @@ body { background: var(--cream); color: var(--black); font-family: var(--font-in
 /* Landing page (/celebrate): dark behind the page, so a phone's bounce scroll never flashes cream. */
 html:has([data-landing-variant]), body:has([data-landing-variant]) { background: #111111; }
 h1, h2, h3 { font-family: var(--font-poppins), system-ui, sans-serif; }
+
+/* Translated pages (components/LanguageRoot.tsx). Latin letters keep Poppins and Inter; the page's own script
+   uses its Noto font. Indian scripts need more line height and no negative letter spacing, or the vowel signs
+   above and below the letters get cut off or overlap. */
+.i18n-script[lang="kn"] { --font-indic: var(--font-noto-kn); }
+.i18n-script[lang="hi"] { --font-indic: var(--font-noto-hi); }
+.i18n-script[lang="ml"] { --font-indic: var(--font-noto-ml); }
+.i18n-script[lang="ta"] { --font-indic: var(--font-noto-ta); }
+.i18n-script[lang="te"] { --font-indic: var(--font-noto-te); }
+.i18n-script, .i18n-script .font-body { font-family: var(--font-inter), var(--font-indic), system-ui, sans-serif; }
+.i18n-script :is(h1, h2, h3, .font-display) { font-family: var(--font-poppins), var(--font-indic), system-ui, sans-serif; }
+.i18n-script * { letter-spacing: normal !important; }
+.i18n-script :is(h1, h2, h3, .font-display) { line-height: 1.3 !important; overflow-wrap: break-word; }
+.i18n-script :is(p, li, label, summary, legend, a, button) { line-height: 1.6; }
 :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 .skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 100; transform: translateY(-180%); border-radius: .5rem; background: var(--yellow); color: var(--black); padding: .75rem 1rem; font-weight: 700; }
 .skip-link:focus { transform: translateY(0); }

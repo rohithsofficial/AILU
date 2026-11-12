@@ -1,0 +1,21 @@
+// Normal World: sales partner registration form. Registering does not guarantee earnings.
+import PageHero from "@/components/PageHero";
+import PartnerForm from "@/components/forms/PartnerForm";
+import { metadataForPath } from "@/lib/public-metadata";
+import { getContent } from "@/server/cms";
+import { toLocale, type LangParams } from "@/lib/i18n";
+export async function generateMetadata({ params }: LangParams) { const locale = toLocale(params.lang); return metadataForPath("/join/partner", (await getContent(locale)).seo, locale); }
+
+export default async function PartnerPage({ params }: LangParams) {
+  const content = await getContent(toLocale(params.lang));
+  const t = content.join;
+  return (
+    <>
+      <PageHero marker={content.ui.pageMarker} title={t.partnerPageTitle}>{t.partnerPageLead}</PageHero>
+      <div className="mx-auto max-w-3xl px-4 py-14">
+        <p className="mb-6 rounded-lg bg-ailu-yellow/50 p-4 text-sm text-black">{t.partnerPageNote}</p>
+        <PartnerForm />
+      </div>
+    </>
+  );
+}

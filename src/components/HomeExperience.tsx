@@ -1,14 +1,15 @@
 // Normal World home: everything under the story: ticker, at a glance, services, people, culture, inspiration,
 // about, how it works, opportunities and FAQ. Wording comes from the CMS (Home section).
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/LocaleLink";
 import { getContent } from "@/server/cms";
 import { BRAND } from "@/lib/brand";
+import type { Locale } from "@/lib/i18n";
 
 const ideaArt = ["from-ailu-yellow/35 via-ailu-yellow/10 to-ailu-cream/5", "from-white/15 via-ailu-black to-ailu-yellow/25", "from-ailu-yellow/30 via-ailu-black to-white/10"];
 
-export default async function HomeExperience() {
-  const content = await getContent();
+export default async function HomeExperience({ locale = "en" }: { locale?: Locale }) {
+  const content = await getContent(locale);
   const t = content.home;
   const EVENT_CATEGORIES = content.celebrations.items;
   const featuredFaqs = content.faqs.items.slice(0, 5);

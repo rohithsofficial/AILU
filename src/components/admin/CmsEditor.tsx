@@ -1,10 +1,13 @@
 "use client";
 
 // CMS editor form. It is built from the shape of the default content, so new keys appear automatically.
+// With `english` set it edits a translation: text fields only, each with the English line under it.
+// Links, photos, switches and list order stay English (src/lib/i18n.ts overlayTranslation).
 import { useState } from "react";
 import { humanise, isFixedKey, isFixedList, isImageKey, listTemplate, type Json } from "@/lib/cms";
 import { ConfirmButton } from "@/components/admin/RecordControls";
 import MediaUpload, { type MediaItem } from "@/components/admin/MediaUpload";
+import { isSharedKey } from "@/lib/i18n";
 
 const input = "mt-1 w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-ailu-cream";
 const small = "rounded-lg border border-white/20 px-2.5 py-1 text-xs text-ailu-cream/80 hover:border-ailu-yellow disabled:opacity-30";
@@ -29,8 +32,12 @@ function ImageField({ label, value, onChange, media, setMedia }: { label: string
   </div>;
 }
 
-function Field({ name, value, sample, onChange, media, setMedia, section }: { name: string; value: Json; sample: Json | undefined; onChange: Change; media: MediaItem[]; setMedia: (items: MediaItem[]) => void; section: string }) {
+type FieldProps = { name: string; value: Json; sample: Json | undefined; onChange: Change; media: MediaItem[]; setMedia: (items: MediaItem[]) => void; section: string; english?: Json };
+
+function Field({ name, value, sample, onChange, media, setMedia, section, english }: FieldProps) {
   const label = humanise(name);
+  const translating = english !== undefined;
+  if (translating && (typeof value === "boolean" || (typeof value === "string" && (isFixedKey(name) || isSharedKey(name) || isImageKey(name))))) return null;
   if (typeof value === "boolean") return <label className="flex min-h-10 items-center gap-2 text-sm"><input type="checkbox" checked={value} onChange={(event) => onChange(event.target.checked)} /> {label}</label>;
   if (typeof value === "string") {
     if (isFixedKey(name)) return value ? <p className="text-xs text-ailu-cream/50">{label}: <code>{value}</code></p> : null;
@@ -39,11 +46,13 @@ function Field({ name, value, sample, onChange, media, setMedia, section }: { na
     const long = value.length > 70 || /(text|body|copy|lead|answer|blurb|description|paragraphs)$/i.test(name);
     return <label className="block text-sm">{label}{limit ? <Counter value={value} limit={limit} /> : null}
       {long ? <textarea value={value} rows={Math.min(10, Math.max(2, Math.ceil(value.length / 80)))} onChange={(event) => onChange(event.target.value)} className={input} /> : <input value={value} onChange={(event) => onChange(event.target.value)} className={input} />}
+      {translating && typeof english === "string" ? <span lang="en" className="mt-1 block text-xs text-ailu-cream/45">English: {english}</span> : null}
     </label>;
   }
   if (Array.isArray(value)) {
     const base = Array.isArray(sample) ? sample : [];
-    const fixed = isFixedList(base);
+    const fixed = translating || isFixedList(base);
+    const englishItems = Array.isArray(english) ? english : [];
     const move = (from: number, to: number) => { const next = [...value]; const [item] = next.splice(from, 1); next.splice(to, 0, item); onChange(next); };
     const summary = (item: Json, index: number) => {
       if (typeof item === "string") return item || `Item ${index + 1}`;
@@ -59,7 +68,7 @@ function Field({ name, value, sample, onChange, media, setMedia, section }: { na
             <button type="button" className={small} disabled={index === value.length - 1} onClick={() => move(index, index + 1)}>Move down</button>
             <button type="button" className={`${small} text-red-400`} onClick={() => onChange(value.filter((_, i) => i !== index))}>Remove</button>
           </div>;
-          const child = <Field name={typeof item === "string" ? `${name.replace(/s$/, "")} ${index + 1}` : name} value={item} sample={base[0] ?? listTemplate(name, base)} onChange={(next) => onChange(value.map((old, i) => i === index ? next : old))} media={media} setMedia={setMedia} section={section} />;
+          const child = <Field name={typeof item === "string" ? `${name.replace(/s$/, "")} ${index + 1}` : name} value={item} sample={base[0] ?? listTemplate(name, base)} onChange={(next) => onChange(value.map((old, i) => i === index ? next : old))} media={media} setMedia={setMedia} section={section} english={translating ? englishItems[index] ?? "" : undefined} />;
           if (typeof item === "string") return <div key={index}>{child}{controls}</div>;
           return <details key={index} className="rounded-lg border border-white/10 p-3">
             <summary className="cursor-pointer text-sm font-medium">{summary(item, index)}</summary>
@@ -71,7 +80,8 @@ function Field({ name, value, sample, onChange, media, setMedia, section }: { na
     </fieldset>;
   }
   const baseFields = (sample ?? {}) as Record<string, Json>;
-  return <div className="space-y-3">{Object.entries(value).map(([key, item]) => <Field key={key} name={key} value={item} sample={baseFields[key]} onChange={(next) => onChange({ ...value, [key]: next })} media={media} setMedia={setMedia} section={section} />)}</div>;
+  const englishFields = (english ?? {}) as Record<string, Json>;
+  return <div className="space-y-3">{Object.entries(value).map(([key, item]) => <Field key={key} name={key} value={item} sample={baseFields[key]} onChange={(next) => onChange({ ...value, [key]: next })} media={media} setMedia={setMedia} section={section} english={translating ? englishFields[key] ?? "" : undefined} />)}</div>;
 }
 
 function GooglePreview({ value }: { value: Json }) {
@@ -91,21 +101,23 @@ function GooglePreview({ value }: { value: Json }) {
   </section>;
 }
 
-export default function CmsEditor({ sectionKey, initial, defaults, media: startMedia, action, canPublish, canUndo, hasDraft }: { sectionKey: string; initial: Json; defaults: Json; media: MediaItem[]; action: (fd: FormData) => Promise<void>; canPublish: boolean; canUndo: boolean; hasDraft: boolean }) {
+// `sectionKey` is "hero" for English or "hero:kn" for a translation. `english` is given only for a translation.
+export default function CmsEditor({ sectionKey, english, initial, defaults, media: startMedia, action, canPublish, canUndo, hasDraft }: { sectionKey: string; english?: Json | null; initial: Json; defaults: Json; media: MediaItem[]; action: (fd: FormData) => Promise<void>; canPublish: boolean; canUndo: boolean; hasDraft: boolean }) {
+  const key = sectionKey.split(":")[0];
   const [value, setValue] = useState<Json>(initial);
   const [media, setMedia] = useState(startMedia);
   const button = "rounded-lg px-4 py-2 text-sm font-semibold";
   return <form action={action} className="mt-5">
     <input type="hidden" name="key" value={sectionKey} />
     <input type="hidden" name="value" value={JSON.stringify(value)} />
-    {sectionKey === "seo" ? <GooglePreview value={value} /> : null}
-    <div className="mt-5 rounded-2xl border border-white/10 bg-[#111114] p-5"><Field name={sectionKey} value={value} sample={defaults} onChange={setValue} media={media} setMedia={setMedia} section={sectionKey} /></div>
+    {key === "seo" ? <GooglePreview value={value} /> : null}
+    <div className="mt-5 rounded-2xl border border-white/10 bg-[#111114] p-5"><Field name={key} value={value} sample={defaults} onChange={setValue} media={media} setMedia={setMedia} section={key} english={english ?? undefined} /></div>
     <div className="sticky bottom-0 z-10 mt-4 flex flex-wrap items-center gap-2 border-t border-white/10 bg-[#0b0b0d] py-3">
       <button name="intent" value="save" className={`${button} border border-ailu-yellow/60 text-ailu-yellow`}>Save draft</button>
       {canPublish ? <button name="intent" value="publish" className={`${button} bg-ailu-yellow text-ailu-black`}>Publish</button> : <span className="text-xs text-ailu-cream/55">An owner or manager will publish this.</span>}
       {hasDraft ? <button name="intent" value="discard" className="text-sm text-ailu-cream/60 underline">Discard draft</button> : null}
       {canPublish && canUndo ? <button name="intent" value="undo" className="text-sm text-ailu-cream/60 underline">Undo last publish</button> : null}
-      {canPublish ? <span className="ml-auto"><ConfirmButton label="Restore original" message="Go back to the original wording for this section? Your published changes will be replaced." className="text-sm text-red-400 underline" name="intent" value="restore" /></span> : null}
+      {canPublish ? <span className="ml-auto"><ConfirmButton label="Restore original" message={english ? "Go back to the draft translation for this section? Your published changes in this language will be replaced." : "Go back to the original wording for this section? Your published changes will be replaced."} className="text-sm text-red-400 underline" name="intent" value="restore" /></span> : null}
     </div>
   </form>;
 }

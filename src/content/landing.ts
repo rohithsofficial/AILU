@@ -47,4 +47,10 @@ export const LANDING = {
   whatsappLabel: "WhatsApp us",
   callLabel: "Call",
   enquireShort: "Enquire",
+  homeLabel: "AILU website home",
+  quickActions: "Quick actions",
+  goodToKnow: "Good to know",
+  websiteLink: "Website",
+  privacyLink: "Privacy",
+  termsLink: "Terms",
 };

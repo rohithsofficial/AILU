@@ -4,6 +4,7 @@ import { PUBLIC_PAGE_CONTENT } from "@/lib/public-metadata";
 import { SITE_CONTENT } from "@/content/site";
 import { LEGAL_TEXT } from "@/content/legalText";
 import { PAGE_TEXT } from "@/content/pageText";
+import { UI_TEXT } from "@/content/uiText";
 
 // Everything the CMS can change, with today's wording as the default. The editor screens are built from the
 // shape of this object, so a new key here appears in the CMS without more code.
@@ -117,6 +118,7 @@ export const CMS_DEFAULTS = {
     ],
   },
   intro: PAGE_TEXT.intro,
+  ui: UI_TEXT,
   world: SITE_CONTENT.world,
   privacy: LEGAL_TEXT.privacy,
   terms: LEGAL_TEXT.terms,
@@ -149,6 +151,7 @@ export const CMS_SECTIONS: CmsSectionInfo[] = [
   { key: "comingSoon", group: "Pages", label: "Coming soon", help: "Shown to the public while the site is hidden." },
   { key: "nav", group: "Site parts", label: "Menu", help: "The full-screen menu on the website." },
   { key: "footer", group: "Site parts", label: "Footer", help: "The bottom of every normal page." },
+  { key: "ui", group: "Site parts", label: "Buttons, forms and messages", help: "Menu links, form labels, error messages and language notes used across the website." },
   { key: "intro", group: "AILU World", label: "Intro", help: "The welcome screen, and the world and website button names." },
   { key: "world", group: "AILU World", label: "World text", help: "Form cards and policy text inside the world. The 3D scenes stay in code." },
   { key: "privacy", group: "Legal", label: "Privacy policy", help: "Have legal changes checked by a lawyer. Only the owner can publish these.", ownerPublish: true },

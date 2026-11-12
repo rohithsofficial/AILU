@@ -6,15 +6,17 @@ import { actionMessage } from "@/lib/actionMessage";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { can, requireRole } from "@/lib/authz";
-import { deleteMedia, discardDraft, publishSection, restoreDefault, saveDraft, undoPublish, updateMediaAlt } from "@/server/cms";
+import { deleteMedia, discardDraft, parseSectionId, publishSection, restoreDefault, saveDraft, undoPublish, updateMediaAlt } from "@/server/cms";
 
 const message = (error: unknown) => actionMessage(error);
-const back = (path: string, text: string): never => redirect(`${path}?msg=${encodeURIComponent(text)}`);
+const back = (path: string, text: string): never => redirect(`${path}${path.includes("?") ? "&" : "?"}msg=${encodeURIComponent(text)}`);
 
 export async function cmsSectionAction(fd: FormData) {
+  // `key` is a section id: "hero" for English, "hero:kn" for its Kannada wording.
   const key = String(fd.get("key") ?? "");
   const intent = String(fd.get("intent") ?? "save");
-  const path = `/admin/cms/${key}`;
+  const section = parseSectionId(key);
+  const path = `/admin/cms/${section.key}${section.locale === "en" ? "" : `?lang=${section.locale}`}`;
   let done = "Draft saved. Visitors do not see it yet.";
   try {
     const staff = await requireRole(["OWNER", "MANAGER", "STAFF"]);
@@ -29,7 +31,7 @@ export async function cmsSectionAction(fd: FormData) {
     } else if (intent === "undo") { publisher(); await undoPublish(staff, key); done = "Went back to the earlier version."; }
     else if (intent === "restore") { publisher(); await restoreDefault(staff, key); done = "Back to the original wording."; }
     revalidatePath("/admin/cms");
-    revalidatePath(path);
+    revalidatePath(`/admin/cms/${section.key}`);
   } catch (error) { done = message(error); }
   back(path, done);
 }

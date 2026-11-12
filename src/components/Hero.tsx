@@ -2,7 +2,7 @@
 
 // Normal World home: the first screen (headline, buttons, and the 3D hand on large screens).
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/LocaleLink";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { BRAND } from "@/lib/brand";

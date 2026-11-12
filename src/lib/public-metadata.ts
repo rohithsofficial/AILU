@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getCategory } from "@/lib/events";
+import { DEFAULT_LOCALE, LANGUAGES, indexedLocales, languageAlternates, localePath, type Locale } from "@/lib/i18n";
 
 type SeoPage = { path: string; title: string; description: string; shareImage: string; hideFromGoogle: boolean };
 type SeoContent = { defaultShareImage: string; pages: SeoPage[] };
@@ -31,28 +32,35 @@ export const PUBLIC_PAGE_CONTENT: Record<string, { title: string; description: s
   "/referral-policy": { title: "Referral policy", description: "How AILU partner IDs are recorded and when a referral reward may be considered." },
 };
 
-export function metadataForPath(path: keyof typeof PUBLIC_PAGE_CONTENT, seo?: SeoContent): Metadata {
+export function metadataForPath(path: keyof typeof PUBLIC_PAGE_CONTENT, seo?: SeoContent, locale: Locale = DEFAULT_LOCALE): Metadata {
   const item = PUBLIC_PAGE_CONTENT[path];
   const page = seo?.pages.find((entry) => entry.path === path);
-  const metadata = publicMetadata(page?.title || item.title, page?.description || item.description, path, page?.shareImage || seo?.defaultShareImage);
+  const metadata = publicMetadata(page?.title || item.title, page?.description || item.description, path, page?.shareImage || seo?.defaultShareImage, locale);
   return page?.hideFromGoogle ? { ...metadata, robots: { index: false, follow: false } } : metadata;
 }
 
-export function eventMetadata(slug: string, celebrations?: CelebrationSeo[], defaultImage?: string): Metadata | undefined {
+export function eventMetadata(slug: string, celebrations?: CelebrationSeo[], defaultImage?: string, locale: Locale = DEFAULT_LOCALE): Metadata | undefined {
   const edited = celebrations?.find((item) => item.slug === slug);
   const category = edited ?? getCategory(slug);
   if (!category) return undefined;
   const description = edited?.seoDescription || `${category.blurb} Based in Udupi, planning celebrations across India.`;
-  return publicMetadata(edited?.seoTitle || category.title, description, `/events/${category.slug}`, edited?.shareImage || defaultImage);
+  return publicMetadata(edited?.seoTitle || category.title, description, `/events/${category.slug}`, edited?.shareImage || defaultImage, locale);
 }
 
-export function publicMetadata(title: string, description: string, path: string, image?: string): Metadata {
+/**
+ * Title, description, share card and address for a page in one language. `path` is the English address.
+ * hreflang links appear once a second language is checked. A draft language is kept out of Google.
+ */
+export function publicMetadata(title: string, description: string, path: string, image?: string, locale: Locale = DEFAULT_LOCALE): Metadata {
   const images = image ? [image] : undefined;
+  const url = localePath(locale, path);
+  const languages = indexedLocales().length > 1 && LANGUAGES[locale].checked ? { languages: languageAlternates(path) } : {};
   return {
     title,
     description,
-    alternates: { canonical: path },
-    openGraph: { title: `${title} | AILU`, description, type: "website", url: path, siteName: "AILU", ...(images ? { images } : {}) },
+    alternates: { canonical: url, ...languages },
+    openGraph: { title: `${title} | AILU`, description, type: "website", url, siteName: "AILU", ...(images ? { images } : {}) },
     twitter: { card: "summary_large_image", title: `${title} | AILU`, description, ...(images ? { images } : {}) },
+    ...(LANGUAGES[locale].checked ? {} : { robots: { index: false, follow: true } }),
   };
 }

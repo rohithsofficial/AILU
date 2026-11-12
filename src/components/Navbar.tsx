@@ -1,12 +1,14 @@
 "use client";
 
 // Normal World top bar: logo, main links, the "Enter AILU World" switch and the Explore menu.
-import Link from "next/link";
+import Link from "./LocaleLink";
+import LanguageSwitcher from "./LanguageSwitcher";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { BRAND } from "@/lib/brand";
+import { splitLocale } from "@/lib/i18n";
 import NavLogo from "./NavLogo";
 import { SITE_CONTENT } from "@/content/site";
 
@@ -22,7 +24,7 @@ const sceneMotion = {
 };
 
 export default function Navbar() {
-  const { nav: t, intro } = useContent();
+  const { nav: t, intro, ui } = useContent();
   const DESTINATIONS = t.destinations;
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -87,11 +89,12 @@ export default function Navbar() {
     <>
       <header className="sticky top-0 z-40 border-b border-white/10 bg-ailu-black text-ailu-cream">
         <nav className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3" aria-label="Main">
-          <Link href={TO_SITE.href} aria-label="AILU home" data-ailu-logo className="block shrink-0"><NavLogo compact={compact} /></Link>
+          <Link href={TO_SITE.href} aria-label={ui.nav.home} data-ailu-logo className="block shrink-0"><NavLogo compact={compact} /></Link>
           <div className="hidden items-center gap-6 text-sm text-ailu-cream/65 lg:flex">
-            {[{ href: "/events", label: "Events" }, { href: "/join", label: "Join" }, { href: "/dreams", label: "Dream support" }, { href: "/about", label: "About" }].map((item) => <Link key={item.href} href={item.href} className="min-h-10 inline-flex items-center transition-colors hover:text-ailu-yellow">{item.label}</Link>)}
+            {[{ href: "/events", label: ui.nav.events }, { href: "/join", label: ui.nav.join }, { href: "/dreams", label: ui.nav.dreams }, { href: "/about", label: ui.nav.about }].map((item) => <Link key={item.href} href={item.href} className="min-h-10 inline-flex items-center transition-colors hover:text-ailu-yellow">{item.label}</Link>)}
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 min-[400px]:gap-2">
+          <LanguageSwitcher />
           <Link href={TO_WORLD.href} className="inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full bg-ailu-yellow px-3 text-xs font-bold text-ailu-black transition-colors hover:bg-ailu-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ailu-yellow sm:px-4 sm:text-sm">
             {intro.worldButton} <span aria-hidden className="hidden min-[400px]:inline">◉</span>
           </Link>
@@ -100,14 +103,14 @@ export default function Navbar() {
             type="button"
             aria-expanded={open}
             aria-controls="celebration-portal"
-            aria-label={open ? "Close the AILU celebration world" : "Explore the AILU celebration world"}
+            aria-label={open ? ui.nav.closeMenu : ui.nav.openMenu}
             onClick={() => setOpen((value) => !value)}
             className="group inline-flex min-h-12 items-center gap-2 rounded-full border border-ailu-yellow/50 px-2 py-1.5 min-[400px]:px-3 text-sm font-semibold text-ailu-cream transition-colors hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow sm:gap-3 sm:px-5"
           >
             <span className="relative block h-7 w-8 overflow-hidden min-[400px]:h-8 min-[400px]:w-10">
               <Image src={BRAND.hand} alt="" fill sizes="40px" className="object-contain transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110" />
             </span>
-            <span className="hidden sm:inline">{open ? "Return" : "Explore AILU"}</span>
+            <span className="hidden sm:inline">{open ? ui.nav.close : ui.nav.explore}</span>
             <span aria-hidden className="hidden text-ailu-yellow sm:inline">{open ? "×" : "↗"}</span>
           </button>
           </div>
@@ -121,7 +124,7 @@ export default function Navbar() {
             ref={panelRef}
             role="dialog"
             aria-modal="true"
-            aria-label="Explore the AILU celebration world"
+            aria-label={ui.nav.openMenu}
             data-scene={destination.scene}
             className="fixed inset-0 z-[70] overflow-y-auto bg-ailu-black text-ailu-cream"
             initial={reduceMotion ? { opacity: 0 } : { clipPath: "circle(0% at calc(100% - 90px) 32px)", opacity: 0.85 }}
@@ -143,8 +146,8 @@ export default function Navbar() {
             />
             <div className="relative mx-auto flex min-h-full max-w-[1600px] flex-col px-6 pb-8 pt-6 sm:px-10 sm:pb-10 lg:px-16 lg:pt-8">
               <div className="flex items-center justify-between">
-                <Link href={TO_SITE.href} aria-label="AILU home" onClick={() => setOpen(false)} className="rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow"><NavLogo compact={false} /></Link>
-                <button type="button" onClick={() => setOpen(false)} className="inline-flex min-h-11 items-center gap-3 rounded-full border border-white/30 px-4 text-sm font-semibold transition hover:border-ailu-yellow hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow" aria-label="Close and return to the page">
+                <Link href={TO_SITE.href} aria-label={ui.nav.home} onClick={() => setOpen(false)} className="rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow"><NavLogo compact={false} /></Link>
+                <button type="button" onClick={() => setOpen(false)} className="inline-flex min-h-11 items-center gap-3 rounded-full border border-white/30 px-4 text-sm font-semibold transition hover:border-ailu-yellow hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow" aria-label={ui.nav.closeAndReturn}>
                   <span aria-hidden className="relative block h-7 w-9"><Image src={BRAND.hand} alt="" fill sizes="36px" className="object-contain" /></span> {t.closeButton}
                 </button>
               </div>
@@ -167,7 +170,7 @@ export default function Navbar() {
                       <Link
                         key={item.href}
                         href={item.href}
-                        aria-current={item.href !== "/" && pathname.startsWith(item.href) ? "page" : undefined}
+                        aria-current={item.href !== "/" && splitLocale(pathname).path.startsWith(item.href) ? "page" : undefined}
                         onMouseEnter={() => setActive(index)}
                         onFocus={() => setActive(index)}
                         onKeyDown={(event) => handleDestinationKey(event, index)}
@@ -190,6 +193,7 @@ export default function Navbar() {
 
               <div className="relative z-10 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/15 pt-4 text-xs text-ailu-cream/60 sm:gap-x-8 sm:pt-5">
                 <span className="mr-1 font-semibold uppercase tracking-[.18em] text-ailu-cream/40">{t.alsoTitle}</span>
+                <LanguageSwitcher variant="list" />
                 <Link href={TO_WORLD.href} onClick={() => setOpen(false)} className="min-h-11 inline-flex items-center rounded-full bg-ailu-yellow px-4 font-bold text-ailu-black hover:bg-ailu-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ailu-yellow">{intro.worldButton} ◉</Link>
                 <Link href="/dreams" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">{t.dreamLink}</Link>
                 <Link href="/contact" onClick={() => setOpen(false)} className="min-h-9 inline-flex items-center hover:text-ailu-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow">{t.contactLink}</Link>

@@ -1,7 +1,7 @@
 "use client";
 
 // Normal World home: the scroll story of event types. Swipe or scroll between chapters; 3D only on large screens.
-import Link from "next/link";
+import Link from "@/components/LocaleLink";
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
