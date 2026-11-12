@@ -12,7 +12,7 @@ import { steadyPhoneTurn } from "./phoneTurn";
 import { roomSwipe } from "./roomSwipe";
 import { levelView } from "./levelView";
 import { worldSteps } from "./worldSteps";
-import { ENTER_WORLD_EVENT, INTRO_SEEN_KEY, INTRO_STEPS_MS, whenIdle } from "@/lib/worldStart";
+import { ENTER_WORLD_EVENT, INTRO_STEPS_MS, introSeen, whenIdle } from "@/lib/worldStart";
 import { SITE_CONTENT } from "@/content/site";
 
 // The engine builds a hotspot and a dock button for every place. Remove the ones the site has switched off.
@@ -70,7 +70,7 @@ export default function AiluWorld({ markup }: { markup: string }) {
     const boot = () => { loadThree().then((THREE) => start(withLightRenderer(THREE)), () => start(undefined)); };
     // A first visit starts the engine only when the visitor enters the world. three.js loads quietly once the
     // intro has reached its choices, so it never interrupts the text. A returning visitor starts when the browser is free.
-    const firstVisit = !sessionStorage.getItem(INTRO_SEEN_KEY);
+    const firstVisit = !introSeen();
     let cancelIdle = () => {};
     let prefetch: ReturnType<typeof setTimeout> | undefined;
     if (firstVisit) {

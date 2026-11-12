@@ -1,13 +1,14 @@
 "use client";
 
-// The intro on "/" (once per browser session): hand, welcome, then "Enter AILU World" or "Explore Website".
+// The intro on "/" (first visit, then again after INTRO_REPEAT_DAYS): hand, welcome, then "Enter AILU World" or "Explore Website".
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BRAND } from "@/lib/brand";
 import { SITE_CONTENT } from "@/content/site";
 import { useContent } from "@/components/ContentProvider";
-import { ENTER_WORLD_EVENT, INTRO_SEEN_KEY as KEY, INTRO_STEPS_MS } from "@/lib/worldStart";
+import { ENTER_WORLD_EVENT, INTRO_STEPS_MS, introSeen, markIntroSeen } from "@/lib/worldStart";
+import World360Icon from "@/components/World360Icon";
 const { toSite } = SITE_CONTENT.switch;
 
 const setLogo = (v: "pending" | "ready") => { document.documentElement.dataset.logo = v; };
@@ -25,7 +26,7 @@ export default function Intro() {
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem(KEY)) { setLogo("ready"); setPhase("done"); return; }
+    if (introSeen()) { setLogo("ready"); setPhase("done"); return; }
     const rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setReduced(rm);
     setLogo("pending");
@@ -49,7 +50,7 @@ export default function Intro() {
     if (phase === "done") document.getElementById("main-content")?.focus();
   }, [phase]);
 
-  const finishNow = () => { sessionStorage.setItem(KEY, "1"); setLogo("ready"); setPhase("done"); };
+  const finishNow = () => { markIntroSeen(); setLogo("ready"); setPhase("done"); };
 
   // "Skip intro" and "Enter AILU World" fade the intro away to show the world behind it.
   function enterWorld() {
@@ -82,9 +83,14 @@ export default function Intro() {
             {step >= 3 && <div key="choose" className="intro-rise">
               <h2 className="font-display text-2xl font-bold sm:text-3xl">{t.question}</h2>
               <p className="mt-2 text-sm text-ailu-cream/65">{t.questionText}</p>
-              <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-                <button onClick={enterWorld} className="min-h-14 rounded-full bg-ailu-yellow px-7 font-semibold text-ailu-black transition hover:-translate-y-1">{t.worldButton}</button>
-                <button onClick={goToWebsite} className="min-h-14 rounded-full border border-ailu-yellow px-7 font-semibold text-ailu-yellow transition hover:bg-ailu-yellow/10">{t.websiteButton}</button>
+              {/* The world is the special choice, so it gets a glowing card that says what waits inside. */}
+              <div className="mt-6 grid gap-3">
+                <button onClick={enterWorld} className="group relative overflow-hidden rounded-2xl bg-ailu-yellow p-4 text-left text-ailu-black shadow-[0_0_40px_rgba(245,196,0,.35)] transition hover:-translate-y-1 sm:p-5">
+                  <span className="absolute right-3 top-3 rounded-full bg-ailu-black px-2 py-0.5 text-[10px] font-bold uppercase tracking-[.15em] text-ailu-yellow">{t.worldBadge}</span>
+                  <span className="flex items-center gap-3 pr-16 font-display text-xl font-bold sm:text-2xl"><World360Icon className="h-7 w-7 shrink-0" />{t.worldButton}<span aria-hidden className="transition-transform group-hover:translate-x-1">→</span></span>
+                  <span className="mt-1.5 block text-sm leading-snug text-black/75">{t.worldHint}</span>
+                </button>
+                <button onClick={goToWebsite} className="min-h-12 rounded-full border border-ailu-yellow/60 px-6 text-sm font-semibold text-ailu-yellow transition hover:bg-ailu-yellow/10">{t.websiteButton} <span className="font-normal text-ailu-cream/60">· {t.websiteHint}</span></button>
               </div>
             </div>}
           </div>
