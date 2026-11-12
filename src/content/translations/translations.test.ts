@@ -69,10 +69,12 @@ describe("buildContent per language", () => {
     expect(kn.hero.titleLine2).not.toBe("Edited in English");
   });
 
-  it("an untranslated line falls back to English", () => {
-    const hi = buildContent({}, "hi");
-    expect(hi.hero).toEqual(CMS_DEFAULTS.hero);
-    expect(hi.ui.nav.events).not.toBe(CMS_DEFAULTS.ui.nav.events);
+  it("an untranslated part falls back to English (the AILU World text stays English)", () => {
+    for (const locale of ["kn", "hi", "ml", "ta", "te"] as const) {
+      const built = buildContent({}, locale);
+      expect(built.world).toEqual(CMS_DEFAULTS.world);
+      expect(built.ui.nav.events).not.toBe(CMS_DEFAULTS.ui.nav.events);
+    }
   });
 
   it("builds every language without errors", () => {

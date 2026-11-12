@@ -1,11 +1,16 @@
 import type { Translation } from "./types";
+import { ML_LEGAL } from "./ml.legal";
+import { ML_LANDING, ML_PAGES } from "./ml.pages";
 
-// മലയാളം (Malayalam). DRAFT machine translation, partial: menu, footer, language switcher, forms and errors.
-// Page text shows in English until it is translated. A native Malayalam speaker must check this before launch.
+// മലയാളം (Malayalam). DRAFT machine translation of the whole Normal World (pages in ml.pages.ts, legal in ml.legal.ts).
+// A native Malayalam speaker must check this before launch.
 // Keep {phone}, {email}, {id} and {privacy} as they are. Lists follow the English order.
 
 const translation: Translation = {
+  landing: ML_LANDING,
   content: {
+    ...ML_PAGES,
+    ...ML_LEGAL,
     settings: { tagline: "നിമിഷങ്ങൾ സൃഷ്ടിക്കുന്നു. പുഞ്ചിരി എത്തിക്കുന്നു.", whatsappMessage: "നമസ്കാരം AILU, ഒരു ആഘോഷം പ്ലാൻ ചെയ്യുന്നതിനെക്കുറിച്ച് ചോദിക്കാനുണ്ട്." },
     nav: {
       closeButton: "ഈ നിമിഷത്തിലേക്ക് മടങ്ങുക",

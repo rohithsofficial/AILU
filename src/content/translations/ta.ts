@@ -1,11 +1,16 @@
 import type { Translation } from "./types";
+import { TA_LEGAL } from "./ta.legal";
+import { TA_LANDING, TA_PAGES } from "./ta.pages";
 
-// தமிழ் (Tamil). DRAFT machine translation, partial: menu, footer, language switcher, forms and errors.
-// Page text shows in English until it is translated. A native Tamil speaker must check this before launch.
+// தமிழ் (Tamil). DRAFT machine translation of the whole Normal World (pages in ta.pages.ts, legal in ta.legal.ts).
+// A native Tamil speaker must check this before launch.
 // Keep {phone}, {email}, {id} and {privacy} as they are. Lists follow the English order.
 
 const translation: Translation = {
+  landing: TA_LANDING,
   content: {
+    ...TA_PAGES,
+    ...TA_LEGAL,
     settings: { tagline: "தருணங்களை உருவாக்குகிறோம். புன்னகையைத் தருகிறோம்.", whatsappMessage: "வணக்கம் AILU, ஒரு கொண்டாட்டத்தைத் திட்டமிடுவது பற்றிக் கேட்க விரும்புகிறேன்." },
     nav: {
       closeButton: "இந்தத் தருணத்துக்குத் திரும்பு",

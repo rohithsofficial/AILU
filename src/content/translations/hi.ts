@@ -1,11 +1,16 @@
 import type { Translation } from "./types";
+import { HI_LEGAL } from "./hi.legal";
+import { HI_LANDING, HI_PAGES } from "./hi.pages";
 
-// हिन्दी (Hindi). DRAFT machine translation, partial: menu, footer, language switcher, forms and errors.
-// Page text shows in English until it is translated. A native Hindi speaker must check this before launch.
+// हिन्दी (Hindi). DRAFT machine translation of the whole Normal World (pages in hi.pages.ts, legal in hi.legal.ts).
+// A native Hindi speaker must check this before launch.
 // Keep {phone}, {email}, {id} and {privacy} as they are. Lists follow the English order.
 
 const translation: Translation = {
+  landing: HI_LANDING,
   content: {
+    ...HI_PAGES,
+    ...HI_LEGAL,
     settings: { tagline: "पल बनाते हैं। मुस्कान लाते हैं।", whatsappMessage: "नमस्ते AILU, मैं एक समारोह की योजना के बारे में पूछना चाहता/चाहती हूँ।" },
     nav: {
       closeButton: "इस पल पर लौटें",

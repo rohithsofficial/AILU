@@ -1,11 +1,16 @@
 import type { Translation } from "./types";
+import { TE_LEGAL } from "./te.legal";
+import { TE_LANDING, TE_PAGES } from "./te.pages";
 
-// తెలుగు (Telugu). DRAFT machine translation, partial: menu, footer, language switcher, forms and errors.
-// Page text shows in English until it is translated. A native Telugu speaker must check this before launch.
+// తెలుగు (Telugu). DRAFT machine translation of the whole Normal World (pages in te.pages.ts, legal in te.legal.ts).
+// A native Telugu speaker must check this before launch.
 // Keep {phone}, {email}, {id} and {privacy} as they are. Lists follow the English order.
 
 const translation: Translation = {
+  landing: TE_LANDING,
   content: {
+    ...TE_PAGES,
+    ...TE_LEGAL,
     settings: { tagline: "క్షణాలను సృష్టిస్తాం. చిరునవ్వులను అందిస్తాం.", whatsappMessage: "నమస్తే AILU, ఒక వేడుకను ప్లాన్ చేయడం గురించి అడగాలనుకుంటున్నాను." },
     nav: {
       closeButton: "ఈ క్షణానికి తిరిగి వెళ్ళండి",
