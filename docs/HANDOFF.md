@@ -77,7 +77,9 @@ Rohith chose to build on `feat/languages`, so merge `feat/languages` first, then
 - Save and preview: Next.js draft mode (`/api/admin/cms/preview`), staff only. `getContent()` reads drafts only in preview. A yellow bar on the site offers Back to editor and Exit preview. Public pages stay static.
 - Activity page `/admin/cms/activity` from the audit log. Staff accounts reuse `/admin/settings/staff`.
 - No new package, no migration. Each section now has a `path` in `CMS_SECTIONS` (tested).
-- Checked: lint, server lint, typecheck, 186 tests, build; preview without sign-in goes to login.
+- Fixed while testing: Save and preview now opens with a full page load (`OpenPreview.tsx`), because a form redirect did not keep the preview cookie; the preview bar sits above the WhatsApp button on phones; after Discard, Undo or Restore the form shows the saved wording, not old typing (this was also wrong before); labels like "atAGlance" read "At a glance".
+- Checked: lint, server lint, typecheck, 187 tests, build (public pages still static). Signed in on localhost with the live database at 390px and 1440px: CMS home, editor boxes and counters, Unsaved changes, photo picker window, Save and preview (draft shown, bar shown, no overlap on `/classic` and `/`), Back to editor, Exit preview, Activity, Discard draft. Test drafts were discarded.
+- Not checked: uploading a photo (would go to the real photo store), Publish (would change the live site), a translated section, a real phone.
 
 ## Next steps
 0. Languages: have a native speaker read `/kn/classic` and the other Kannada pages (and a lawyer the Kannada legal pages). Then set `kn` to `checked: true`, merge `feat/languages`, and test CMS editing in Kannada on the live site.

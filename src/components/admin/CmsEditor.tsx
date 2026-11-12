@@ -44,7 +44,8 @@ function Field({ name, value, sample, onChange, media, setMedia, section, englis
     const base = Array.isArray(sample) ? sample : [];
     const fixed = translating || isFixedList(base);
     const englishItems = Array.isArray(english) ? english : [];
-    const one = label.replace(/s$/, "").toLowerCase();
+    // "Steps" → "step"; a name that is not a plural, like "At a glance", → "item".
+    const one = /[^s]s$/.test(label) ? label.slice(0, -1).toLowerCase() : "item";
     const move = (from: number, to: number) => { const next = [...value]; const [item] = next.splice(from, 1); next.splice(to, 0, item); onChange(next); };
     const summary = (item: Json, index: number) => {
       if (typeof item === "string") return item || `Item ${index + 1}`;

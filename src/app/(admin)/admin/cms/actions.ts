@@ -6,8 +6,6 @@ import { actionMessage } from "@/lib/actionMessage";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { can, requireRole } from "@/lib/authz";
-import { CMS_SECTIONS } from "@/content/defaults";
-import { localePath } from "@/lib/i18n";
 import { deleteMedia, discardDraft, parseSectionId, publishSection, restoreDefault, saveDraft, undoPublish, updateMediaAlt } from "@/server/cms";
 
 const message = (error: unknown) => actionMessage(error);
@@ -27,10 +25,10 @@ export async function cmsSectionAction(fd: FormData) {
     const publisher = () => { if (!can(staff.role, "cms.publish")) throw new Error("Your role can save drafts but cannot publish."); };
     if (intent === "save") await saveDraft(staff, key, value());
     else if (intent === "preview") {
-      // Save the draft, then show the real page with it. Visitors still see the live wording.
+      // Save the draft, then the editor page opens the preview with a full page load (OpenPreview),
+      // because the preview cookie must be set by a real browser visit, not inside this form request.
       await saveDraft(staff, key, value());
-      const page = CMS_SECTIONS.find((item) => item.key === section.key)?.path ?? "/classic";
-      preview = `/api/admin/cms/preview?path=${encodeURIComponent(localePath(section.locale, page))}&back=${encodeURIComponent(path)}`;
+      preview = `${path}${path.includes("?") ? "&" : "?"}preview=1`;
     }
     else if (intent === "discard") { await discardDraft(staff, key); done = "Draft removed."; }
     else if (intent === "publish") {

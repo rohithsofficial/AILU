@@ -1,6 +1,6 @@
 // Tests for the CMS editing helpers: preview addresses, the editor "back" link and field length hints.
 import { describe, expect, it } from "vitest";
-import { fieldLimit, safeEditorPath, safePreviewPath } from "@/lib/cms";
+import { fieldLimit, humanise, safeEditorPath, safePreviewPath } from "@/lib/cms";
 import { CMS_SECTIONS } from "@/content/defaults";
 
 describe("safePreviewPath", () => {
@@ -40,5 +40,12 @@ describe("CMS sections", () => {
       if (section.key === "seo") expect(section.path).toBeUndefined();
       else expect(safePreviewPath(section.path, "")).toBe(section.path);
     }
+  });
+});
+
+describe("humanise", () => {
+  it("reads keys with several capitals as words", () => {
+    expect(humanise("atAGlance")).toBe("At a glance");
+    expect(humanise("servicesTitleLine1")).toBe("Services title line 1");
   });
 });

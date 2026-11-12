@@ -9,11 +9,12 @@ import { getSection, listMedia, UNTRANSLATED_SECTIONS } from "@/server/cms";
 import type { Json } from "@/lib/cms";
 import { cmsSectionAction } from "../actions";
 import CmsLanguagePicker from "@/components/admin/CmsLanguagePicker";
+import OpenPreview from "@/components/admin/OpenPreview";
 import { LANGUAGES, localePath, toLocale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
-export default async function CmsSectionPage({ params, searchParams }: { params: { key: string }; searchParams: { msg?: string; lang?: string } }) {
+export default async function CmsSectionPage({ params, searchParams }: { params: { key: string }; searchParams: { msg?: string; lang?: string; preview?: string } }) {
   const staff = await requireRolePage(["OWNER", "MANAGER", "STAFF"]);
   const info = CMS_SECTIONS.find((section) => section.key === params.key);
   if (!info) notFound();
@@ -22,7 +23,10 @@ export default async function CmsSectionPage({ params, searchParams }: { params:
   const id = locale === "en" ? params.key : `${params.key}:${locale}`;
   const [section, media] = await Promise.all([getSection(id), listMedia()]);
   const canPublish = can(staff.role, "cms.publish") && (!section.info.ownerPublish || staff.role === "OWNER");
+  const editor = `/admin/cms/${params.key}${locale === "en" ? "" : `?lang=${locale}`}`;
+  const previewHref = info.path ? `/api/admin/cms/preview?path=${encodeURIComponent(localePath(locale, info.path))}&back=${encodeURIComponent(editor)}` : null;
   return <div className="mx-auto max-w-4xl">
+    {searchParams.preview === "1" && previewHref ? <OpenPreview href={previewHref} /> : null}
     <Link href={locale === "en" ? "/admin/cms" : `/admin/cms?lang=${locale}`} className="text-sm text-ailu-cream/60 hover:underline">← Website CMS</Link>
     <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
       <h1 className="font-display text-2xl font-bold">{section.info.label}{locale !== "en" ? ` · ${LANGUAGES[locale].english}` : ""}</h1>
@@ -34,6 +38,8 @@ export default async function CmsSectionPage({ params, searchParams }: { params:
     {searchParams.msg ? <p role="status" className="mt-4 rounded-lg border border-ailu-yellow/30 bg-ailu-yellow/10 p-3 text-sm">{searchParams.msg}</p> : null}
     <p className="mt-4 rounded-lg border border-white/10 p-3 text-xs leading-relaxed text-ailu-cream/60">Publish only true information: no made-up prices, reviews, rewards or availability, and never a person&apos;s dream or story. Write {"{phone}"} or {"{email}"} to use your Contact details.</p>
     <CmsEditor
+      // A new key when the saved wording changes (after Discard, Undo or Restore), so the form shows it, not old typing.
+      key={JSON.stringify(section.value)}
       sectionKey={id}
       english={section.english as Json | null}
       initial={section.value as Json}

@@ -85,7 +85,7 @@ const WORDS: Record<string, string> = { eyebrow: "small heading", seo: "SEO", ct
 
 /** Turns a key like servicesTitleLine1 into "Services title line 1". */
 export function humanise(key: string) {
-  const words = key.replace(/([a-z])([A-Z0-9])/g, "$1 $2").split(" ").map((word) => WORDS[word.toLowerCase()] ?? word.toLowerCase());
+  const words = key.replace(/([a-z])([A-Z0-9])/g, "$1 $2").replace(/([A-Z])([A-Z][a-z])/g, "$1 $2").split(" ").map((word) => WORDS[word.toLowerCase()] ?? word.toLowerCase());
   const text = words.join(" ");
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
