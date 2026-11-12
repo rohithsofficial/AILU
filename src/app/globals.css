@@ -25,12 +25,14 @@ h1, h2, h3 { font-family: var(--font-poppins), system-ui, sans-serif; }
 @media (max-width: 639px) {
   /* Words in Indian scripts are long, so big phone headings and the top bar need room to wrap. */
   .i18n-script h1 { font-size: min(2rem, 8.5vw) !important; max-width: none !important; }
+  .i18n-script [data-world-switch] svg { display: none; }
   .i18n-script [data-world-switch] { white-space: normal; max-width: 7.5rem; text-align: center; font-size: 11px; line-height: 1.15 !important; overflow-wrap: anywhere; }
 }
 /* Very small phones: with the language button in the top bar, the world button may wrap onto two lines.
    Without the language button (no checked translation yet) nothing changes. */
 @media (max-width: 399px) {
   header:has([data-lang-switch]) [data-world-switch] { white-space: normal; max-width: 6.25rem; text-align: center; line-height: 1.15; }
+  header:has([data-lang-switch]) [data-world-switch] svg { display: none; }
 }
 :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
 .skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 100; transform: translateY(-180%); border-radius: .5rem; background: var(--yellow); color: var(--black); padding: .75rem 1rem; font-weight: 700; }

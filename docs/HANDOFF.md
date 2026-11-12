@@ -38,6 +38,7 @@ Rohith is sharing feedback from a friend, one point at a time. For each point: f
 | 6 | Too much gap between sections | Same branch: phone spacing about 36px above and below each section on all public pages and `/celebrate`; desktop unchanged. Measured at 390px: gaps from 125–160px down to under 100px on most pages |
 | 7 | The "right people" table looks off | Same branch: number and name on one line, no empty boxes |
 | 8 | Few people click Enter AILU World | Same branch, Rohith chose icon + tour card: a turning 360° icon on the button (`World360Icon.tsx`), a "Take the 360° tour" card under the top section (`WorldTourCard.tsx`, wording in CMS Home sections, draft translations), and three lines on the phone menu button |
+| 9 | Intro: make the AILU World exciting, and do not show the intro every time | On `release/website`: the world choice is a glowing card with a 360° icon, badge and a line about what waits inside; the intro plays on a first visit, then again after 30 days |
 
 ## Work on 2026-11-08 (branch `claude/new-session-x8qhdu`, merged to `main` on 2026-11-12)
 Full report: `docs/REPORT_2026-11-08.md`.
@@ -88,6 +89,12 @@ Rohith chose to build on `feat/languages`, so merge `feat/languages` first, then
 - Fixed while testing: Save and preview now opens with a full page load (`OpenPreview.tsx`), because a form redirect did not keep the preview cookie; the preview bar sits above the WhatsApp button on phones; after Discard, Undo or Restore the form shows the saved wording, not old typing (this was also wrong before); labels like "atAGlance" read "At a glance".
 - Checked: lint, server lint, typecheck, 187 tests, build (public pages still static). Signed in on localhost with the live database at 390px and 1440px: CMS home, editor boxes and counters, Unsaved changes, photo picker window, Save and preview (draft shown, bar shown, no overlap on `/classic` and `/`), Back to editor, Exit preview, Activity, Discard draft. Test drafts were discarded.
 - Not checked: uploading a photo (would go to the real photo store), Publish (would change the live site), a translated section, a real phone.
+
+## One branch for the whole website (2026-11-12): `release/website`
+Rohith asked for everything in one branch before merging to main. `release/website` = `fix/home-feedback` (which contains `feat/languages`) + `feat/cms-easy-editing` + the intro update. Merge only this branch into `main`.
+- Draft languages are hidden on the live site until a native speaker checks them (`checked: true` in `src/lib/i18n.ts`). To see them locally, build and start with `NEXT_PUBLIC_SHOW_DRAFT_LANGUAGES=true`.
+- Phone top bar: below 400px the menu button shows three lines only, and with the language button the 360° icon hides, so the bar fits at 320px in all six languages.
+- Checked: lint, server lint, typecheck, 190 tests, build; intro first visit and a returning new session (no intro, world starts); top bar 320 to 1440px in all six languages. Not checked: a real phone, the live site.
 
 ## Next steps
 0. Languages: have a native speaker check each language (start with Kannada at `/kn/classic`), and a lawyer the translated legal pages. Mark each checked language `checked: true` in `src/lib/i18n.ts`, merge `feat/languages` with Rohith's OK, and test CMS editing in one language on the live site.

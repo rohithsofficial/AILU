@@ -108,9 +108,10 @@ export default function Navbar() {
             onClick={() => setOpen((value) => !value)}
             className="group inline-flex min-h-12 items-center gap-2 rounded-full border border-ailu-yellow/50 px-2 py-1.5 min-[400px]:px-3 text-sm font-semibold text-ailu-cream transition-colors hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ailu-yellow sm:gap-3 sm:px-5"
           >
-            {/* Three lines on phones, so the button clearly reads as a menu. Desktop shows the word "Explore". */}
+            {/* Three lines on phones, so the button clearly reads as a menu. Desktop shows the word "Explore".
+                Below 400px only the lines show, so the top bar fits on the smallest phones. */}
             <svg aria-hidden viewBox="0 0 20 14" className="h-3.5 w-5 shrink-0 text-ailu-yellow sm:hidden"><path d="M1 1h18M1 7h18M1 13h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-            <span className="relative block h-6 w-7 overflow-hidden min-[400px]:h-8 min-[400px]:w-10">
+            <span className="relative hidden h-8 w-10 overflow-hidden min-[400px]:block">
               <Image src={BRAND.hand} alt="" fill sizes="40px" className="object-contain transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110" />
             </span>
             <span className="hidden sm:inline">{open ? ui.nav.close : ui.nav.explore}</span>
