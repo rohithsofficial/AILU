@@ -3,7 +3,9 @@
 This file lets work continue on any computer. Claude reads it at the start of a session and updates it at the end.
 Never put passwords, keys or connection strings here. This file goes to GitHub.
 
-Last updated: 2026-11-12 (languages)
+Last updated: 2026-11-12 (end of day)
+
+**Start here:** work continues on branch `release/website`. Read `docs/SESSION_LOG_2026-11-12.md` for today and the unfinished tasks (language suggestion, analytics and pixels, SEO keywords, A to Z growth guide).
 
 ## Owner
 Rohith. Freelance developer. Often sends voice-typed messages, so read for the meaning. Use simple English and short sentences.
