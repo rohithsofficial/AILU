@@ -8,7 +8,7 @@ Short snapshot only. Full details, setup steps and notes are in `docs/HANDOFF.md
 - `main` has all finished work: CRM, two worlds, CMS, speed work and the first two feedback fixes.
 - The public site is still hidden by `COMING_SOON=true`. The CRM and CMS are live.
 
-## Latest work (2026-11-08, branch `claude/new-session-x8qhdu`)
+## Latest work (2026-11-08, branch `claude/new-session-x8qhdu`, merged to `main` on 2026-11-12)
 - World: dragging turns left and right only (no more blank sky or floor). Rooms show named, tappable steps.
 - New landing page `/celebrate` with an A/B test. Results in CRM → A/B test.
 - `/privacy` fixed on phones. Report: `docs/REPORT_2026-11-08.md`. Ideas: `docs/IMPROVEMENT_IDEAS.md`.

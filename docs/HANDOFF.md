@@ -3,7 +3,7 @@
 This file lets work continue on any computer. Claude reads it at the start of a session and updates it at the end.
 Never put passwords, keys or connection strings here. This file goes to GitHub.
 
-Last updated: 2026-11-08
+Last updated: 2026-11-12
 
 ## Owner
 Rohith. Freelance developer. Often sends voice-typed messages, so read for the meaning. Use simple English and short sentences.
@@ -32,10 +32,10 @@ Rohith is sharing feedback from a friend, one point at a time. For each point: f
 |---|---|---|
 | 1 | Tapping small dots is hard, add left and right swipe | Done, on `main`: home story swipe, quick flick in world rooms, hints on both. Not tested on a real phone |
 | 2 | Explore menu options seem to do nothing | Done, on `main`: a slow database can no longer hold up a page, and website pages show a loading screen. Rohith still needs to confirm the menu |
-| 3 | In the world, moving up or down shows a blank page | Done on `claude/new-session-x8qhdu`: `levelView.ts` keeps the view level, drag turns left and right only |
-| 4 | Each world step should show what it is | Done on `claude/new-session-x8qhdu`: step bar with room name, "Step 2 of 5", named chips and "Next: ..." (`worldSteps.ts`) |
+| 3 | In the world, moving up or down shows a blank page | Done, on `main`: `levelView.ts` keeps the view level, drag turns left and right only |
+| 4 | Each world step should show what it is | Done, on `main`: step bar with room name, "Step 2 of 5", named chips and "Next: ..." (`worldSteps.ts`) |
 
-## Work on 2026-11-08 (branch `claude/new-session-x8qhdu`, not merged yet)
+## Work on 2026-11-08 (branch `claude/new-session-x8qhdu`, merged to `main` on 2026-11-12)
 Full report: `docs/REPORT_2026-11-08.md`.
 - Health check: lint, typecheck, 139 tests and build pass. `npm audit` has 1 critical and 4 high advisories (Next 14, zod 3, @vercel/blob). Upgrade waits for Rohith.
 - World: level view and named steps (feedback 3 and 4 above).
@@ -53,8 +53,11 @@ Full report: `docs/CODE_REVIEW_2026-11-08.md`. Code map: `docs/CODE_MAP.md`.
 - Every source file now starts with a comment saying what it is for.
 - 150 tests pass. Lint, typecheck and build pass.
 
+## Review and merge on 2026-11-12
+Reviewed `claude/new-session-x8qhdu`: no new package, no migration, no change to the generated world files, landing wording matches the site. Lint, server lint, typecheck, 150 tests and build pass. `/celebrate` (A and B), `/privacy`, `/classic`, `/events` checked at 390px and `/celebrate` and `/` at 1440px: no sideways scroll, no console errors. Fast-forward merged to `main`. Not checked: a real enquiry save and `/admin/experiments` signed in (no database here), the world on a real phone.
+
 ## Next steps
-1. Review and merge `claude/new-session-x8qhdu`. Then send one test enquiry from `/celebrate?v=b` (leave Expected guests empty) and check CRM → A/B test. Try a name search in CRM → Inbox and Clients.
+1. Send one test enquiry from `/celebrate?v=b` (leave Expected guests empty) and check CRM → A/B test, Note: that test enquiry counts as one version B result (results come from the saved notes), so subtract it, or change `LANDING_TEST.id` before real traffic starts. Try a name search in CRM → Inbox and Clients.
 2. Try the world on a real phone: drag up and down, tap the step chips.
 3. Answer the questions at the end of `docs/IMPROVEMENT_IDEAS.md`.
 4. Continue the feedback round: Rohith sends the next point.
