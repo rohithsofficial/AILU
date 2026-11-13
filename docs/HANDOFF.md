@@ -102,6 +102,8 @@ Rohith asked for everything in one branch before merging to main. `release/websi
 ## Vercel setting (2026-11-13)
 `NEXT_PUBLIC_SHOW_DRAFT_LANGUAGES=true` is set for **Preview only**. Preview links show the language switch with all drafts; the live site shows only checked languages. Preview links need a Vercel login; to let a tester in, use the Share button in the Vercel toolbar on the preview page.
 
+**Testing link for friends and testers:** branch `testing` always matches `main`. Its preview, https://worldofailu-git-testing-rohithofficial99.vercel.app, shows the language switch. After every merge to `main`, update it with `git push origin main:testing` (never edit `testing` directly). The `worldofailu-git-main-…` address follows the live build, so it does not show draft languages.
+
 ## Next steps
 0. Languages: have a native speaker check each language (start with Kannada at `/kn/classic`), and a lawyer the translated legal pages. Mark each checked language `checked: true` in `src/lib/i18n.ts`, merge `feat/languages` with Rohith's OK, and test CMS editing in one language on the live site.
 1. Send one test enquiry from `/celebrate?v=b` (leave Expected guests empty) and check CRM → A/B test, Note: that test enquiry counts as one version B result (results come from the saved notes), so subtract it, or change `LANDING_TEST.id` before real traffic starts. Try a name search in CRM → Inbox and Clients.
