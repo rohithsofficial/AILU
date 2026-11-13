@@ -41,6 +41,7 @@ Rohith is sharing feedback from a friend, one point at a time. For each point: f
 | 7 | The "right people" table looks off | Same branch: number and name on one line, no empty boxes |
 | 8 | Few people click Enter AILU World | Same branch, Rohith chose icon + tour card: a turning 360° icon on the button (`World360Icon.tsx`), a "Take the 360° tour" card under the top section (`WorldTourCard.tsx`, wording in CMS Home sections, draft translations), and three lines on the phone menu button |
 | 9 | Intro: make the AILU World exciting, and do not show the intro every time | On `release/website`: the world choice is a glowing card with a 360° icon, badge and a line about what waits inside; the intro plays on a first visit, then again after 30 days |
+| 10 | Phone overflow: top bar and Explore menu wider than the screen (seen on a 412px Android) | Branch `fix/mobile-overflow`: on phones the language button shows only the globe, the menu button only the three lines, and the 360° icon hides when the language button is there. Scanned 320–768px: home and menu in all six languages, every website page in English and Kannada, the world and the login: all fit |
 
 ## Work on 2026-11-08 (branch `claude/new-session-x8qhdu`, merged to `main` on 2026-11-12)
 Full report: `docs/REPORT_2026-11-08.md`.
@@ -97,6 +98,9 @@ Rohith asked for everything in one branch before merging to main. `release/websi
 - Draft languages are hidden on the live site until a native speaker checks them (`checked: true` in `src/lib/i18n.ts`). To see them locally, build and start with `NEXT_PUBLIC_SHOW_DRAFT_LANGUAGES=true`.
 - Phone top bar: below 400px the menu button shows three lines only, and with the language button the 360° icon hides, so the bar fits at 320px in all six languages.
 - Checked: lint, server lint, typecheck, 190 tests, build; intro first visit and a returning new session (no intro, world starts); top bar 320 to 1440px in all six languages. Not checked: a real phone, the live site.
+
+## Vercel setting (2026-11-13)
+`NEXT_PUBLIC_SHOW_DRAFT_LANGUAGES=true` is set for **Preview only**. Preview links show the language switch with all drafts; the live site shows only checked languages. Preview links need a Vercel login; to let a tester in, use the Share button in the Vercel toolbar on the preview page.
 
 ## Next steps
 0. Languages: have a native speaker check each language (start with Kannada at `/kn/classic`), and a lawyer the translated legal pages. Mark each checked language `checked: true` in `src/lib/i18n.ts`, merge `feat/languages` with Rohith's OK, and test CMS editing in one language on the live site.
