@@ -5,7 +5,7 @@ Never put passwords, keys or connection strings here. This file goes to GitHub.
 
 Last updated: 2026-11-13
 
-**Start here:** everything from `release/website` is merged to `main` (2026-11-13). Start new work on a new branch from `main`. Unfinished tasks (language suggestion, analytics and pixels, SEO keywords, A to Z growth guide) are in `docs/SESSION_LOG_2026-11-12.md`.
+**Start here:** read `docs/PROJECT_STATUS.md`, then the latest `docs/SESSION_LOG_*.md` (2026-11-13). Unfinished task plans are in `docs/SESSION_LOG_2026-11-12.md`. New work: a new branch from `main`, checked on its preview link before merging.
 
 ## Owner
 Rohith. Freelance developer. Often sends voice-typed messages, so read for the meaning. Use simple English and short sentences.
