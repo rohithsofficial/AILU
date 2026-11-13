@@ -4,7 +4,7 @@ Read this with `CLAUDE.md` and `docs/HANDOFF.md` to continue on any computer.
 Owner: Rohith. Simple English, short sentences.
 
 ## The one branch
-**`release/website`** has everything not yet on `main`. Merge only this branch into `main` when Rohith says so.
+**`release/website`** has everything not yet on `main`. Merged into `main` on 2026-11-13, with Rohith's OK.
 It contains `feat/languages`, `feat/cms-easy-editing` and `fix/home-feedback`. No other branch has missing work.
 Merging to `main` makes it live on Vercel (public site still hidden by `COMING_SOON`).
 
